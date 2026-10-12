@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.DirectionsRun
 import androidx.compose.material.icons.automirrored.rounded.DirectionsWalk
+import androidx.compose.material.icons.rounded.FitnessCenter
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -42,6 +43,7 @@ import com.rave.app.ui.theme.TileColor
 @Composable
 fun ActivityPickerSheet(
     onPick: (ActivityType) -> Unit,
+    onWorkout: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     ModalBottomSheet(
@@ -81,6 +83,13 @@ fun ActivityPickerSheet(
                     icon = Icons.AutoMirrored.Rounded.DirectionsRun,
                     tile = RaveTheme.colors.tilePeach,
                     onClick = { onPick(ActivityType.RUN) },
+                    modifier = Modifier.weight(1f),
+                )
+                PickerCard(
+                    title = stringResource(R.string.activity_workout),
+                    icon = Icons.Rounded.FitnessCenter,
+                    tile = RaveTheme.colors.tilePink,
+                    onClick = onWorkout,
                     modifier = Modifier.weight(1f),
                 )
             }

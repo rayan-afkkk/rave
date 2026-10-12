@@ -14,6 +14,8 @@ enum class HabitType {
     TIMED,
     /** Auto-completed by a tracked walk/run that meets the goal. */
     ACTIVITY,
+    /** Auto-completed by finishing a strength workout (target = number of working sets, min 1). */
+    WORKOUT,
 }
 
 /** When a habit is due. */
@@ -32,7 +34,7 @@ enum class HabitColor { PEACH, GREEN, PINK, BLUE }
 enum class ActivityGoalUnit { METERS, MINUTES }
 
 /** Where a habit log came from. */
-enum class LogSource { MANUAL, GPS, AUTO }
+enum class LogSource { MANUAL, GPS, AUTO, WORKOUT }
 
 data class HabitSchedule(
     val type: ScheduleType = ScheduleType.EVERY_DAY,

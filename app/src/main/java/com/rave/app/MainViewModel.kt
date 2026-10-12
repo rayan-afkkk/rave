@@ -25,7 +25,12 @@ class MainViewModel @Inject constructor(
     settings: SettingsRepository,
     private val tracking: TrackingManager,
     private val deepLinks: DeepLinkHandler,
+    workouts: com.rave.app.data.repository.WorkoutRepository,
 ) : ViewModel() {
+    /** Unfinished strength workout (drives the "Workout in progress" banner). */
+    val activeWorkout: StateFlow<com.rave.app.data.local.entity.WorkoutEntity?> =
+        workouts.observeActiveWorkout().stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
     val themeMode: StateFlow<ThemeMode> = settings.themeMode
         .stateIn(viewModelScope, SharingStarted.Eagerly, ThemeMode.SYSTEM)
 

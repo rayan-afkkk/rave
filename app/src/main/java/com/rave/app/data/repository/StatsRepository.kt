@@ -45,6 +45,7 @@ class StatsRepository @Inject constructor(
     private val statsDao: StatsDao,
     private val time: TimeProvider,
     private val notifier: Notifier,
+    private val workoutDao: com.rave.app.data.local.dao.WorkoutDao,
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
     fun observeProfileStats(): Flow<ProfileStats> = time.todayFlow.flatMapLatest { today ->
@@ -55,6 +56,7 @@ class StatsRepository @Inject constructor(
             logDao.observeCompletedCount(),
             logDao.observeCompletedCountBetween(weekStart.toEpochDay(), today.toEpochDay()),
         ) { activities, allDone, weekDone -> Triple(activities, allDone, weekDone) }
+        val sets = combine(workoutDao.observeWorkingSetCount(), workoutDao.observeWorkingSetCountSince(weekStartMs)) { all, week -> all to week }
         val streaksAndRest = combine(
             statsDao.observeStreaks(),
             statsDao.observeFreezes(),
@@ -62,19 +64,19 @@ class StatsRepository @Inject constructor(
             statsDao.observeWins(),
         ) { streaks, freezes, badges, wins -> Quad(streaks, freezes?.count ?: 0, badges, wins) }
 
-        combine(activitiesAndLogs, streaksAndRest) { (activities, allDone, weekDone), (streaks, freezes, badges, wins) ->
+        combine(activitiesAndLogs, streaksAndRest, sets) { (activities, allDone, weekDone), (streaks, freezes, badges, wins), (setsAll, setsWeek) ->
             val total = activities.sumOf { it.distanceM }
             val week = activities.filter { it.startTime >= weekStartMs }.sumOf { it.distanceM }
             val weekWins = wins.count { it.wonAt >= weekStartMs }
             val overall = streaks.firstOrNull { it.habitId == StreakEntity.OVERALL }
-            val pointsTotal = Points.compute(allDone, total, wins.size)
+            val pointsTotal = Points.compute(allDone, total, wins.size, setsAll)
             ProfileStats(
                 totalDistanceM = total,
                 weekDistanceM = week,
                 totalActivities = activities.size,
                 currentStreak = overall?.current ?: 0,
                 bestStreak = streaks.maxOfOrNull { it.best } ?: 0,
-                pointsThisWeek = Points.compute(weekDone, week, weekWins),
+                pointsThisWeek = Points.compute(weekDone, week, weekWins, setsWeek),
                 pointsTotal = pointsTotal,
                 level = Points.level(pointsTotal),
                 levelProgress = Points.levelProgress(pointsTotal),
@@ -100,6 +102,8 @@ class StatsRepository @Inject constructor(
             totalHabitCompletions = logDao.observeCompletedCount().first(),
             competitionWins = statsDao.observeWins().first().size,
             invitesAccepted = userStats.invitesAccepted,
+            workouts = workoutDao.finishedWorkouts().size,
+            workingSets = workoutDao.allWorkingSets().size,
         )
         val already = statsDao.getBadges().map { it.id }.toSet()
         val newOnes = BadgeEvaluator.earned(inputs).filter { it.name !in already }

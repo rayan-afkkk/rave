@@ -171,3 +171,55 @@ data class CompetitionWinEntity(
     val name: String,
     val wonAt: Long,
 )
+
+// ---- Strength workouts (set tracker) ----
+
+@Entity(tableName = "exercises", indices = [Index(value = ["name"], unique = true)])
+data class ExerciseEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val name: String,
+    val muscle: com.rave.app.domain.workout.MuscleGroup,
+    val kind: com.rave.app.domain.workout.ExerciseKind,
+    val custom: Boolean = false,
+    val archived: Boolean = false,
+)
+
+/** A workout session. [endTime] == null means it's still in progress (survives process death). */
+@Entity(tableName = "workouts", indices = [Index("startTime")])
+data class WorkoutEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val name: String = "",
+    val note: String = "",
+    val startTime: Long,
+    val endTime: Long? = null,
+    val totalVolumeKg: Double = 0.0,
+    val workingSets: Int = 0,
+    /** Number of exercise PRs set in this workout. */
+    val prCount: Int = 0,
+    /** "exerciseId:TAG|TAG;exerciseId:TAG" — see WorkoutRepository. */
+    val prTags: String = "",
+)
+
+@Entity(
+    tableName = "workout_sets",
+    foreignKeys = [
+        ForeignKey(entity = WorkoutEntity::class, parentColumns = ["id"], childColumns = ["workoutId"], onDelete = ForeignKey.CASCADE),
+        ForeignKey(entity = ExerciseEntity::class, parentColumns = ["id"], childColumns = ["exerciseId"], onDelete = ForeignKey.CASCADE),
+    ],
+    indices = [Index("workoutId"), Index("exerciseId")],
+)
+data class WorkoutSetEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val workoutId: Long,
+    val exerciseId: Long,
+    /** Position of the exercise within the workout (exercises keep the order they were added). */
+    val exerciseOrder: Int,
+    /** Position of the set within the exercise. */
+    val setOrder: Int,
+    val weightKg: Double = 0.0,
+    val reps: Int = 0,
+    val durationS: Int = 0,
+    val warmup: Boolean = false,
+    val done: Boolean = false,
+    val completedAt: Long? = null,
+)

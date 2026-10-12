@@ -31,6 +31,7 @@ class DataExporter @Inject constructor(
     private val pointDao: LocationPointDao,
     private val zoneDao: PrivacyZoneDao,
     private val statsDao: StatsDao,
+    private val workoutDao: com.rave.app.data.local.dao.WorkoutDao,
 ) {
     suspend fun exportTo(uri: Uri): Boolean = withContext(Dispatchers.IO) {
         runCatching {
@@ -87,6 +88,23 @@ class DataExporter @Inject constructor(
         })
         root.put("privacyZones", JSONArray().apply {
             zoneDao.getAll().forEach { z -> put(JSONObject().apply { put("label", z.label); put("lat", z.lat); put("lng", z.lng); put("radiusM", z.radiusM) }) }
+        })
+        val exercises = workoutDao.allExercises().associateBy { it.id }
+        root.put("workouts", JSONArray().apply {
+            workoutDao.finishedWorkouts().forEach { w ->
+                put(JSONObject().apply {
+                    put("id", w.id); put("name", w.name); put("note", w.note); put("startTime", w.startTime); put("endTime", w.endTime ?: JSONObject.NULL)
+                    put("totalVolumeKg", w.totalVolumeKg); put("workingSets", w.workingSets)
+                    put("sets", JSONArray().apply {
+                        workoutDao.sets(w.id).filter { it.done }.forEach { st ->
+                            put(JSONObject().apply {
+                                put("exercise", exercises[st.exerciseId]?.name ?: ""); put("weightKg", st.weightKg); put("reps", st.reps)
+                                put("durationS", st.durationS); put("warmup", st.warmup)
+                            })
+                        }
+                    })
+                })
+            }
         })
         root.put("badges", JSONArray().apply {
             statsDao.getBadges().forEach { b -> put(JSONObject().apply { put("id", b.id); put("earnedAt", b.earnedAt) }) }

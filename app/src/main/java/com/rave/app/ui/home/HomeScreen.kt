@@ -444,6 +444,7 @@ private fun trailingLabel(item: HabitItem, unit: com.rave.app.domain.model.Dista
             else "${Format.distance(h.target.toDouble(), unit, 1)} ${unitLabel(unit)}"
         HabitType.COUNTER -> "${h.target} ${h.unit.orEmpty()}".trim()
         HabitType.CHECKBOX -> ""
+        HabitType.WORKOUT -> pluralStringResource(R.plurals.habit_workout_target, h.target, h.target)
     }
 }
 
@@ -456,6 +457,9 @@ private fun habitSubtitle(item: HabitItem, unit: com.rave.app.domain.model.Dista
         val progress = if (h.activityGoalUnit == ActivityGoalUnit.MINUTES) stringResource(R.string.minutes_short, item.value)
             else "${Format.distance(item.value.toDouble(), unit, 1)} ${unitLabel(unit)}"
         parts += if (item.completed) stringResource(R.string.habit_sub_auto_gps, progress) else progress
+    } else if (h.type == HabitType.WORKOUT && item.value > 0) {
+        parts += if (item.completed) stringResource(R.string.habit_sub_auto_workout, item.value)
+            else stringResource(R.string.habit_sub_workout_progress, item.value, h.target)
     } else when (h.type) {
         HabitType.COUNTER -> parts += stringResource(R.string.habit_sub_counter, item.value, h.target, h.unit.orEmpty()).trim()
         HabitType.TIMED -> if (item.value > 0 && !item.completed) parts += stringResource(R.string.habit_sub_timed, item.value, h.target)

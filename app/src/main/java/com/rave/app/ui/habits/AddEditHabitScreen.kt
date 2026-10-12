@@ -214,20 +214,21 @@ fun AddEditHabitScreen(
                     HabitType.COUNTER to R.string.habit_type_counter,
                     HabitType.TIMED to R.string.habit_type_timed,
                     HabitType.ACTIVITY to R.string.habit_type_activity,
+                    HabitType.WORKOUT to R.string.habit_type_workout,
                 )
-                SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                    types.forEachIndexed { i, (type, label) ->
-                        SegmentedButton(
-                            selected = form.type == type,
-                            onClick = { viewModel.edit { it.copy(type = type) } },
-                            shape = SegmentedButtonDefaults.itemShape(i, types.size),
-                            icon = {},
-                            label = { Text(stringResource(label), maxLines = 1, style = MaterialTheme.typography.labelMedium) },
-                        )
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    types.forEach { (type, label) ->
+                        PillChip(form.type == type, stringResource(label), { viewModel.edit { it.copy(type = type) } })
                     }
                 }
                 Spacer(Modifier.height(12.dp))
                 when (form.type) {
+                    HabitType.WORKOUT -> Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        NumberField(form.workoutSets, { v -> viewModel.edit { it.copy(workoutSets = v) } },
+                            R.string.habit_workout_min_sets, state.goalError, Modifier.fillMaxWidth())
+                        Text(stringResource(R.string.habit_type_workout_help), style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                     HabitType.CHECKBOX -> Text(stringResource(R.string.habit_type_check_help), style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                     HabitType.COUNTER -> Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {

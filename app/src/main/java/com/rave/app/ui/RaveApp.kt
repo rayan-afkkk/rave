@@ -56,6 +56,9 @@ import com.rave.app.ui.navigation.OnboardingRoute
 import com.rave.app.ui.navigation.RaveNavHost
 import com.rave.app.ui.navigation.SharedStreaksRoute
 import com.rave.app.ui.navigation.TopLevelDestination
+import com.rave.app.ui.navigation.WorkoutRoute
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.FitnessCenter
 import com.rave.app.ui.theme.PillShape
 import com.rave.app.ui.tracking.ActivityPickerSheet
 
@@ -84,6 +87,12 @@ fun RaveApp(viewModel: MainViewModel, navController: NavHostController = remembe
     val pendingInvite by viewModel.pendingInvite.collectAsStateWithLifecycle()
     val onboardingDone by viewModel.onboardingDone.collectAsStateWithLifecycle()
 
+    val activeWorkout by viewModel.activeWorkout.collectAsStateWithLifecycle()
+    val onWorkout = currentDestination?.hierarchy?.any { it.hasRoute(WorkoutRoute::class) } == true
+    val startWorkout: () -> Unit = {
+        showPicker = false
+        navController.navigate(WorkoutRoute) { launchSingleTop = true }
+    }
     val startActivity: (ActivityType) -> Unit = { type ->
         showPicker = false
         navController.navigate(LiveTrackingRoute(tracking.type.takeIf { tracking.isTracking }?.name ?: type.name)) { launchSingleTop = true }
@@ -126,6 +135,7 @@ fun RaveApp(viewModel: MainViewModel, navController: NavHostController = remembe
             startDestination = HomeRoute,
             contentPadding = contentPadding,
             onStartActivity = startActivity,
+            onStartWorkout = startWorkout,
         )
 
         AnimatedVisibility(
@@ -144,10 +154,12 @@ fun RaveApp(viewModel: MainViewModel, navController: NavHostController = remembe
         // "Walk in progress" banner when tracking runs in the background.
         if (tracking.isTracking && !onTracking) {
             TrackingBanner(tracking, Modifier.align(Alignment.TopCenter)) { startActivity(tracking.type) }
+        } else if (activeWorkout != null && !onWorkout && !onOnboarding) {
+            WorkoutBanner(Modifier.align(Alignment.TopCenter), onClick = startWorkout)
         }
 
         if (showPicker) {
-            ActivityPickerSheet(onPick = startActivity, onDismiss = { showPicker = false })
+            ActivityPickerSheet(onPick = startActivity, onWorkout = startWorkout, onDismiss = { showPicker = false })
         }
     }
 }
@@ -169,6 +181,24 @@ private fun TrackingBanner(state: TrackingState, modifier: Modifier, onClick: ()
                     Format.distance(state.distanceM, DistanceUnit.KM), Format.duration(state.elapsedMs / 1000)),
                 style = MaterialTheme.typography.labelLarge, modifier = Modifier.weight(1f),
             )
+            Text(stringResource(R.string.tracking_banner_return), style = MaterialTheme.typography.labelLarge)
+        }
+    }
+}
+
+@Composable
+private fun WorkoutBanner(modifier: Modifier, onClick: () -> Unit) {
+    Surface(
+        onClick = onClick,
+        shape = PillShape,
+        color = MaterialTheme.colorScheme.secondary,
+        contentColor = MaterialTheme.colorScheme.onSecondary,
+        modifier = modifier.statusBarsPadding().padding(top = 8.dp, start = 16.dp, end = 16.dp).fillMaxWidth(),
+    ) {
+        Row(Modifier.padding(horizontal = 18.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Rounded.FitnessCenter, null)
+            Spacer(Modifier.width(10.dp))
+            Text(stringResource(R.string.workout_banner), style = MaterialTheme.typography.labelLarge, modifier = Modifier.weight(1f))
             Text(stringResource(R.string.tracking_banner_return), style = MaterialTheme.typography.labelLarge)
         }
     }

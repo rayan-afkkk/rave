@@ -112,7 +112,7 @@ class SharedStreakRepository @Inject constructor(
         if (habitDao.getBySharedStreak(id) == null) {
             val habit = Habit(
                 name = shared.habitName, icon = shared.icon, color = shared.color,
-                type = if (shared.type == HabitType.ACTIVITY) HabitType.CHECKBOX else shared.type,
+                type = if (shared.type == HabitType.ACTIVITY || shared.type == HabitType.WORKOUT) HabitType.CHECKBOX else shared.type,
                 target = shared.target, sharedStreakId = id, sharedWithName = shared.friendName(me),
                 createdDate = time.today(),
             )

@@ -33,6 +33,9 @@ import com.rave.app.ui.settings.PrivacyZonesScreen
 import com.rave.app.ui.settings.SettingsScreen
 import com.rave.app.ui.share.ShareActivityScreen
 import com.rave.app.ui.tracking.LiveTrackingScreen
+import com.rave.app.ui.workout.WorkoutDetailScreen
+import com.rave.app.ui.workout.WorkoutHistoryScreen
+import com.rave.app.ui.workout.WorkoutScreen
 
 @Composable
 fun RaveNavHost(
@@ -40,6 +43,7 @@ fun RaveNavHost(
     startDestination: Any,
     contentPadding: PaddingValues,
     onStartActivity: (ActivityType) -> Unit,
+    onStartWorkout: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val back: () -> Unit = { navController.popBackStack() }
@@ -64,7 +68,11 @@ fun RaveNavHost(
             )
         }
         composable<RoutesRoute> {
-            RoutesScreen(contentPadding = contentPadding, onOpenActivity = { navController.navigate(ActivitySummaryRoute(it)) })
+            RoutesScreen(
+                contentPadding = contentPadding,
+                onOpenActivity = { navController.navigate(ActivitySummaryRoute(it)) },
+                onOpenWorkouts = { navController.navigate(WorkoutHistoryRoute) },
+            )
         }
         composable<FriendsRoute> {
             FriendsScreen(
@@ -119,6 +127,17 @@ fun RaveNavHost(
             )
         }
         composable<ShareActivityRoute> { ShareActivityScreen(onBack = back) }
+
+        // ---- Strength workouts ----
+        composable<WorkoutRoute> {
+            WorkoutScreen(onBack = back, onFinished = { id ->
+                navController.navigate(WorkoutDetailRoute(id, isNew = true)) { popUpTo<WorkoutRoute> { inclusive = true } }
+            })
+        }
+        composable<WorkoutDetailRoute> { WorkoutDetailScreen(onClose = back) }
+        composable<WorkoutHistoryRoute> {
+            WorkoutHistoryScreen(onBack = back, onStart = onStartWorkout, onOpen = { navController.navigate(WorkoutDetailRoute(it)) })
+        }
 
         // ---- Settings ----
         composable<SettingsRoute> {

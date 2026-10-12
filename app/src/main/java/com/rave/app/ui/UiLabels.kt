@@ -7,6 +7,8 @@ import androidx.compose.material.icons.automirrored.rounded.DirectionsWalk
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.Group
+import androidx.compose.material.icons.rounded.FitnessCenter
+import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.LocalFireDepartment
 import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.Stars
@@ -56,6 +58,8 @@ fun badgeTitleRes(badge: BadgeId): Int = when (badge) {
     BadgeId.HABITS_100 -> R.string.badge_habits_100
     BadgeId.COMPETITION_WINNER -> R.string.badge_competition_winner
     BadgeId.SOCIAL -> R.string.badge_social
+    BadgeId.FIRST_WORKOUT -> R.string.badge_first_workout
+    BadgeId.SETS_100 -> R.string.badge_sets_100
 }
 
 @StringRes
@@ -70,6 +74,8 @@ fun badgeDescriptionRes(badge: BadgeId): Int = when (badge) {
     BadgeId.HABITS_100 -> R.string.badge_habits_100_desc
     BadgeId.COMPETITION_WINNER -> R.string.badge_competition_winner_desc
     BadgeId.SOCIAL -> R.string.badge_social_desc
+    BadgeId.FIRST_WORKOUT -> R.string.badge_first_workout_desc
+    BadgeId.SETS_100 -> R.string.badge_sets_100_desc
 }
 
 fun badgeIcon(badge: BadgeId): ImageVector = when (badge) {
@@ -83,6 +89,8 @@ fun badgeIcon(badge: BadgeId): ImageVector = when (badge) {
     BadgeId.HABITS_100 -> Icons.Rounded.CheckCircle
     BadgeId.COMPETITION_WINNER -> Icons.Rounded.EmojiEvents
     BadgeId.SOCIAL -> Icons.Rounded.Group
+    BadgeId.FIRST_WORKOUT -> Icons.Rounded.FitnessCenter
+    BadgeId.SETS_100 -> Icons.Rounded.Bolt
 }
 
 @StringRes

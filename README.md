@@ -20,6 +20,12 @@ plus friends, shared streaks, competitions and invites.
   restore after process death. Bad fixes are filtered (accuracy > 25 m, impossible jumps).
 - **Summary & history**: route map, splits, PBs (fastest 1K/5K, longest), habit auto-tick
   banner, favourites, repeat a favourite route with a guide line, filters, weekly summary.
+- **Set tracker (strength workouts)**: built-in exercise library plus custom exercises (weight × reps,
+  reps only, or timed). Sets prefill from your last session, a rest timer starts when you tick a set,
+  warm-up sets are supported, and kg/lb follows your units setting. PRs are tracked (heaviest,
+  estimated 1RM by Epley, best set volume, most reps, longest hold), along with history and
+  personal records. A "Workout" habit type ticks itself off. Sessions are saved live, so they
+  survive the app being killed.
 - **Insights**: weekly pill bars, monthly heatmap, km chart (weekly/monthly), points, best streaks.
 - **Share cards**: 4 templates (warm, dark, minimal, transparent sticker), Instagram Story,
   WhatsApp, save to gallery, system share. Privacy trimming is applied automatically (first/last
@@ -56,6 +62,7 @@ app/src/main/java/com/rave/app/
 │   ├── tracking/    Haversine, GPS filter, splits/PBs, calories, polyline, privacy trimming
 │   ├── habit/       Streak + freeze engine, auto-tick, PB detection, points, badges
 │   ├── competition/ Ranking, scoring, anti-cheat
+│   ├── workout/     Set tracker maths: e1RM, volume, PR detection
 │   └── social/      Invite codes, phone hashing
 ├── data/
 │   ├── local/       Room entities, DAOs, mappers
@@ -170,7 +177,7 @@ Meta requires a Facebook App ID for the Story intent. Add `FACEBOOK_APP_ID=...` 
 `./gradlew :app:testDebugUnitTest` runs JVM unit tests for distance and pace, GPS filtering,
 splits and fastest-window PBs, calories, polyline encoding and privacy trimming, the streak and
 freeze engine, auto-tick, PB detection, points and badges, competition ranking, scoring and
-anti-cheat, and invite codes and phone hashing.
+anti-cheat, workout maths (e1RM, volume, PRs), and invite codes and phone hashing.
 
 ## Build phases
 
@@ -188,3 +195,4 @@ anti-cheat, and invite codes and phone hashing.
 | 10 | Shared streaks | ✅ |
 | 11 | Competitions: create, types, modes, invites, live leaderboard, notifications, podium, anti-cheat | ✅ |
 | 12 | Glance widget, animations, empty states, tests, README | ✅ |
+| + | Set tracker: strength workouts, rest timer, PRs, history, Workout habit type | ✅ |

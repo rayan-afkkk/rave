@@ -15,6 +15,7 @@ import com.rave.app.data.local.dao.HabitLogDao
 import com.rave.app.data.local.dao.LocationPointDao
 import com.rave.app.data.local.dao.PrivacyZoneDao
 import com.rave.app.data.local.dao.StatsDao
+import com.rave.app.data.local.dao.WorkoutDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,6 +39,7 @@ object DataModule {
     @Provides fun provideLocationPointDao(db: AppDatabase): LocationPointDao = db.locationPointDao()
     @Provides fun provideStatsDao(db: AppDatabase): StatsDao = db.statsDao()
     @Provides fun providePrivacyZoneDao(db: AppDatabase): PrivacyZoneDao = db.privacyZoneDao()
+    @Provides fun provideWorkoutDao(db: AppDatabase): WorkoutDao = db.workoutDao()
 
     @Provides
     @Singleton

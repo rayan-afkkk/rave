@@ -9,9 +9,13 @@ import com.rave.app.data.local.dao.HabitLogDao
 import com.rave.app.data.local.dao.LocationPointDao
 import com.rave.app.data.local.dao.PrivacyZoneDao
 import com.rave.app.data.local.dao.StatsDao
+import com.rave.app.data.local.dao.WorkoutDao
 import com.rave.app.data.local.entity.ActivityEntity
 import com.rave.app.data.local.entity.BadgeEntity
 import com.rave.app.data.local.entity.CompetitionWinEntity
+import com.rave.app.data.local.entity.ExerciseEntity
+import com.rave.app.data.local.entity.WorkoutEntity
+import com.rave.app.data.local.entity.WorkoutSetEntity
 import com.rave.app.data.local.entity.FreezeInventoryEntity
 import com.rave.app.data.local.entity.HabitEntity
 import com.rave.app.data.local.entity.HabitLogEntity
@@ -33,6 +37,9 @@ import com.rave.app.data.local.entity.UserStatsEntity
         BadgeEntity::class,
         PrivacyZoneEntity::class,
         CompetitionWinEntity::class,
+        ExerciseEntity::class,
+        WorkoutEntity::class,
+        WorkoutSetEntity::class,
     ],
     version = 1,
     exportSchema = true,
@@ -45,6 +52,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun locationPointDao(): LocationPointDao
     abstract fun statsDao(): StatsDao
     abstract fun privacyZoneDao(): PrivacyZoneDao
+    abstract fun workoutDao(): WorkoutDao
 
     companion object {
         const val NAME = "rave.db"

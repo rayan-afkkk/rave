@@ -11,6 +11,8 @@ enum class BadgeId {
     HABITS_100,
     COMPETITION_WINNER,
     SOCIAL,
+    FIRST_WORKOUT,
+    SETS_100,
 }
 
 data class BadgeInputs(
@@ -24,6 +26,8 @@ data class BadgeInputs(
     val totalHabitCompletions: Int = 0,
     val competitionWins: Int = 0,
     val invitesAccepted: Int = 0,
+    val workouts: Int = 0,
+    val workingSets: Int = 0,
 )
 
 object BadgeEvaluator {
@@ -38,5 +42,7 @@ object BadgeEvaluator {
         if (i.totalHabitCompletions >= 100) add(BadgeId.HABITS_100)
         if (i.competitionWins >= 1) add(BadgeId.COMPETITION_WINNER)
         if (i.invitesAccepted >= 3) add(BadgeId.SOCIAL)
+        if (i.workouts >= 1) add(BadgeId.FIRST_WORKOUT)
+        if (i.workingSets >= 100) add(BadgeId.SETS_100)
     }
 }

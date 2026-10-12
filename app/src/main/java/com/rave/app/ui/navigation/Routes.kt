@@ -37,6 +37,11 @@ import kotlinx.serialization.Serializable
 @Serializable data class InviteLandingRoute(val code: String)
 @Serializable data object SharedStreaksRoute
 
+// Strength workouts (set tracker)
+@Serializable data object WorkoutRoute
+@Serializable data class WorkoutDetailRoute(val workoutId: Long, val isNew: Boolean = false)
+@Serializable data object WorkoutHistoryRoute
+
 // Competitions
 @Serializable data object CompetitionsRoute
 @Serializable data object CreateCompetitionRoute

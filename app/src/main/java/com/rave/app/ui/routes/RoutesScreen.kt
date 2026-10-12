@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.EmojiEvents
+import androidx.compose.material.icons.rounded.FitnessCenter
 import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarBorder
@@ -61,6 +62,7 @@ import java.time.format.FormatStyle
 fun RoutesScreen(
     contentPadding: PaddingValues,
     onOpenActivity: (Long) -> Unit,
+    onOpenWorkouts: () -> Unit,
     viewModel: RoutesViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -77,8 +79,11 @@ fun RoutesScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Text(stringResource(R.string.nav_routes), style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.semantics { heading() })
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.nav_routes), style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.weight(1f).semantics { heading() })
+                PillChip(false, stringResource(R.string.workouts_title), onOpenWorkouts, icon = Icons.Rounded.FitnessCenter)
+            }
         }
         item {
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

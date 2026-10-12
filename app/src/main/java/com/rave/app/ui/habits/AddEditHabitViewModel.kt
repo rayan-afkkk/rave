@@ -45,6 +45,8 @@ data class HabitForm(
     val activityGoalUnit: ActivityGoalUnit = ActivityGoalUnit.METERS,
     /** Distance in the user's unit (km/mi) or minutes. */
     val activityGoal: String = "3",
+    /** WORKOUT: minimum working sets for the day to count. */
+    val workoutSets: String = "1",
     val scheduleType: ScheduleType = ScheduleType.EVERY_DAY,
     val days: Set<DayOfWeek> = DayOfWeek.entries.toSet(),
     val timesPerWeek: Int = 3,
@@ -122,6 +124,7 @@ class AddEditHabitViewModel @Inject constructor(
             HabitType.CHECKBOX -> 1
             HabitType.COUNTER -> f.counterTarget.toIntOrNull()
             HabitType.TIMED -> f.timedMinutes.toIntOrNull()
+            HabitType.WORKOUT -> f.workoutSets.toIntOrNull()
             HabitType.ACTIVITY -> f.activityGoal.replace(',', '.').toDoubleOrNull()?.let { v ->
                 if (f.activityGoalUnit == ActivityGoalUnit.METERS) (v * s.unit.meters).roundToInt() else v.roundToInt()
             }
@@ -180,6 +183,7 @@ class AddEditHabitViewModel @Inject constructor(
         activityGoal = if (type != HabitType.ACTIVITY) "3"
             else if (activityGoalUnit == ActivityGoalUnit.METERS) String.format(Locale.US, "%.1f", target / unit.meters)
             else target.toString(),
+        workoutSets = if (type == HabitType.WORKOUT) target.toString() else "1",
         scheduleType = schedule.type,
         days = DayOfWeek.entries.filter { schedule.includes(it) }.toSet(),
         timesPerWeek = schedule.timesPerWeek.coerceIn(1, 6),
