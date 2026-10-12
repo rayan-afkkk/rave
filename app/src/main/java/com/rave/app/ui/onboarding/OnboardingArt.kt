@@ -30,7 +30,6 @@ import androidx.compose.material.icons.automirrored.rounded.DirectionsRun
 import androidx.compose.material.icons.rounded.AutoStories
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.EmojiEvents
-import androidx.compose.material.icons.rounded.LocalFireDepartment
 import androidx.compose.material.icons.rounded.SelfImprovement
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material3.Icon
@@ -56,6 +55,7 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.rave.app.ui.components.RaveLogo
 import com.rave.app.ui.theme.RaveTheme
 import com.rave.app.ui.theme.TileColor
 import kotlinx.coroutines.async
@@ -97,7 +97,7 @@ fun WelcomeArt(active: Boolean, modifier: Modifier = Modifier) {
     val intro = rememberIntro(active, 1200)
     val loop = rememberInfiniteTransition(label = "welcome")
     val ripple by loop.animateFloat(0f, 1f, infiniteRepeatable(tween(2400, easing = LinearEasing)), label = "ripple")
-    val flicker by loop.animateFloat(0.94f, 1.08f, infiniteRepeatable(tween(700), RepeatMode.Reverse), label = "flicker")
+    val flicker by loop.animateFloat(0.97f, 1.04f, infiniteRepeatable(tween(1100), RepeatMode.Reverse), label = "breathe")
     val accent = MaterialTheme.colorScheme.primary
     val ring = RaveTheme.colors.tilePeach.container
     Box(modifier, contentAlignment = Alignment.Center) {
@@ -117,12 +117,11 @@ fun WelcomeArt(active: Boolean, modifier: Modifier = Modifier) {
                 drawCircle(accent.copy(alpha = intro), radius = 6.dp.toPx(), center = Offset(c.x + cos(angle) * r, c.y + sin(angle) * r))
             }
         }
-        Icon(
-            Icons.Rounded.LocalFireDepartment, null, tint = accent,
-            modifier = Modifier.size(96.dp).graphicsLayer {
-                val s = intro.segment(0.2f, 1f) * flicker
-                scaleX = s; scaleY = s
-                rotationZ = lerp(-25f, 0f, intro)
+        RaveLogo(
+            color = accent,
+            progress = intro.segment(0.15f, 1f),
+            modifier = Modifier.size(104.dp).graphicsLayer {
+                scaleX = flicker; scaleY = flicker
             },
         )
     }
