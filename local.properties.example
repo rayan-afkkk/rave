@@ -4,3 +4,9 @@ sdk.dir=/path/to/Android/sdk
 
 # Google Maps SDK for Android key (used from Phase 3 onwards)
 MAPS_API_KEY=your-maps-api-key-here
+
+# Domain used for invite App Links: https://<INVITE_DOMAIN>/invite/{code}
+INVITE_DOMAIN=rave.example.com
+
+# Facebook App ID, required by Instagram's "Share to Story" intent (optional)
+FACEBOOK_APP_ID=

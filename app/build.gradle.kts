@@ -11,12 +11,22 @@ plugins {
     alias(libs.plugins.room)
 }
 
-// Secrets live in local.properties (git-ignored). See README.md.
+// Firebase is optional: the app runs fully offline (guest mode) without it.
+// Drop app/google-services.json in to enable sign-in, friends and competitions.
+if (file("google-services.json").exists()) {
+    apply(plugin = libs.plugins.google.services.get().pluginId)
+}
+
+// Secrets / machine-specific values live in local.properties (git-ignored). See README.md.
 val localProps = Properties().apply {
     val file = rootProject.file("local.properties")
     if (file.exists()) file.inputStream().use { load(it) }
 }
-val mapsApiKey: String = localProps.getProperty("MAPS_API_KEY") ?: ""
+fun localProp(key: String, default: String = ""): String = localProps.getProperty(key) ?: default
+
+val mapsApiKey = localProp("MAPS_API_KEY")
+val inviteDomain = localProp("INVITE_DOMAIN", "rave.example.com")
+val facebookAppId = localProp("FACEBOOK_APP_ID")
 
 android {
     namespace = "com.rave.app"
@@ -27,14 +37,20 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
 
-        // Injected into AndroidManifest.xml (<meta-data com.google.android.geo.API_KEY>).
+        // Injected into AndroidManifest.xml.
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        manifestPlaceholders["INVITE_DOMAIN"] = inviteDomain
         buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
+        buildConfigField("String", "INVITE_DOMAIN", "\"$inviteDomain\"")
+        // Needed by Instagram's "share to story" intent. Optional.
+        buildConfigField("String", "FACEBOOK_APP_ID", "\"$facebookAppId\"")
+        // Feature flag: reward inviter + invitee with a streak freeze.
+        buildConfigField("boolean", "INVITE_REWARD_ENABLED", "true")
     }
 
     buildTypes {
@@ -58,6 +74,9 @@ android {
     }
     packaging {
         resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" }
+    }
+    testOptions {
+        unitTests.isReturnDefaultValues = true
     }
 }
 
@@ -97,6 +116,8 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
 
     // Local storage
     implementation(libs.room.runtime)
@@ -104,7 +125,36 @@ dependencies {
     ksp(libs.room.compiler)
     implementation(libs.androidx.datastore.preferences)
 
+    // Async & background
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.androidx.work.runtime)
+
+    // Location & maps
+    implementation(libs.play.services.location)
+    implementation(libs.play.services.maps)
+    implementation(libs.maps.compose)
+
+    // Widget
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
+
+    // Firebase (only active when google-services.json is present)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.messaging)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services)
+    implementation(libs.googleid)
+    implementation(libs.installreferrer)
+
+    // QR: scan with CameraX + ML Kit, generate with ZXing
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.mlkit.barcode.scanning)
+    implementation(libs.zxing.core)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
