@@ -96,9 +96,9 @@ fun RaveNavHost(
 
         // ---- Onboarding & auth ----
         composable<OnboardingRoute> {
-            OnboardingScreen(onFinished = { signIn ->
+            OnboardingScreen(onFinished = { openEmailSignIn ->
                 goHome()
-                if (signIn) navController.navigate(SignInRoute)
+                if (openEmailSignIn) navController.navigate(SignInRoute)
             })
         }
         composable<SignInRoute> { SignInScreen(onDone = back, onSkip = back) }

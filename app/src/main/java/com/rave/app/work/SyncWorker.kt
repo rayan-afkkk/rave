@@ -39,7 +39,7 @@ import org.json.JSONObject
  * Cloud sync for signed-in users (no-op for guests or without Firebase):
  * activity summaries + privacy-trimmed feed posts, daily habit summaries, profile stats,
  * competition scores, invite rewards — and local notifications for competition changes and
- * friend events, so the app is useful even before Cloud Functions/FCM are deployed.
+ * friend events (no server code needed).
  */
 @HiltWorker
 class SyncWorker @AssistedInject constructor(
@@ -124,7 +124,7 @@ class SyncWorker @AssistedInject constructor(
         profiles.setFields(mapOf("firstActivityAt" to (activityDao.getAllCompleted().minOfOrNull { it.startTime })))
     }
 
-    /** Per-day habit summaries (used by habit/active-day competitions and the Cloud Function). */
+    /** Per-day habit summaries (used by habit and active-day competitions). */
     private suspend fun uploadDays(uid: String) {
         val today = time.today()
         val from = today.minusDays(7)

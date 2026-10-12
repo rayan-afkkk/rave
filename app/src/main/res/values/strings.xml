@@ -347,8 +347,6 @@ Permission was denied. You can turn it on in Settings.</string>
     <string name="onboarding_perm_location">Location while tracking</string>
     <string name="onboarding_perm_location_body">Precise location, only during a walk or run.</string>
     <string name="onboarding_perm_activity_note">Physical activity and background location are only requested if you turn on auto-detect walks in Settings.</string>
-    <string name="onboarding_start_guest">Start as guest</string>
-    <string name="onboarding_sign_in">I want friends &amp; backup — sign in</string>
     <string name="cd_granted">Granted</string>
     <string name="signin_title">Sign in</string>
     <string name="signin_headline">Unlock friends &amp; backup</string>
@@ -634,6 +632,17 @@ Permission was denied. You can turn it on in Settings.</string>
     <string name="badge_first_workout_desc">Finish your first strength workout.</string>
     <string name="badge_sets_100">100 sets</string>
     <string name="badge_sets_100_desc">Complete 100 working sets.</string>
+    <string name="onb_welcome_title">Welcome to Rave</string>
+    <string name="onb_welcome_body">Your habits, walks, runs and workouts — all in one warm little place.</string>
+    <string name="onb_workout_title">Log every set</string>
+    <string name="onb_workout_body">Track exercises, sets and reps with a rest timer. Beat your last session and set new PRs.</string>
+    <string name="onb_cta_start">Let\'s go</string>
+    <string name="onb_signin_title">One last thing</string>
+    <string name="onb_signin_body">Sign in with Google to bring your friends along and keep your progress safe.</string>
+    <string name="onb_signin_perk_friends">Shared streaks and nudges with friends</string>
+    <string name="onb_signin_perk_compete">Competitions and weekly leaderboards</string>
+    <string name="onb_signin_perk_backup">Cloud backup of your habits and history</string>
+    <string name="onb_signin_email">Use email instead</string>
     <plurals name="freezes_count">
         <item quantity="one">%d streak freeze</item>
         <item quantity="other">%d streak freezes</item>

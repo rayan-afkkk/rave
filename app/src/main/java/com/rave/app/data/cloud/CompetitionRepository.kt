@@ -46,7 +46,7 @@ data class ParticipantRow(val score: ParticipantScore, val daily: Map<Long, Doub
 /**
  * `competitions/{id}` + `competitions/{id}/participants/{uid}`. Each participant writes only
  * their own doc with a value computed from their own synced activities / habit logs inside the
- * window; a Cloud Function re-validates it (see functions/index.js).
+ * window (security rules stop anyone writing someone else's score).
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @Singleton

@@ -38,6 +38,10 @@ plus friends, shared streaks, competitions and invites.
   friends, invite link/code/QR, contact matching (hashed), activity feed with cheers, nudges,
   shared streaks, and competitions (5 types; duel, group or team modes; live leaderboard; podium
   plus a shareable result card; anti-cheat).
+- **Animated onboarding**: five motion-graphics story pages that replay as you reach them (habit
+  checks ticking, a route drawing itself, a podium rising with confetti, a barbell lifting), with
+  parallax swiping and a stretching page indicator. Then a setup page that explains permissions,
+  then Google sign-in (email and guest stay available).
 - **Home screen widget** (Glance): small (streak + ring) and medium (tap-to-tick + Start walk).
 
 ## Tech stack
@@ -75,8 +79,7 @@ app/src/main/java/com/rave/app/
 ├── notifications/   Channels, FCM service, notification actions
 ├── widget/          Glance widget
 └── ui/              Theme, components and one package per feature
-functions/           Cloud Functions (pushes, competition validation)
-firestore.rules      Security rules · firestore.indexes.json  Composite indexes
+firestore.rules      Security rules · firestore.indexes.json  Composite indexes (no server code; 100% Kotlin)
 ```
 
 **Theming rule:** composables never use colour literals. Use `MaterialTheme.colorScheme.*` or
@@ -116,13 +119,10 @@ history, insights, share cards and the widget all work offline as a guest.
    npm i -g firebase-tools && firebase login && firebase use <project-id>
    firebase deploy --only firestore:rules,firestore:indexes
    ```
-5. Enable **Cloud Messaging**. Then deploy the functions, which handle pushes for nudges,
-   requests, overtakes, "24 h left", "ended", and server-side score validation:
-   ```bash
-   cd functions && npm install && cd .. && firebase deploy --only functions
-   ```
-   Functions need the Blaze plan. Without them the app still raises its own local notifications
-   from the hourly sync. Those cover overtakes, 24 h left, ended, friend requests and invitations.
+5. No server code is needed: the project is 100% Kotlin. The app's hourly sync raises its own
+   notifications for nudges, friend requests, invitations, overtakes, "24 h left" and "competition
+   ended". If you later add your own push sender, `RaveMessagingService` already handles FCM
+   data messages (`type`, `title`, `body`, `targetId`).
 
 ### 3. SHA-1 for Google Sign-In
 

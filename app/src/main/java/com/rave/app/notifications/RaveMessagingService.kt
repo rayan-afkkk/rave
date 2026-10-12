@@ -11,8 +11,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * Pushes sent by the Cloud Functions (functions/index.js): nudges, friend requests,
- * competition overtakes / 24 h left / ended. Data payload: type, title, body, targetId.
+ * Handles FCM data messages (type, title, body, targetId) if you add your own push sender.
+ * The app works without it: SyncWorker raises the same notifications locally every hour.
  */
 @AndroidEntryPoint
 class RaveMessagingService : FirebaseMessagingService() {

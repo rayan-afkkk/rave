@@ -135,7 +135,7 @@ class FriendsRepository @Inject constructor(
         return runCatching { db().collection(NUDGES).document(nudgeId(me, friendUid)).get().await().exists() }.getOrDefault(false)
     }
 
-    /** Sends a nudge push (delivered by the Cloud Function). Returns false if already nudged today. */
+    /** Records a nudge; the friend's app shows it on its next sync. Returns false if already nudged today. */
     suspend fun nudge(friendUid: String, reason: String, targetId: String? = null): Result<Boolean> = runCatching {
         val me = firebase.requireUid()
         val ref = db().collection(NUDGES).document(nudgeId(me, friendUid))
@@ -149,7 +149,7 @@ class FriendsRepository @Inject constructor(
         true
     }
 
-    /** Nudges sent to me since [sinceMs] (used for local notifications when no push is set up). */
+    /** Nudges sent to me since [sinceMs] (shown as local notifications by the sync worker). */
     suspend fun nudgesSince(sinceMs: Long): List<Pair<String, String>> {
         val me = firebase.uid ?: return emptyList()
         return runCatching {

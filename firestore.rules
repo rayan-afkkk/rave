@@ -3,7 +3,7 @@ rules_version = '2';
 // Security rules for Rave.
 // Principles: users only write their own data; participants only update their own
 // participant doc; friend edges need an accepted request; feed reads are limited to the
-// audience the owner chose. Competition values are re-validated by a Cloud Function.
+// audience the owner chose.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -111,7 +111,6 @@ service cloud.firestore {
       allow delete: if signedIn() && resource.data.createdBy == request.auth.uid;
 
       // Participants write only their own doc, and only if they are a member.
-      // `value` is recomputed server-side by the validateParticipant Cloud Function.
       match /participants/{uid} {
         allow read: if signedIn();
         allow write: if isMe(uid)
