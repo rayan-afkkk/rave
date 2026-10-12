@@ -6,9 +6,9 @@ import org.junit.Test
 class DayPeriodTest {
 
     @Test
-    fun `early hours before 5am count as evening`() {
-        assertEquals(DayPeriod.EVENING, dayPeriodFor(0))
-        assertEquals(DayPeriod.EVENING, dayPeriodFor(4))
+    fun `early hours before 5am count as night`() {
+        assertEquals(DayPeriod.NIGHT, dayPeriodFor(0))
+        assertEquals(DayPeriod.NIGHT, dayPeriodFor(4))
     }
 
     @Test
@@ -24,9 +24,10 @@ class DayPeriodTest {
     }
 
     @Test
-    fun `evening starts at 17`() {
+    fun `evening runs from 17 to 21, then night`() {
         assertEquals(DayPeriod.EVENING, dayPeriodFor(17))
-        assertEquals(DayPeriod.EVENING, dayPeriodFor(23))
+        assertEquals(DayPeriod.EVENING, dayPeriodFor(21))
+        assertEquals(DayPeriod.NIGHT, dayPeriodFor(22))
     }
 
     @Test(expected = IllegalArgumentException::class)
