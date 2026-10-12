@@ -4,10 +4,41 @@ import kotlinx.serialization.Serializable
 
 /* Type-safe navigation destinations. */
 
+// Bottom-bar tabs
 @Serializable data object HomeRoute
 @Serializable data object RoutesRoute
 @Serializable data object FriendsRoute
 @Serializable data object ProfileRoute
 
-/** Live GPS tracking. [activityType] is an [com.rave.app.domain.model.ActivityType] name. */
-@Serializable data class LiveTrackingRoute(val activityType: String)
+// Onboarding & auth
+@Serializable data object OnboardingRoute
+@Serializable data object SignInRoute
+
+// Habits
+@Serializable data class AddEditHabitRoute(val habitId: Long = -1)
+@Serializable data class HabitTimerRoute(val habitId: Long)
+@Serializable data object ProgressRoute
+
+// Tracking & activities
+/** [activityType] is an [com.rave.app.domain.model.ActivityType] name; [guideActivityId] a favourite route to follow. */
+@Serializable data class LiveTrackingRoute(val activityType: String, val guideActivityId: Long = -1)
+@Serializable data class ActivitySummaryRoute(val activityId: Long, val isNew: Boolean = false)
+@Serializable data class ShareActivityRoute(val activityId: Long)
+
+// Settings
+@Serializable data object SettingsRoute
+@Serializable data object PrivacyZonesRoute
+
+// Social
+@Serializable data object FriendRequestsRoute
+@Serializable data object AddFriendRoute
+@Serializable data object InviteRoute
+@Serializable data object QrScanRoute
+@Serializable data class InviteLandingRoute(val code: String)
+@Serializable data object SharedStreaksRoute
+
+// Competitions
+@Serializable data object CompetitionsRoute
+@Serializable data object CreateCompetitionRoute
+@Serializable data class CompetitionDetailRoute(val id: String)
+@Serializable data class CompetitionResultRoute(val id: String)

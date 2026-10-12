@@ -7,8 +7,9 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
 
-private val LightColors = lightColorScheme(
+internal val LightColors = lightColorScheme(
     primary = LightAccent,
     onPrimary = LightOnAccent,
     primaryContainer = TilePeach,
@@ -45,7 +46,7 @@ private val LightColors = lightColorScheme(
     scrim = Black,
 )
 
-private val DarkColors = darkColorScheme(
+internal val DarkColors = darkColorScheme(
     primary = DarkAccent,
     onPrimary = DarkOnAccent,
     primaryContainer = DarkAccentContainer,
@@ -92,7 +93,7 @@ fun RaveTheme(
     content: @Composable () -> Unit,
 ) {
     val extended = if (darkTheme) DarkExtendedColors else LightExtendedColors
-    CompositionLocalProvider(LocalExtendedColors provides extended) {
+    CompositionLocalProvider(LocalExtendedColors provides extended, LocalIsDarkTheme provides darkTheme) {
         MaterialTheme(
             colorScheme = if (darkTheme) DarkColors else LightColors,
             typography = RaveTypography,
@@ -102,9 +103,16 @@ fun RaveTheme(
     }
 }
 
+/** Whether the in-app theme (not just the system) is dark. Used for map styles. */
+val LocalIsDarkTheme = staticCompositionLocalOf { false }
+
 /** Shortcut for the extra design tokens: `RaveTheme.colors.tilePeach`. */
 object RaveTheme {
     val colors: ExtendedColors
         @Composable @ReadOnlyComposable
         get() = LocalExtendedColors.current
+
+    val isDark: Boolean
+        @Composable @ReadOnlyComposable
+        get() = LocalIsDarkTheme.current
 }
