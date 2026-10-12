@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The app name lives ONLY here. Change it in one place. -->
+    <string name="app_name">Rave</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_routes">Routes</string>
+    <string name="nav_friends">Friends</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_start">Start an activity</string>
+    <string name="action_back">Back</string>
+
+    <!-- Activities -->
+    <string name="activity_walk">Walk</string>
+    <string name="activity_run">Run</string>
+    <string name="picker_title">Ready to move?</string>
+    <string name="picker_subtitle">Pick an activity and we\'ll start tracking.</string>
+    <string name="start_walk">Start walk</string>
+    <string name="start_run">Start run</string>
+
+    <!-- Home -->
+    <string name="greeting_morning">Morning, %1$s</string>
+    <string name="greeting_afternoon">Afternoon, %1$s</string>
+    <string name="greeting_evening">Evening, %1$s</string>
+    <string name="guest_name">friend</string>
+    <plurals name="streak_days">
+        <item quantity="one">Current streak: %d day</item>
+        <item quantity="other">Current streak: %d days</item>
+    </plurals>
+    <string name="home_empty_title">Your routine starts here</string>
+    <string name="home_empty_message">Habits, your daily progress ring and the week strip will live on this screen.</string>
+
+    <!-- Routes -->
+    <string name="routes_empty_title">No routes yet</string>
+    <string name="routes_empty_message">Your walks and runs will show up here once you finish your first one.</string>
+
+    <!-- Friends -->
+    <string name="friends_empty_title">Better together</string>
+    <string name="friends_empty_message">Invite friends, share streaks and start friendly competitions. Coming soon.</string>
+
+    <!-- Profile -->
+    <string name="profile_empty_title">Your profile</string>
+    <string name="profile_empty_message">Stats, badges and streak freezes will appear here.</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">System</string>
+
+    <!-- Tracking -->
+    <string name="tracking_placeholder_title">Live tracking</string>
+    <string name="tracking_placeholder_message">The live map, route line and stats sheet are on their way.</string>
+</resources>

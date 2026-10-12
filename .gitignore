@@ -1,0 +1,17 @@
+# Gradle / build
+.gradle/
+build/
+/captures
+.externalNativeBuild
+.cxx
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# Secrets & machine-specific config — never commit
+local.properties
+app/google-services.json
+*.jks
+*.keystore
