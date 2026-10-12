@@ -76,6 +76,7 @@ import com.rave.app.ui.components.SectionHeader
 import com.rave.app.ui.components.StreakChip
 import com.rave.app.ui.components.TonalPillButton
 import com.rave.app.ui.components.tile
+import com.rave.app.ui.theme.Dimens
 import com.rave.app.ui.theme.RaveTheme
 import com.rave.app.ui.unitLabel
 import java.time.LocalDate
@@ -106,9 +107,9 @@ fun HomeScreen(
             contentPadding = PaddingValues(
                 top = contentPadding.calculateTopPadding() + 12.dp,
                 bottom = contentPadding.calculateBottomPadding() + 72.dp,
-                start = 20.dp, end = 20.dp,
+                start = Dimens.ScreenPadding, end = Dimens.ScreenPadding,
             ),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap),
         ) {
             item(key = "header") { Header(state) }
             item(key = "progress") { ProgressCard(state, onOpenProgress) }
@@ -225,13 +226,13 @@ private fun ProgressCard(state: HomeUiState, onClick: () -> Unit) {
             .clip(MaterialTheme.shapes.large)
             .background(colors.accentCard)
             .clickable(onClickLabel = stringResource(R.string.home_open_progress), onClick = onClick)
-            .padding(20.dp),
+            .padding(16.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             ProgressRing(
                 progress = progress,
-                size = 104.dp,
-                strokeWidth = 11.dp,
+                size = 88.dp,
+                strokeWidth = 9.dp,
                 trackColor = colors.onAccentCard.copy(alpha = 0.15f),
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -292,8 +293,8 @@ private fun WeekStrip(state: HomeUiState, onSelect: (LocalDate) -> Unit) {
                     .then(if (isSelected && !isToday) Modifier.border(2.dp, MaterialTheme.colorScheme.secondary, MaterialTheme.shapes.medium) else Modifier)
                     .clickable(enabled = !future, role = Role.Tab) { onSelect(day) }
                     .semantics { selected = isSelected; contentDescription = description }
-                    .heightIn(min = 64.dp)
-                    .padding(vertical = 8.dp),
+                    .heightIn(min = 54.dp)
+                    .padding(vertical = 6.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
@@ -395,8 +396,8 @@ private fun HabitCard(
             .clip(MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.surface)
             .clickable(onClickLabel = stringResource(R.string.action_edit), onClick = onEdit)
-            .heightIn(min = 72.dp)
-            .padding(start = 4.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)
+            .heightIn(min = Dimens.RowMinHeight)
+            .padding(start = 2.dp, end = 10.dp, top = 6.dp, bottom = 6.dp)
             .animateContentSize(),
         verticalAlignment = Alignment.CenterVertically,
     ) {

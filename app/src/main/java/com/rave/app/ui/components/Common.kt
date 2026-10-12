@@ -50,6 +50,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.rave.app.R
+import com.rave.app.ui.theme.Dimens
 import com.rave.app.ui.theme.PillShape
 import com.rave.app.ui.theme.RaveTheme
 import com.rave.app.ui.theme.TileColor
@@ -102,7 +103,7 @@ fun RaveScreen(
 fun SectionCard(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.surface,
-    contentPadding: PaddingValues = PaddingValues(18.dp),
+    contentPadding: PaddingValues = PaddingValues(Dimens.CardPadding),
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -133,7 +134,7 @@ fun SectionHeader(title: String, modifier: Modifier = Modifier, action: (@Compos
 
 /** Icon on a soft coloured rounded tile. */
 @Composable
-fun IconTile(icon: ImageVector, tile: TileColor, modifier: Modifier = Modifier, size: Dp = 44.dp, iconSize: Dp = 24.dp) {
+fun IconTile(icon: ImageVector, tile: TileColor, modifier: Modifier = Modifier, size: Dp = Dimens.IconTile, iconSize: Dp = Dimens.IconTileIcon) {
     Box(
         modifier.size(size).clip(MaterialTheme.shapes.medium).background(tile.container),
         contentAlignment = Alignment.Center,
@@ -144,7 +145,7 @@ fun IconTile(icon: ImageVector, tile: TileColor, modifier: Modifier = Modifier, 
 
 /** Round avatar with initials on a tile colour picked from the name. */
 @Composable
-fun Avatar(name: String, modifier: Modifier = Modifier, size: Dp = 44.dp) {
+fun Avatar(name: String, modifier: Modifier = Modifier, size: Dp = 40.dp) {
     val tiles = RaveTheme.colors.tiles
     val tile = tiles[(name.hashCode() and Int.MAX_VALUE) % tiles.size]
     val initials = name.split(" ").filter { it.isNotBlank() }.take(2).joinToString("") { it.first().uppercase() }.ifEmpty { "?" }
@@ -167,7 +168,7 @@ fun PillChip(selected: Boolean, label: String, onClick: () -> Unit, modifier: Mo
         label = { Text(label, style = MaterialTheme.typography.labelMedium) },
         leadingIcon = icon?.let { { Icon(it, null, Modifier.size(18.dp)) } },
         shape = PillShape,
-        modifier = modifier.heightIn(min = 40.dp),
+        modifier = modifier.heightIn(min = Dimens.ChipHeight),
         colors = FilterChipDefaults.filterChipColors(
             containerColor = MaterialTheme.colorScheme.surface,
             selectedContainerColor = MaterialTheme.colorScheme.secondary,

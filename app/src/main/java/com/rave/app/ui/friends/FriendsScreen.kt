@@ -1,6 +1,7 @@
 package com.rave.app.ui.friends
 
 import android.widget.Toast
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -117,7 +118,7 @@ fun FriendsScreen(
     LazyColumn(
         contentPadding = PaddingValues(
             top = contentPadding.calculateTopPadding() + 12.dp, bottom = contentPadding.calculateBottomPadding() + 16.dp,
-            start = 20.dp, end = 20.dp,
+            start = Dimens.ScreenPadding, end = Dimens.ScreenPadding,
         ),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {

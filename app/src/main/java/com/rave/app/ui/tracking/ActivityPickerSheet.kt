@@ -1,6 +1,7 @@
 package com.rave.app.ui.tracking
 
 import androidx.compose.foundation.background
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -56,7 +57,7 @@ fun ActivityPickerSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .navigationBarsPadding()
-                .padding(start = 20.dp, end = 20.dp, bottom = 24.dp),
+                .padding(start = Dimens.ScreenPadding, end = Dimens.ScreenPadding, bottom = 24.dp),
         ) {
             Text(
                 text = stringResource(R.string.picker_title),

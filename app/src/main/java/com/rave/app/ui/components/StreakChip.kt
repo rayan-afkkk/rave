@@ -48,7 +48,7 @@ fun StreakChip(days: Int, modifier: Modifier = Modifier) {
     ) {
         Row(
             modifier = Modifier
-                .heightIn(min = 40.dp)
+                .heightIn(min = 36.dp)
                 .padding(horizontal = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -56,7 +56,7 @@ fun StreakChip(days: Int, modifier: Modifier = Modifier) {
                 Icons.Rounded.LocalFireDepartment,
                 contentDescription = null,
                 tint = RaveTheme.colors.streakFlame,
-                modifier = Modifier.size(22.dp).scale(scale),
+                modifier = Modifier.size(19.dp).scale(scale),
             )
             Spacer(Modifier.width(6.dp))
             Text(

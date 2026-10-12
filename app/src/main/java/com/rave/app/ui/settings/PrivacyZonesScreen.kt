@@ -1,6 +1,7 @@
 package com.rave.app.ui.settings
 
 import android.annotation.SuppressLint
+import com.rave.app.ui.theme.Dimens
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -112,8 +113,8 @@ fun PrivacyZonesScreen(onBack: () -> Unit, viewModel: PrivacyZonesViewModel = hi
 
     RaveScreen(title = stringResource(R.string.privacy_title), onBack = onBack) {
         Column(
-            Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = 20.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = Dimens.ScreenPadding, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap),
         ) {
             SectionCard {
                 Row(verticalAlignment = Alignment.CenterVertically) {

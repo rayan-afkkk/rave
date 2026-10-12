@@ -1,6 +1,7 @@
 package com.rave.app.ui.settings
 
 import android.Manifest
+import com.rave.app.ui.theme.Dimens
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -114,8 +115,8 @@ fun SettingsScreen(
 
     RaveScreen(title = stringResource(R.string.settings_title), onBack = onBack) {
         Column(
-            Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = 20.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = Dimens.ScreenPadding, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap),
         ) {
             // Account
             SettingsSection(stringResource(R.string.settings_account)) {

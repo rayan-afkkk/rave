@@ -1,6 +1,7 @@
 package com.rave.app.ui.onboarding
 
 import android.Manifest
+import com.rave.app.ui.theme.Dimens
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -190,7 +191,7 @@ fun OnboardingScreen(
                     shape = PillShape,
                     color = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp).heightIn(min = 56.dp),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = Dimens.ScreenPadding, vertical = 12.dp).heightIn(min = 56.dp),
                 ) {
                     AnimatedContent(
                         targetState = when (current) {
@@ -261,8 +262,8 @@ private fun SetupPage(name: String, onName: (String) -> Unit) {
         onPauseOrDispose { }
     }
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = Dimens.ScreenPadding),
+        verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap),
     ) {
         Text(stringResource(R.string.onboarding_setup_title), style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onBackground)
         OutlinedTextField(

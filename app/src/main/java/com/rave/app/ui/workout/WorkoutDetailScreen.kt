@@ -1,6 +1,7 @@
 package com.rave.app.ui.workout
 
 import androidx.compose.foundation.background
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -155,7 +156,7 @@ fun WorkoutDetailScreen(onClose: () -> Unit, viewModel: WorkoutDetailViewModel =
             LoadingState()
             return@RaveScreen
         }
-        LazyColumn(contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        LazyColumn(contentPadding = PaddingValues(Dimens.ScreenPadding), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item {
                 val c = RaveTheme.colors
                 Column(Modifier.fillMaxWidth().clip(MaterialTheme.shapes.large).background(c.accentCard).padding(20.dp)) {

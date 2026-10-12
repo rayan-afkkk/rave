@@ -14,9 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.rave.app.ui.theme.Dimens
 import com.rave.app.ui.theme.PillShape
 
-private val PillHeight = 54.dp
+private val PillHeight = Dimens.ButtonHeight
 
 /** Primary pill-shaped action (52–56dp tall, accent colour). */
 @Composable
@@ -32,7 +33,7 @@ fun PillButton(
         modifier = modifier.heightIn(min = PillHeight),
         enabled = enabled,
         shape = PillShape,
-        contentPadding = PaddingValues(horizontal = 24.dp),
+        contentPadding = PaddingValues(horizontal = 20.dp),
         elevation = ButtonDefaults.buttonElevation(0.dp, 0.dp, 0.dp, 0.dp, 0.dp),
     ) { PillContent(text, icon) }
 }
@@ -51,14 +52,14 @@ fun TonalPillButton(
         modifier = modifier.heightIn(min = PillHeight),
         enabled = enabled,
         shape = PillShape,
-        contentPadding = PaddingValues(horizontal = 24.dp),
+        contentPadding = PaddingValues(horizontal = 20.dp),
     ) { PillContent(text, icon) }
 }
 
 @Composable
 private fun PillContent(text: String, icon: ImageVector?) {
     if (icon != null) {
-        Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp))
+        Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
         Spacer(Modifier.width(8.dp))
     }
     Text(text)

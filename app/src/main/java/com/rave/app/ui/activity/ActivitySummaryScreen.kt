@@ -1,6 +1,7 @@
 package com.rave.app.ui.activity
 
 import androidx.compose.foundation.background
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -105,8 +106,8 @@ fun ActivitySummaryScreen(
                 val a = state.activity!!
                 val unit = state.unit
                 Column(
-                    Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = 20.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                    Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = Dimens.ScreenPadding, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap),
                 ) {
                     RouteMapCard(state.segments)
 

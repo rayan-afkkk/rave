@@ -42,13 +42,14 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.rave.app.R
+import com.rave.app.ui.theme.Dimens
 import com.rave.app.ui.theme.RaveTheme
 
 /** Height of the bar itself (not counting the raised Start button). */
-private val BarHeight = 68.dp
-private val StartButtonSize = 64.dp
+private val BarHeight = Dimens.NavBarHeight
+private val StartButtonSize = Dimens.StartButton
 /** How far the Start button rises above the bar's top edge. */
-private val StartButtonRaise = 22.dp
+private val StartButtonRaise = 20.dp
 
 /**
  * Space screens should leave at the bottom so content isn't hidden behind the
@@ -136,7 +137,7 @@ private fun NavItem(
             // The label below already describes the item for TalkBack.
             contentDescription = null,
             tint = tint,
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(22.dp),
         )
         Text(
             text = label,
@@ -180,7 +181,7 @@ private fun StartButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
             imageVector = Icons.Rounded.PlayArrow,
             contentDescription = stringResource(R.string.nav_start),
             tint = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier.size(34.dp),
+            modifier = Modifier.size(30.dp),
         )
     }
 }

@@ -1,6 +1,7 @@
 package com.rave.app.ui.friends
 
 import androidx.compose.foundation.layout.Arrangement
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -95,7 +96,7 @@ fun SharedStreaksScreen(onBack: () -> Unit, viewModel: SharedStreaksViewModel = 
     var creating by rememberSaveable { mutableStateOf(false) }
     val me = viewModel.me
     RaveScreen(title = stringResource(R.string.shared_title), onBack = onBack) {
-        LazyColumn(contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        LazyColumn(contentPadding = PaddingValues(Dimens.ScreenPadding), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             item {
                 Text(stringResource(R.string.shared_explainer), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }

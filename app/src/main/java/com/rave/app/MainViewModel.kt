@@ -32,7 +32,7 @@ class MainViewModel @Inject constructor(
         workouts.observeActiveWorkout().stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val themeMode: StateFlow<ThemeMode> = settings.themeMode
-        .stateIn(viewModelScope, SharingStarted.Eagerly, ThemeMode.SYSTEM)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ThemeMode.LIGHT)
 
     /** Null until settings are read (avoids flashing onboarding for returning users). */
     private val _needsOnboarding = MutableStateFlow<Boolean?>(null)

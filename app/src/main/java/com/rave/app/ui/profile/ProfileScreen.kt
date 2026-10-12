@@ -1,6 +1,7 @@
 package com.rave.app.ui.profile
 
 import androidx.compose.foundation.background
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -83,8 +84,8 @@ fun ProfileScreen(
         Modifier
             .verticalScroll(rememberScrollState())
             .padding(contentPadding)
-            .padding(horizontal = 20.dp, vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+            .padding(horizontal = Dimens.ScreenPadding, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.nav_profile), style = MaterialTheme.typography.headlineMedium,

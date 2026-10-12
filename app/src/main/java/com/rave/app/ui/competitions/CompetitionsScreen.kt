@@ -1,6 +1,7 @@
 package com.rave.app.ui.competitions
 
 import androidx.compose.foundation.layout.Arrangement
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -92,7 +93,7 @@ fun CompetitionsScreen(
     var tab by rememberSaveable { mutableStateOf(CompetitionTab.ACTIVE) }
     RaveScreen(title = stringResource(R.string.competitions_title), onBack = onBack) {
         androidx.compose.foundation.layout.Box(Modifier.fillMaxWidth().weight(1f)) {
-            LazyColumn(contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 96.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            LazyColumn(contentPadding = PaddingValues(start = Dimens.ScreenPadding, end = Dimens.ScreenPadding, top = 4.dp, bottom = 96.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 item {
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         item { PillChip(tab == CompetitionTab.ACTIVE, stringResource(R.string.comp_tab_active), { tab = CompetitionTab.ACTIVE }) }

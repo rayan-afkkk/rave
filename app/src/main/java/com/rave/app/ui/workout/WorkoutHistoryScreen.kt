@@ -1,6 +1,7 @@
 package com.rave.app.ui.workout
 
 import androidx.compose.foundation.background
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -96,7 +97,7 @@ class WorkoutHistoryViewModel @Inject constructor(
 fun WorkoutHistoryScreen(onBack: () -> Unit, onStart: () -> Unit, onOpen: (Long) -> Unit, viewModel: WorkoutHistoryViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     RaveScreen(title = stringResource(R.string.workouts_title), onBack = onBack) {
-        LazyColumn(contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        LazyColumn(contentPadding = PaddingValues(Dimens.ScreenPadding), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item {
                 PillButton(
                     stringResource(if (state.hasActive) R.string.workout_resume else R.string.workout_start),

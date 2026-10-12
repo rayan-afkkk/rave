@@ -1,6 +1,7 @@
 package com.rave.app.ui.competitions
 
 import androidx.compose.animation.AnimatedContent
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -185,7 +186,7 @@ fun CompetitionDetailScreen(onBack: () -> Unit, onResults: (String) -> Unit, vie
             else -> state.ranked.maxOfOrNull { it.score.value }?.coerceAtLeast(0.001) ?: 1.0
         }
 
-        LazyColumn(contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        LazyColumn(contentPadding = PaddingValues(Dimens.ScreenPadding), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item {
                 SectionCard(color = RaveTheme.colors.accentCard) {
                     val on = RaveTheme.colors.onAccentCard

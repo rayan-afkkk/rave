@@ -9,7 +9,7 @@ enum class ProfileVisibility { FRIENDS, PRIVATE }
 enum class NotificationCategory { REMINDERS, FRIENDS, COMPETITIONS, AUTO_DETECT }
 
 data class UserSettings(
-    val themeMode: ThemeMode = ThemeMode.SYSTEM,
+    val themeMode: ThemeMode = ThemeMode.LIGHT,
     val unit: DistanceUnit = DistanceUnit.KM,
     val weightKg: Float = 70f,
     val heightCm: Float = 170f,

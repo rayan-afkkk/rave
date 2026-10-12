@@ -55,7 +55,7 @@ fun AnimatedCheck(
     Box(clickable, contentAlignment = Alignment.Center) {
         Box(
             Modifier
-                .size(30.dp)
+                .size(26.dp)
                 .scale(scale)
                 .clip(CircleShape)
                 .background(fill)
@@ -63,7 +63,7 @@ fun AnimatedCheck(
             contentAlignment = Alignment.Center,
         ) {
             AnimatedVisibility(checked, enter = scaleIn(spring(dampingRatio = Spring.DampingRatioHighBouncy)), exit = scaleOut()) {
-                Icon(Icons.Rounded.Check, null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(20.dp))
+                Icon(Icons.Rounded.Check, null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(17.dp))
             }
             if (skipped && !checked) {
                 Icon(Icons.Rounded.Remove, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))

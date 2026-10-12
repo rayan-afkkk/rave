@@ -7,6 +7,9 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.runtime.staticCompositionLocalOf
 
 internal val LightColors = lightColorScheme(
@@ -93,7 +96,15 @@ fun RaveTheme(
     content: @Composable () -> Unit,
 ) {
     val extended = if (darkTheme) DarkExtendedColors else LightExtendedColors
-    CompositionLocalProvider(LocalExtendedColors provides extended, LocalIsDarkTheme provides darkTheme) {
+    // Ignore the system font-size setting so text, buttons and cards keep the same size on
+    // every phone (the layout is designed around this fixed scale).
+    val density = LocalDensity.current
+    val fixedDensity = remember(density.density) { Density(density.density, fontScale = 1f) }
+    CompositionLocalProvider(
+        LocalExtendedColors provides extended,
+        LocalIsDarkTheme provides darkTheme,
+        LocalDensity provides fixedDensity,
+    ) {
         MaterialTheme(
             colorScheme = if (darkTheme) DarkColors else LightColors,
             typography = RaveTypography,

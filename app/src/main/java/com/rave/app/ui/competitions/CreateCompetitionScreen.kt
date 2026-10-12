@@ -1,6 +1,7 @@
 package com.rave.app.ui.competitions
 
 import androidx.compose.foundation.layout.Arrangement
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -127,8 +128,8 @@ fun CreateCompetitionScreen(onBack: () -> Unit, onCreated: (String) -> Unit, vie
     LaunchedEffect(s.createdId) { s.createdId?.let(onCreated) }
     RaveScreen(title = stringResource(R.string.comp_create), onBack = onBack) {
         Column(
-            Modifier.verticalScroll(rememberScrollState()).imePadding().navigationBarsPadding().padding(horizontal = 20.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            Modifier.verticalScroll(rememberScrollState()).imePadding().navigationBarsPadding().padding(horizontal = Dimens.ScreenPadding, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap),
         ) {
             OutlinedTextField(s.name, { v -> viewModel.edit { it.copy(name = v.take(40)) } }, label = { Text(stringResource(R.string.comp_name)) },
                 singleLine = true, modifier = Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium)

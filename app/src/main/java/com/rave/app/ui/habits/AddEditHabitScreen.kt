@@ -1,6 +1,7 @@
 package com.rave.app.ui.habits
 
 import androidx.annotation.StringRes
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -134,7 +135,7 @@ fun AddEditHabitScreen(
                 .verticalScroll(rememberScrollState())
                 .imePadding()
                 .navigationBarsPadding()
-                .padding(horizontal = 20.dp, vertical = 8.dp),
+                .padding(horizontal = Dimens.ScreenPadding, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             if (!state.isEdit) {

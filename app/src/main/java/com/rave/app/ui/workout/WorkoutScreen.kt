@@ -1,6 +1,7 @@
 package com.rave.app.ui.workout
 
 import android.widget.Toast
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -187,7 +188,7 @@ fun WorkoutScreen(onBack: () -> Unit, onFinished: (Long) -> Unit, viewModel: Wor
 private fun SummaryStrip(state: WorkoutUiState) {
     val c = RaveTheme.colors
     Row(
-        Modifier.fillMaxWidth().clip(MaterialTheme.shapes.large).background(c.accentCard).padding(horizontal = 20.dp, vertical = 14.dp),
+        Modifier.fillMaxWidth().clip(MaterialTheme.shapes.large).background(c.accentCard).padding(horizontal = Dimens.ScreenPadding, vertical = 14.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Strip(Format.duration(state.elapsedS), stringResource(R.string.stat_time))

@@ -1,6 +1,7 @@
 package com.rave.app.ui.friends
 
 import androidx.compose.foundation.layout.Arrangement
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -81,7 +82,7 @@ fun FriendRequestsScreen(onBack: () -> Unit, onOpenCompetition: (String) -> Unit
             EmptyState(Icons.Rounded.Inbox, stringResource(R.string.inbox_empty_title), stringResource(R.string.inbox_empty_body))
             return@RaveScreen
         }
-        LazyColumn(contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        LazyColumn(contentPadding = PaddingValues(Dimens.ScreenPadding), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             if (state.requests.incoming.isNotEmpty()) {
                 item { SectionHeader(stringResource(R.string.inbox_incoming)) }
                 items(state.requests.incoming, key = { it.id }) { r ->

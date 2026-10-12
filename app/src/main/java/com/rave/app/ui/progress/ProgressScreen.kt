@@ -1,6 +1,7 @@
 package com.rave.app.ui.progress
 
 import androidx.compose.foundation.layout.Arrangement
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -55,8 +56,8 @@ fun ProgressScreen(onBack: () -> Unit, viewModel: ProgressViewModel = hiltViewMo
         }
         val chart = RaveTheme.colors.chart
         Column(
-            Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = 20.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = Dimens.ScreenPadding, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap),
         ) {
             // Points + level
             SectionCard(color = RaveTheme.colors.accentCard) {

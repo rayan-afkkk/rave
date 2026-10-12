@@ -1,6 +1,7 @@
 package com.rave.app.ui.friends
 
 import android.Manifest
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -136,8 +137,8 @@ fun AddFriendScreen(
         }
 
         Column(
-            Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = 20.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = Dimens.ScreenPadding, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap),
         ) {
             SectionCard {
                 Text(stringResource(R.string.add_friend_by_code), style = MaterialTheme.typography.titleSmall)

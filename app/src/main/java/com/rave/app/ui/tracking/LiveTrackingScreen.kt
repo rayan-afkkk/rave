@@ -1,6 +1,7 @@
 package com.rave.app.ui.tracking
 
 import androidx.activity.compose.BackHandler
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -269,7 +270,7 @@ private fun LiveTrackingContent(viewModel: LiveTrackingViewModel, onBack: () -> 
                 contentAlignment = Alignment.Center,
             ) {
                 Surface(shape = PillShape, color = MaterialTheme.colorScheme.surface) {
-                    Row(Modifier.padding(horizontal = 20.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.padding(horizontal = Dimens.ScreenPadding, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Rounded.LockOpen, null, tint = MaterialTheme.colorScheme.primary)
                         Spacer(Modifier.width(8.dp))
                         Text(unlockHint, style = MaterialTheme.typography.labelLarge)

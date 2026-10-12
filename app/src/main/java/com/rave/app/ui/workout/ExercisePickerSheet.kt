@@ -1,6 +1,7 @@
 package com.rave.app.ui.workout
 
 import androidx.annotation.StringRes
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -88,7 +89,7 @@ fun ExercisePickerSheet(
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = MaterialTheme.colorScheme.surface,
     ) {
-        Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 20.dp)) {
+        Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = Dimens.ScreenPadding)) {
             Text(stringResource(R.string.workout_add_exercise), style = MaterialTheme.typography.headlineSmall)
             Spacer(Modifier.height(10.dp))
             OutlinedTextField(

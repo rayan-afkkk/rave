@@ -1,6 +1,7 @@
 package com.rave.app.ui.competitions
 
 import androidx.compose.foundation.background
+import com.rave.app.ui.theme.Dimens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -111,7 +112,7 @@ fun CompetitionResultScreen(onBack: () -> Unit, viewModel: CompetitionResultView
             Text(
                 if (iWon) stringResource(R.string.comp_you_won) else winner?.let { stringResource(R.string.comp_winner, it.score.name) } ?: "",
                 style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = Dimens.ScreenPadding),
             )
             if (iWon) {
                 Text(stringResource(R.string.comp_badge_awarded), style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center,

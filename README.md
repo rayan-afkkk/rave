@@ -86,6 +86,11 @@ firestore.rules      Security rules · firestore.indexes.json  Composite indexes
 `RaveTheme.colors.*` (gradient, habit tiles, chart colours, nav bar, accent card). Literals live
 only in `ui/theme/Color.kt`.
 
+**Sizing rule:** the app starts in the light theme (dark and system are options in Settings).
+Text ignores the phone's font-size setting (`RaveTheme` pins `fontScale = 1`), so buttons, cards and
+text look the same on every device. Shared sizes (padding, button/chip/row heights, nav bar) live in
+`ui/theme/Dimens.kt`.
+
 ## Setup
 
 1. Install the latest stable Android Studio with Android SDK 36.

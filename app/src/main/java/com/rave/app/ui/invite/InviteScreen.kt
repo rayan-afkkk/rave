@@ -1,6 +1,7 @@
 package com.rave.app.ui.invite
 
 import android.content.ClipData
+import com.rave.app.ui.theme.Dimens
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
@@ -96,8 +97,8 @@ fun InviteScreen(onBack: () -> Unit, viewModel: InviteViewModel = hiltViewModel(
         val copied = stringResource(R.string.invite_copied)
 
         Column(
-            Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = 20.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = Dimens.ScreenPadding, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(stringResource(R.string.invite_headline), style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
