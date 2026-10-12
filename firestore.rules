@@ -1,0 +1,122 @@
+rules_version = '2';
+
+// Security rules for Rave.
+// Principles: users only write their own data; participants only update their own
+// participant doc; friend edges need an accepted request; feed reads are limited to the
+// audience the owner chose. Competition values are re-validated by a Cloud Function.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isMe(uid) { return signedIn() && request.auth.uid == uid; }
+    function onlyChanges(keys) { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys); }
+
+    // ---- Users ----
+    match /users/{uid} {
+      // Profiles (name, username, stats summary) are readable by signed-in users so friends
+      // can be found; the app hides stats of PRIVATE profiles from non-friends.
+      allow read: if signedIn();
+      allow create, update: if isMe(uid)
+        && (!('username' in request.resource.data) || request.resource.data.username.matches('^[a-z0-9_]{3,20}$'));
+      allow delete: if isMe(uid);
+
+      // Friend edges. Owner manages their own list; the other side may add itself only when
+      // an ACCEPTED request between the two exists (written in the same batch).
+      match /friends/{friendUid} {
+        allow read: if isMe(uid) || isMe(friendUid);
+        allow write: if isMe(uid);
+        allow create: if isMe(friendUid)
+          && getAfter(/databases/$(database)/documents/friendRequests/$(uid + '_' + friendUid)).data.status == 'ACCEPTED';
+        allow delete: if isMe(friendUid);
+      }
+
+      // Private sub-collections (FCM tokens, activity summaries, day summaries, backup).
+      match /tokens/{token} { allow read, write: if isMe(uid); }
+      match /backup/{doc} { allow read, write: if isMe(uid); }
+      match /days/{day} { allow read, write: if isMe(uid); }
+      match /activities/{activityId} {
+        allow read, write: if isMe(uid);
+      }
+    }
+
+    // ---- Friend requests: id = {from}_{to} ----
+    match /friendRequests/{id} {
+      allow read: if signedIn() && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.from == request.auth.uid
+        && id == request.auth.uid + '_' + request.resource.data.to
+        && request.resource.data.status == 'PENDING';
+      // Only the recipient can accept/decline; the sender can cancel (delete).
+      allow update: if signedIn() && resource.data.to == request.auth.uid && onlyChanges(['status'])
+        && request.resource.data.status in ['ACCEPTED', 'DECLINED'];
+      allow delete: if signedIn() && resource.data.from == request.auth.uid;
+    }
+
+    // ---- Nudges: id = {from}_{to}_{yyyyMMdd} → max one per friend per day ----
+    match /nudges/{id} {
+      allow read: if signedIn() && (resource.data.to == request.auth.uid || resource.data.from == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.from == request.auth.uid
+        && id.matches(request.auth.uid + '_' + request.resource.data.to + '_[0-9]{8}')
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid)/friends/$(request.resource.data.to));
+      allow update, delete: if false;
+    }
+
+    // ---- Invite codes ----
+    match /invites/{code} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.createdBy == request.auth.uid;
+      allow update, delete: if signedIn() && resource.data.createdBy == request.auth.uid;
+    }
+
+    // ---- Activity feed (simplified, privacy-trimmed polylines only) ----
+    match /feed/{id} {
+      allow read: if signedIn() && request.auth.uid in resource.data.audience;
+      allow create, update: if signedIn() && request.resource.data.ownerUid == request.auth.uid
+        && (resource == null || resource.data.ownerUid == request.auth.uid);
+      // Friends may only add/remove their own uid in `cheers`.
+      allow update: if signedIn() && request.auth.uid in resource.data.audience && onlyChanges(['cheers'])
+        && request.resource.data.cheers.toSet().difference(resource.data.get('cheers', []).toSet()).hasOnly([request.auth.uid])
+        && resource.data.get('cheers', []).toSet().difference(request.resource.data.cheers.toSet()).hasOnly([request.auth.uid]);
+      allow delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
+    }
+
+    // ---- Shared streaks ----
+    match /sharedStreaks/{id} {
+      allow read: if signedIn() && request.auth.uid in resource.data.members;
+      allow create: if signedIn() && request.auth.uid in request.resource.data.members
+        && request.resource.data.members.size() == 2 && request.resource.data.invitedBy == request.auth.uid;
+      allow update: if signedIn() && request.auth.uid in resource.data.members
+        && request.resource.data.members == resource.data.members
+        && request.resource.data.invitedBy == resource.data.invitedBy;
+      allow delete: if false;
+    }
+
+    // ---- Competitions ----
+    match /competitions/{id} {
+      allow read: if signedIn();   // needed to open a competition from an invite link
+      allow create: if signedIn() && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.members == [request.auth.uid]
+        && request.resource.data.invited.size() <= 19;
+      // Creator can edit details; anyone can add/remove only themselves (join/leave/decline).
+      allow update: if signedIn() && (
+        (resource.data.createdBy == request.auth.uid && request.resource.data.createdBy == resource.data.createdBy)
+        || (onlyChanges(['members', 'invited', 'teams'])
+            && request.resource.data.members.size() <= 20
+            && request.resource.data.members.toSet().difference(resource.data.members.toSet()).hasOnly([request.auth.uid])
+            && resource.data.members.toSet().difference(request.resource.data.members.toSet()).hasOnly([request.auth.uid])
+            && resource.data.invited.toSet().difference(request.resource.data.invited.toSet()).hasOnly([request.auth.uid])
+            && request.resource.data.invited.toSet().difference(resource.data.invited.toSet()).size() == 0)
+      );
+      allow delete: if signedIn() && resource.data.createdBy == request.auth.uid;
+
+      // Participants write only their own doc, and only if they are a member.
+      // `value` is recomputed server-side by the validateParticipant Cloud Function.
+      match /participants/{uid} {
+        allow read: if signedIn();
+        allow write: if isMe(uid)
+          && request.auth.uid in get(/databases/$(database)/documents/competitions/$(id)).data.members;
+      }
+    }
+  }
+}
