@@ -13,7 +13,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -40,8 +39,8 @@ import androidx.lifecycle.viewModelScope
 import android.content.Context
 import com.rave.app.R
 import com.rave.app.data.cloud.AuthRepository
+import com.rave.app.ui.components.GoogleSignInButton
 import com.rave.app.ui.components.EmptyState
-import com.rave.app.ui.components.PillButton
 import com.rave.app.ui.components.RaveScreen
 import com.rave.app.ui.components.TonalPillButton
 import com.rave.app.ui.theme.RaveTheme
@@ -129,8 +128,7 @@ fun SignInScreen(onDone: () -> Unit, onSkip: () -> Unit, viewModel: SignInViewMo
                 TonalPillButton(stringResource(R.string.signin_continue_guest), onClick = onSkip, modifier = Modifier.fillMaxWidth())
                 return@RaveScreen
             }
-            PillButton(stringResource(R.string.signin_google), onClick = { viewModel.google(context) }, icon = Icons.Rounded.AccountCircle,
-                enabled = !state.busy, modifier = Modifier.fillMaxWidth())
+            GoogleSignInButton(onClick = { viewModel.google(context) }, busy = state.busy)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 HorizontalDivider(Modifier.weight(1f))
                 Text("  " + stringResource(R.string.signin_or) + "  ", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)

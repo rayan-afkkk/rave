@@ -1,6 +1,7 @@
 package com.rave.app.ui.onboarding
 
 import android.Manifest
+import com.rave.app.ui.components.GoogleSignInButton
 import com.rave.app.ui.theme.Dimens
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -37,17 +38,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.CloudDone
 import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material.icons.rounded.Notifications
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -319,22 +317,7 @@ private fun SignInPage(
         }
         Spacer(Modifier.height(24.dp))
         if (available) {
-            Surface(
-                onClick = { onGoogle(context) },
-                enabled = !busy,
-                shape = PillShape,
-                color = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.onSurface,
-                shadowElevation = 2.dp,
-                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
-            ) {
-                Row(Modifier.padding(vertical = 16.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                    if (busy) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                    else Icon(Icons.Rounded.AccountCircle, null, tint = MaterialTheme.colorScheme.primary)
-                    Spacer(Modifier.width(10.dp))
-                    Text(stringResource(R.string.signin_google), style = MaterialTheme.typography.labelLarge)
-                }
-            }
+            GoogleSignInButton(onClick = { onGoogle(context) }, busy = busy)
             error?.let {
                 Spacer(Modifier.height(8.dp))
                 Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)

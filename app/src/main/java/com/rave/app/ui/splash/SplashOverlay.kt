@@ -7,9 +7,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
@@ -33,7 +32,7 @@ import kotlinx.coroutines.delay
 
 /**
  * Animated launch screen shown once per cold start, on top of the app:
- * the three pills grow in one after another, the wordmark rises in, then the
+ * the three pills grow in one after another, the wordmark slides out beside them, then the
  * whole screen fades into the app. About 1.6 s; taps are blocked while it shows.
  */
 @Composable
@@ -66,23 +65,25 @@ fun SplashOverlay(onFinished: () -> Unit) {
             .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {},
         contentAlignment = Alignment.Center,
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        // Horizontal lockup, like the logo: mark on the left, wordmark sliding out from behind it.
+        Row(verticalAlignment = Alignment.CenterVertically) {
             RaveLogo(
                 color = colors.splashMark,
                 progress = pills.value,
-                modifier = Modifier.size(112.dp).graphicsLayer {
-                    val s = logoScale.value * (1f + 0.08f * exit.value)
+                modifier = Modifier.size(76.dp).graphicsLayer {
+                    val s = logoScale.value * (1f + 0.06f * exit.value)
                     scaleX = s; scaleY = s
                 },
             )
             Text(
                 text = stringResource(R.string.app_name).lowercase(),
                 color = colors.splashText,
-                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold, fontSize = 34.sp, letterSpacing = (-1).sp),
+                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold, fontSize = 44.sp, letterSpacing = (-1.5).sp),
                 modifier = Modifier.graphicsLayer {
                     alpha = word.value
-                    // The logo has empty space below the pills, so pull the wordmark up into it.
-                    translationY = (1f - word.value) * 12.dp.toPx() - 16.dp.toPx()
+                    // Slide the word out from behind the mark.
+                    translationX = -2.dp.toPx() - (1f - word.value) * 18.dp.toPx()
+                    translationY = -2.dp.toPx()
                 },
             )
         }
