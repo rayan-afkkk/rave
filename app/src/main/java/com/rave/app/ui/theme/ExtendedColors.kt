@@ -26,6 +26,9 @@ data class ExtendedColors(
     val tilePink: TileColor,
     val tileBlue: TileColor,
     val chart: List<Color>,
+    val splashBackground: Color = SplashBackground,
+    val splashMark: Color = SplashMark,
+    val splashText: Color = SplashText,
 ) {
     val tiles: List<TileColor> get() = listOf(tilePeach, tileGreen, tilePink, tileBlue)
 }

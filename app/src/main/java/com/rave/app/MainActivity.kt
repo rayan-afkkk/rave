@@ -9,13 +9,19 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.rave.app.core.DeepLinkHandler
 import com.rave.app.domain.model.ThemeMode
 import com.rave.app.ui.RaveApp
+import com.rave.app.ui.splash.SplashOverlay
 import com.rave.app.ui.theme.RaveTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -29,6 +35,8 @@ class MainActivity : ComponentActivity() {
     @Inject lateinit var deepLinks: DeepLinkHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Black system splash; it hands over straight away to the animated SplashOverlay.
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         if (savedInstanceState == null) handleIntent(intent)
@@ -41,18 +49,25 @@ class MainActivity : ComponentActivity() {
                 ThemeMode.DARK -> true
                 ThemeMode.SYSTEM -> isSystemInDarkTheme()
             }
+            // Once per launch (not again on rotation).
+            var showSplash by rememberSaveable { mutableStateOf(savedInstanceState == null) }
+            // Light status-bar icons while the black splash is up.
+            val darkBars = darkTheme || showSplash
 
             // Keep status/nav bar icon colours in sync with the in-app theme, not just the system one.
-            DisposableEffect(darkTheme) {
+            DisposableEffect(darkBars) {
                 enableEdgeToEdge(
-                    statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { darkTheme },
-                    navigationBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { darkTheme },
+                    statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { darkBars },
+                    navigationBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { darkBars },
                 )
                 onDispose { }
             }
 
             RaveTheme(darkTheme = darkTheme) {
-                RaveApp(viewModel)
+                Box {
+                    RaveApp(viewModel)
+                    if (showSplash) SplashOverlay(onFinished = { showSplash = false })
+                }
             }
         }
     }

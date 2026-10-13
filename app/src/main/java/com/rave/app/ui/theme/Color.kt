@@ -39,6 +39,11 @@ internal val Chart2 = Color(0xFF9A4518)
 internal val Chart3 = Color(0xFF5F7A2A)
 internal val Chart4 = Color(0xFFB8417F)
 
+// ---- Splash (same in light and dark: the brand launch screen is always black) ----
+internal val SplashBackground = Color(0xFF17110E)
+internal val SplashMark = Color(0xFFFF7A2E)
+internal val SplashText = Color(0xFFF6E9DF)
+
 // ---- Dark ----
 internal val DarkBackground = Color(0xFF17110E)
 internal val DarkSurface = Color(0xFF241A16)

@@ -6,4 +6,12 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
+
+    <!-- Launch theme: a plain black system splash (no icon), so the animated Compose splash
+         (ui/splash/SplashOverlay.kt) starts on the same black with no flash. -->
+    <style name="Theme.Rave.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon_blank</item>
+        <item name="postSplashScreenTheme">@style/Theme.Rave</item>
+    </style>
 </resources>
