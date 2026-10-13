@@ -1,5 +1,6 @@
 package com.rave.app.di
 
+import com.rave.app.data.local.dao.StepsDao
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
@@ -31,7 +32,9 @@ object DataModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
-        Room.databaseBuilder(context, AppDatabase::class.java, AppDatabase.NAME).build()
+        Room.databaseBuilder(context, AppDatabase::class.java, AppDatabase.NAME)
+            .addMigrations(AppDatabase.MIGRATION_1_2)
+            .build()
 
     @Provides fun provideHabitDao(db: AppDatabase): HabitDao = db.habitDao()
     @Provides fun provideHabitLogDao(db: AppDatabase): HabitLogDao = db.habitLogDao()
@@ -40,6 +43,7 @@ object DataModule {
     @Provides fun provideStatsDao(db: AppDatabase): StatsDao = db.statsDao()
     @Provides fun providePrivacyZoneDao(db: AppDatabase): PrivacyZoneDao = db.privacyZoneDao()
     @Provides fun provideWorkoutDao(db: AppDatabase): WorkoutDao = db.workoutDao()
+    @Provides fun provideStepsDao(db: AppDatabase): StepsDao = db.stepsDao()
 
     @Provides
     @Singleton

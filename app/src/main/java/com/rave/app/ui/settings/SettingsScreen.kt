@@ -149,6 +149,9 @@ fun SettingsScreen(
                 NumberRow(stringResource(R.string.settings_weight), s.weightKg, stringResource(R.string.unit_kg)) { v -> viewModel.update { it.copy(weightKg = v) } }
                 NumberRow(stringResource(R.string.settings_height), s.heightCm, stringResource(R.string.unit_cm)) { v -> viewModel.update { it.copy(heightCm = v) } }
                 NumberRow(stringResource(R.string.settings_daily_goal), s.dailyGoalKm, stringResource(R.string.unit_km)) { v -> viewModel.update { it.copy(dailyGoalKm = v) } }
+                NumberRow(stringResource(R.string.settings_step_goal), s.dailyStepGoal.toFloat(), stringResource(R.string.unit_steps), decimals = 0) { v ->
+                    viewModel.update { it.copy(dailyStepGoal = v.toInt().coerceIn(500, 100_000)) }
+                }
             }
 
             // Tracking
@@ -306,17 +309,18 @@ private fun ValueRow(title: String, value: String) {
 }
 
 @Composable
-private fun NumberRow(title: String, value: Float, unit: String, onSave: (Float) -> Unit) {
+private fun NumberRow(title: String, value: Float, unit: String, decimals: Int = 1, onSave: (Float) -> Unit) {
+    val pattern = "%.${decimals}f"
     var editing by rememberSaveable { mutableStateOf(false) }
     Row(
         Modifier.fillMaxWidth().heightIn(min = 52.dp).clickable { editing = true },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(title, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-        Text("${"%.1f".format(value)} $unit", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+        Text("${pattern.format(value)} $unit", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
     }
     if (editing) {
-        var text by rememberSaveable { mutableStateOf("%.1f".format(value)) }
+        var text by rememberSaveable { mutableStateOf(pattern.format(value)) }
         AlertDialog(
             onDismissRequest = { editing = false },
             title = { Text(title) },

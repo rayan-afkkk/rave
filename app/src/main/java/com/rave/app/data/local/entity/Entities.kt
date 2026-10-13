@@ -223,3 +223,11 @@ data class WorkoutSetEntity(
     val done: Boolean = false,
     val completedAt: Long? = null,
 )
+
+/** Steps counted on one calendar day (date = ISO yyyy-MM-dd, local time). */
+@Entity(tableName = "daily_steps")
+data class DailyStepsEntity(
+    @PrimaryKey val date: String,
+    val steps: Int,
+    val updatedAt: Long,
+)

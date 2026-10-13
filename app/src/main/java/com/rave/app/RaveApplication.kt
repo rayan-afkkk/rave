@@ -9,6 +9,7 @@ import com.rave.app.data.repository.StreakRepository
 import com.rave.app.notifications.Notifier
 import com.rave.app.tracking.autodetect.AutoDetectManager
 import com.rave.app.work.DailyStreakWorker
+import com.rave.app.work.StepSyncWorker
 import com.rave.app.work.ReminderScheduler
 import com.rave.app.work.SyncScheduler
 import dagger.hilt.android.HiltAndroidApp
@@ -34,6 +35,7 @@ class RaveApplication : Application(), Configuration.Provider {
         super.onCreate()
         notifier.createChannels()
         DailyStreakWorker.schedule(this)
+        StepSyncWorker.schedule(this)
         sync.schedulePeriodic()
         scope.launch {
             // Catch up on days closed while the app wasn't running, and re-arm reminders.

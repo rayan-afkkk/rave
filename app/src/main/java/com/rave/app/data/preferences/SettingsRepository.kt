@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.rave.app.domain.model.DistanceUnit
@@ -72,6 +73,7 @@ class SettingsRepository @Inject constructor(
             weightKg = this[Keys.WEIGHT] ?: d.weightKg,
             heightCm = this[Keys.HEIGHT] ?: d.heightCm,
             dailyGoalKm = this[Keys.DAILY_GOAL] ?: d.dailyGoalKm,
+            dailyStepGoal = this[Keys.STEP_GOAL] ?: d.dailyStepGoal,
             autoDetectWalks = this[Keys.AUTO_DETECT] ?: d.autoDetectWalks,
             batterySaverGps = this[Keys.BATTERY_SAVER] ?: d.batterySaverGps,
             autoPause = this[Keys.AUTO_PAUSE] ?: d.autoPause,
@@ -92,6 +94,7 @@ class SettingsRepository @Inject constructor(
         this[Keys.WEIGHT] = s.weightKg
         this[Keys.HEIGHT] = s.heightCm
         this[Keys.DAILY_GOAL] = s.dailyGoalKm
+        this[Keys.STEP_GOAL] = s.dailyStepGoal
         this[Keys.AUTO_DETECT] = s.autoDetectWalks
         this[Keys.BATTERY_SAVER] = s.batterySaverGps
         this[Keys.AUTO_PAUSE] = s.autoPause
@@ -112,6 +115,7 @@ class SettingsRepository @Inject constructor(
         val WEIGHT = floatPreferencesKey("weight_kg")
         val HEIGHT = floatPreferencesKey("height_cm")
         val DAILY_GOAL = floatPreferencesKey("daily_goal_km")
+        val STEP_GOAL = intPreferencesKey("daily_step_goal")
         val AUTO_DETECT = booleanPreferencesKey("auto_detect")
         val BATTERY_SAVER = booleanPreferencesKey("battery_saver")
         val AUTO_PAUSE = booleanPreferencesKey("auto_pause")

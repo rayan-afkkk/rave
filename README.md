@@ -26,6 +26,9 @@ plus friends, shared streaks, competitions and invites.
   estimated 1RM by Epley, best set volume, most reps, longest hold), along with history and
   personal records. A "Workout" habit type ticks itself off. Sessions are saved live, so they
   survive the app being killed.
+- **Everyday fitness**: all-day step counting with the phone's hardware step counter (works while
+  the app is closed, survives reboots), distance and calories from steps and body stats, active
+  minutes from tracked activities and workouts, a daily step goal and a 7-day step chart, all on Home.
 - **Insights**: weekly pill bars, monthly heatmap, km chart (weekly/monthly), points, best streaks.
 - **Share cards**: 4 templates (warm, dark, minimal, transparent sticker), Instagram Story,
   WhatsApp, save to gallery, system share. Privacy trimming is applied automatically (first/last

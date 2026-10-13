@@ -125,6 +125,7 @@ fun HomeScreen(
                     )
                 }
             }
+            item(key = "fitness") { TodayActivityCard() }
             item(key = "week") { WeekStrip(state, viewModel::selectDate) }
             item(key = "routine_header") {
                 val title = if (state.selectedDate == state.today) stringResource(R.string.home_routine_today)

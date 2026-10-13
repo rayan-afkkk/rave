@@ -14,6 +14,7 @@ data class UserSettings(
     val weightKg: Float = 70f,
     val heightCm: Float = 170f,
     val dailyGoalKm: Float = 3f,
+    val dailyStepGoal: Int = 8_000,
     val autoDetectWalks: Boolean = false,
     val batterySaverGps: Boolean = false,
     val autoPause: Boolean = true,

@@ -1,5 +1,9 @@
 package com.rave.app.data.local
 
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.rave.app.data.local.dao.StepsDao
+import com.rave.app.data.local.entity.DailyStepsEntity
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
@@ -40,8 +44,9 @@ import com.rave.app.data.local.entity.UserStatsEntity
         ExerciseEntity::class,
         WorkoutEntity::class,
         WorkoutSetEntity::class,
+        DailyStepsEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
@@ -53,8 +58,19 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun statsDao(): StatsDao
     abstract fun privacyZoneDao(): PrivacyZoneDao
     abstract fun workoutDao(): WorkoutDao
+    abstract fun stepsDao(): StepsDao
 
     companion object {
         const val NAME = "rave.db"
+
+        /** v2: daily step counts. */
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `daily_steps` (`date` TEXT NOT NULL, `steps` INTEGER NOT NULL, " +
+                        "`updatedAt` INTEGER NOT NULL, PRIMARY KEY(`date`))",
+                )
+            }
+        }
     }
 }
