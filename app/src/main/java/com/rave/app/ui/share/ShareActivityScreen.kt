@@ -66,6 +66,8 @@ data class ShareActivityState(
     val activity: ActivityEntity? = null,
     /** Route with privacy rules applied (ends trimmed, zones removed). */
     val segments: List<List<LatLngPoint>> = emptyList(),
+    /** True when the activity has GPS points but privacy zones hid all of them. */
+    val routeHidden: Boolean = false,
     val streak: Int = 0,
     val unit: DistanceUnit = DistanceUnit.KM,
 )
@@ -85,9 +87,16 @@ class ShareActivityViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val activity = activities.get(id) ?: return@launch
-            val segments = privacy.publicSegments(activities.points(id))
+            val points = activities.points(id)
+            val segments = privacy.shareCardSegments(points)
             val streak = streaks.observeStreaks().first()[StreakEntity.OVERALL]?.current ?: 0
-            _state.value = ShareActivityState(activity, segments, streak, settings.current().unit)
+            _state.value = ShareActivityState(
+                activity = activity,
+                segments = segments,
+                routeHidden = segments.isEmpty() && points.size >= 2,
+                streak = streak,
+                unit = settings.current().unit,
+            )
         }
     }
 }
@@ -121,8 +130,12 @@ private fun BoxScope.ActivityCard(a: ActivityEntity, state: ShareActivityState, 
             Instant.ofEpochMilli(a.startTime).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)),
             style = style(13, androidx.compose.ui.text.font.FontWeight.Medium), color = p.secondaryText,
         )
-        Box(Modifier.weight(1f).fillMaxWidth()) {
-            RouteCanvas(state.segments, p.route, Modifier.fillMaxSize().padding(vertical = 12.dp), strokeWidth = 5.dp, padding = 12.dp)
+        Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+            if (state.segments.isNotEmpty()) {
+                RouteCanvas(state.segments, p.route, Modifier.fillMaxSize().padding(vertical = 12.dp), strokeWidth = 5.dp, padding = 12.dp)
+            } else if (state.routeHidden) {
+                Text(stringResource(R.string.share_route_hidden), style = style(13, androidx.compose.ui.text.font.FontWeight.Medium), color = p.secondaryText)
+            }
         }
         Row(verticalAlignment = Alignment.Bottom) {
             Text(Format.distance(a.distanceM, unit), style = style(52, androidx.compose.ui.text.font.FontWeight.ExtraBold), color = p.text)

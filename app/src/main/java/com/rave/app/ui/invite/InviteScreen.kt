@@ -93,8 +93,10 @@ fun InviteScreen(onBack: () -> Unit, viewModel: InviteViewModel = hiltViewModel(
         val link = viewModel.invites.appLink(p.inviteCode)
         val message = viewModel.invites.shareMessage(p.inviteCode)
         val qrColor = MaterialTheme.colorScheme.onSurface.toArgb()
-        val qr = remember(link, qrColor) { qrBitmap(link, dark = qrColor).asImageBitmap() }
-        val copied = stringResource(R.string.invite_copied)
+        // The scanner accepts a bare code too, so the QR still works without a link domain.
+        val qrText = link ?: p.inviteCode
+        val qr = remember(qrText, qrColor) { qrBitmap(qrText, dark = qrColor).asImageBitmap() }
+        val copied = stringResource(if (link != null) R.string.invite_copied else R.string.invite_code_copied)
 
         Column(
             Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = Dimens.ScreenPadding, vertical = 8.dp),
@@ -112,7 +114,9 @@ fun InviteScreen(onBack: () -> Unit, viewModel: InviteViewModel = hiltViewModel(
                     Spacer(Modifier.height(12.dp))
                     Text(stringResource(R.string.invite_your_code), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(p.inviteCode, style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
-                    Text(link, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+                    if (link != null) {
+                        Text(link, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+                    }
                 }
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
@@ -124,7 +128,7 @@ fun InviteScreen(onBack: () -> Unit, viewModel: InviteViewModel = hiltViewModel(
                 }
                 Target(Icons.Rounded.Sms, stringResource(R.string.share_sms)) { ShareHelper.shareSms(context, message) }
                 Target(Icons.Rounded.ContentCopy, stringResource(R.string.share_copy)) {
-                    copyToClipboard(context, link)
+                    copyToClipboard(context, link ?: p.inviteCode)
                     Toast.makeText(context, copied, Toast.LENGTH_SHORT).show()
                 }
                 Target(Icons.Rounded.IosShare, stringResource(R.string.share_more)) { ShareHelper.shareText(context, message) }

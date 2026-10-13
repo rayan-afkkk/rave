@@ -143,7 +143,7 @@ class CompetitionDetailViewModel @Inject constructor(
     fun invite(friend: Friend) = viewModelScope.launch { repo.inviteMore(id, listOf(friend.uid)) }
 
     /** Creates (or reuses) a short code for this competition and returns the share text. */
-    suspend fun shareText(competitionName: String, appName: String, template: (String, String, String, String) -> String): String {
+    suspend fun shareText(competitionName: String, appName: String, template: (String, String, String, String?) -> String): String {
         val cached = settings.getString("comp_code_$id")
         val code = cached ?: invites.createTargetInvite(InviteType.COMPETITION, id).also { settings.putString("comp_code_$id", it) }
         return template(appName, competitionName, code, invites.competitionLink(id))
@@ -162,7 +162,10 @@ fun CompetitionDetailScreen(onBack: () -> Unit, onResults: (String) -> Unit, vie
         if (shareRequested && c != null) {
             shareRequested = false
             runCatching {
-                viewModel.shareText(c.name, appName) { a, n, code, link -> context.getString(R.string.comp_share_message, a, n, code, link) }
+                viewModel.shareText(c.name, appName) { a, n, code, link ->
+                    if (link != null) context.getString(R.string.comp_share_message, a, n, code, link)
+                    else context.getString(R.string.comp_share_message_code_only, a, n, code)
+                }
             }.onSuccess { ShareHelper.shareText(context, it) }
         }
     }

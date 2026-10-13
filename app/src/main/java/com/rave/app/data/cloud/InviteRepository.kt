@@ -40,11 +40,19 @@ class InviteRepository @Inject constructor(
     private val sharedStreaks: Lazy<SharedStreakRepository>,
     private val settings: SettingsRepository,
 ) {
-    fun appLink(code: String) = "https://${BuildConfig.INVITE_DOMAIN}/invite/$code"
-    fun competitionLink(competitionId: String) = "https://${BuildConfig.INVITE_DOMAIN}/competition/$competitionId"
+    /** Links need a real App Links domain; until one is configured, invites use the short code only. */
+    private val linkDomain: String? = BuildConfig.INVITE_DOMAIN.trim()
+        .takeIf { it.isNotEmpty() && !it.endsWith("example.com") && !it.startsWith("YOUR_") }
 
-    fun shareMessage(code: String): String =
-        context.getString(R.string.invite_share_message, context.getString(R.string.app_name), code, appLink(code))
+    fun appLink(code: String): String? = linkDomain?.let { "https://$it/invite/$code" }
+    fun competitionLink(competitionId: String): String? = linkDomain?.let { "https://$it/competition/$competitionId" }
+
+    fun shareMessage(code: String): String {
+        val appName = context.getString(R.string.app_name)
+        val link = appLink(code)
+        return if (link != null) context.getString(R.string.invite_share_message, appName, code, link)
+        else context.getString(R.string.invite_share_message_code_only, appName, code)
+    }
 
     suspend fun resolve(rawCode: String): InviteInfo? {
         val code = InviteCodes.normalize(rawCode)

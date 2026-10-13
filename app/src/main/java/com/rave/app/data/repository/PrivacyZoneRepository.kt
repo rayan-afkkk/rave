@@ -28,4 +28,21 @@ class PrivacyZoneRepository @Inject constructor(
         val hideEnds = settings.current().hideStartEnd
         return PrivacyFilter.apply(points.map { LatLngPoint(it.lat, it.lng) }, zones, trimEnds = hideEnds)
     }
+
+    /**
+     * The route for a share card. Cards show only the line on a plain background (no map),
+     * so short walks keep their shape: at most 20% of the route is hidden at each end
+     * instead of a flat 200 m. Privacy zones are still removed.
+     */
+    suspend fun shareCardSegments(points: List<TrackPoint>): List<List<LatLngPoint>> {
+        val zones = dao.getAll().map { PrivacyArea(it.lat, it.lng, it.radiusM) }
+        val hideEnds = settings.current().hideStartEnd
+        return PrivacyFilter.apply(
+            points.map { LatLngPoint(it.lat, it.lng) }, zones, trimEnds = hideEnds, maxTrimFraction = SHARE_CARD_MAX_TRIM,
+        )
+    }
+
+    private companion object {
+        const val SHARE_CARD_MAX_TRIM = 0.2
+    }
 }

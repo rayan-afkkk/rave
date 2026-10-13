@@ -66,18 +66,23 @@ android {
         buildConfigField("boolean", "INVITE_REWARD_ENABLED", "true")
     }
 
-    signingConfigs {
-        create("debugConfig") {
-            storeFile = file("${rootDir}/debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
+    // A shared debug keystore (so the SHA-1 registered in Firebase stays the same on every
+    // machine) is used only when it exists; otherwise Android Studio's default debug key is used.
+    val sharedDebugKeystore = rootProject.file("debug.keystore")
+    if (sharedDebugKeystore.exists()) {
+        signingConfigs {
+            create("debugConfig") {
+                storeFile = sharedDebugKeystore
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
         }
     }
 
     buildTypes {
         debug {
-            signingConfig = signingConfigs.getByName("debugConfig")
+            if (sharedDebugKeystore.exists()) signingConfig = signingConfigs.getByName("debugConfig")
         }
         release {
             isMinifyEnabled = true

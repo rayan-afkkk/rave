@@ -202,6 +202,7 @@
     <string name="share_saved">Saved to gallery</string>
     <string name="share_save_failed">Couldn\'t save the image</string>
     <string name="share_streak">day streak</string>
+    <string name="share_route_hidden">Route hidden by your privacy zones</string>
     <string name="share_activity_text">%1$s: %2$s %3$s on %4$s 🔥</string>
     <string name="template_warm">Warm</string>
     <string name="template_dark">Dark</string>
@@ -403,10 +404,12 @@ Permission was denied. You can turn it on in Settings.</string>
     <string name="invite_body">Share your link, code or QR. You\'ll be friends as soon as they join.</string>
     <string name="invite_your_code">Your invite code</string>
     <string name="invite_copied">Link copied</string>
+    <string name="invite_code_copied">Code copied</string>
     <string name="invite_preparing">Setting up your invite code</string>
     <string name="invite_preparing_body">This only takes a moment after your first sign-in.</string>
     <string name="invite_reward_note">When a friend joins and finishes their first activity, you both get a streak freeze ❄️</string>
     <string name="invite_share_message">Join me on %1$s — let\'s keep our streaks together! Use my code %2$s: %3$s</string>
+    <string name="invite_share_message_code_only">Join me on %1$s — let\'s keep our streaks together! Add me with my invite code %2$s</string>
     <string name="invite_landing_title">Invitation</string>
     <string name="invite_landing_app">%1$s invited you to be friends</string>
     <string name="invite_landing_competition">%1$s invited you to a competition</string>
@@ -490,6 +493,7 @@ Permission was denied. You can turn it on in Settings.</string>
     <string name="comp_invite_friends">Invite friends</string>
     <string name="comp_share_code">Share code</string>
     <string name="comp_share_message">Join my competition “%2$s” on %1$s! Use code %3$s: %4$s</string>
+    <string name="comp_share_message_code_only">Join my competition “%2$s” on %1$s! Use code %3$s</string>
     <string name="comp_missing_title">Competition not found</string>
     <string name="comp_missing_body">It may have been removed.</string>
     <string name="comp_results">Results</string>
