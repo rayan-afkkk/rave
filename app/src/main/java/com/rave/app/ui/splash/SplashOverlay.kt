@@ -10,9 +10,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -77,14 +75,14 @@ fun SplashOverlay(onFinished: () -> Unit) {
                     scaleX = s; scaleY = s
                 },
             )
-            Spacer(Modifier.height(14.dp))
             Text(
                 text = stringResource(R.string.app_name).lowercase(),
                 color = colors.splashText,
                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold, fontSize = 34.sp, letterSpacing = (-1).sp),
                 modifier = Modifier.graphicsLayer {
                     alpha = word.value
-                    translationY = (1f - word.value) * 12.dp.toPx()
+                    // The logo has empty space below the pills, so pull the wordmark up into it.
+                    translationY = (1f - word.value) * 12.dp.toPx() - 16.dp.toPx()
                 },
             )
         }
