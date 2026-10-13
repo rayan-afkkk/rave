@@ -25,6 +25,7 @@ if (envExampleFile.exists()) {
     // First sync: start .env as a copy of .env.example so every key is there, ready to fill in.
     if (!envFile.exists()) envExampleFile.copyTo(envFile)
     val props = Properties()
+    var changed = false
     if (envFile.exists()) {
         envFile.inputStream().use { input -> props.load(input) }
     }
@@ -38,11 +39,13 @@ if (envExampleFile.exists()) {
         "FACEBOOK_APP_ID",
     ).forEach { key ->
         val v = System.getenv(key)
-        if (!v.isNullOrEmpty()) {
+        if (!v.isNullOrEmpty() && props.getProperty(key) != v) {
             props.setProperty(key, v)
+            changed = true
         }
     }
-    envFile.outputStream().use { output -> props.store(output, null) }
+    // .env is tracked in Git, so only rewrite it when an environment variable actually changed a value.
+    if (changed) envFile.outputStream().use { output -> props.store(output, null) }
 }
 
 secrets {
