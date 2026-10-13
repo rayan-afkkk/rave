@@ -2,7 +2,6 @@
 <resources>
     <!-- The app name lives ONLY here. Change it in one place. -->
     <string name="app_name">Rave</string>
-    <string name="default_web_client_id" translatable="false">48032485017-tr58c8qn18l5sevb15df85nh9ougul4c.apps.googleusercontent.com</string>
     <string name="nav_home">Home</string>
     <string name="nav_routes">Routes</string>
     <string name="nav_friends">Friends</string>

@@ -12,7 +12,6 @@ build/
 
 # Secrets & machine-specific config — never commit
 local.properties
-app/google-services.json
 *.jks
 *.keystore
 

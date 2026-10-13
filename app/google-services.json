@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "48032485017",
+    "firebase_url": "https://rave-f64af-default-rtdb.firebaseio.com",
+    "project_id": "rave-f64af",
+    "storage_bucket": "rave-f64af.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:48032485017:android:78adb15cae9f56d40b3208",
+        "android_client_info": {
+          "package_name": "com.rave.applet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "48032485017-al07l2uthkc0nmocijcre4kn3jbudiam.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rave.applet",
+            "certificate_hash": "960c035fa3fbf11d4f69b4c671010e1fcee0e6b3"
+          }
+        },
+        {
+          "client_id": "48032485017-tr58c8qn18l5sevb15df85nh9ougul4c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbcSZ_7YFPOh6q5lqfEHWQnEmKvSU0un0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "48032485017-tr58c8qn18l5sevb15df85nh9ougul4c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
