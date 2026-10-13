@@ -4,4 +4,5 @@
     <color name="window_background">#FFFFF6EC</color>
     <color name="ic_launcher_background">#FFF26B1D</color>
     <color name="ic_launcher_foreground">#FFFFFFFF</color>
+    <color name="ic_launcher_flame_inner">#FFFDE3CF</color>
 </resources>

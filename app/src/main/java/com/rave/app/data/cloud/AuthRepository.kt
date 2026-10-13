@@ -1,15 +1,19 @@
 package com.rave.app.data.cloud
 
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import androidx.credentials.exceptions.GetCredentialCancellationException
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.rave.app.R
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,15 +45,14 @@ class AuthRepository @Inject constructor(
     /** [activityContext] must be an Activity context for the Credential Manager sheet. */
     suspend fun signInWithGoogle(activityContext: Context): Result<Unit> = runCatching {
         val auth = firebase.auth ?: throw CloudUnavailableException()
-        val clientId = webClientId() ?: error("default_web_client_id missing: add the Web OAuth client in Firebase")
-        val option = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false)
-            .setServerClientId(clientId)
-            .build()
+        val clientId = webClientId() ?: error("default_web_client_id missing: ensure google-services.json is present")
+        val activity = activityContext.findActivity()
+            ?: throw IllegalArgumentException("Google Sign-In requires an Activity context")
+        val option = GetSignInWithGoogleOption.Builder(serverClientId = clientId).build()
         val request = GetCredentialRequest.Builder().addCredentialOption(option).build()
-        val credential = CredentialManager.create(activityContext).getCredential(activityContext, request).credential
+        val credential = CredentialManager.create(activity).getCredential(activity, request).credential
         require(credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-            "Unexpected credential type"
+            "Unexpected credential type: ${credential::class.java.name}"
         }
         val idToken = GoogleIdTokenCredential.createFrom(credential.data).idToken
         auth.signInWithCredential(GoogleAuthProvider.getCredential(idToken, null)).await()
@@ -90,13 +93,39 @@ class AuthRepository @Inject constructor(
     private suspend fun afterSignIn(nameOverride: String?) {
         val user = firebase.auth?.currentUser ?: return
         _user.value = user.toCloud(nameOverride)
-        profiles.get().ensureProfile(user.toCloud(nameOverride))
-        migration.get().onSignedIn()
+        val profileResult = runCatching {
+            profiles.get().ensureProfile(user.toCloud(nameOverride))
+        }
+        if (profileResult.isFailure) {
+            val err = profileResult.exceptionOrNull()
+            android.util.Log.w("Auth", "Firestore ensureProfile failed: ${err?.message}. Account is authenticated; update Firestore security rules in Firebase Console.", err)
+        }
+        runCatching { migration.get().onSignedIn() }
     }
 
     private fun webClientId(): String? {
-        val id = context.resources.getIdentifier("default_web_client_id", "string", context.packageName)
-        return if (id == 0) null else context.getString(id)
+        val direct = runCatching { context.getString(R.string.default_web_client_id) }.getOrNull()
+        if (!direct.isNullOrBlank()) return direct
+        val resIdPkg = context.resources.getIdentifier("default_web_client_id", "string", context.packageName)
+        if (resIdPkg != 0) {
+            val v = runCatching { context.getString(resIdPkg) }.getOrNull()
+            if (!v.isNullOrBlank()) return v
+        }
+        val resIdApp = context.resources.getIdentifier("default_web_client_id", "string", "com.rave.app")
+        if (resIdApp != 0) {
+            val v = runCatching { context.getString(resIdApp) }.getOrNull()
+            if (!v.isNullOrBlank()) return v
+        }
+        return null
+    }
+
+    private fun Context.findActivity(): Activity? {
+        var c = this
+        while (c is ContextWrapper) {
+            if (c is Activity) return c
+            c = c.baseContext
+        }
+        return null
     }
 
     private fun FirebaseUser.toCloud(nameOverride: String? = null) = CloudUser(

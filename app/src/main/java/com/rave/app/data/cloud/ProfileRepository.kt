@@ -70,10 +70,12 @@ class ProfileRepository @Inject constructor(
 
     /** Creates the profile on first sign-in (username + invite code), fills gaps on later ones. */
     suspend fun ensureProfile(user: CloudUser) {
-        val ref = users().document(user.uid)
-        val existing = ref.get().await()
         val localName = settings.current().displayName
         val name = user.name.ifBlank { localName }.ifBlank { "Rave friend" }
+        if (localName.isBlank()) settings.update { it.copy(displayName = name) }
+
+        val ref = users().document(user.uid)
+        val existing = ref.get().await()
         if (!existing.exists()) {
             val username = uniqueUsername(name)
             ref.set(
@@ -89,10 +91,11 @@ class ProfileRepository @Inject constructor(
             ).await()
         }
         if (existing.getString("inviteCode").isNullOrBlank()) {
-            val code = createInviteCode(user.uid, name)
-            ref.set(mapOf("inviteCode" to code), SetOptions.merge()).await()
+            runCatching {
+                val code = createInviteCode(user.uid, name)
+                ref.set(mapOf("inviteCode" to code), SetOptions.merge()).await()
+            }
         }
-        if (localName.isBlank()) settings.update { it.copy(displayName = name) }
     }
 
     /** Reserves `invites/{code}` for this user's app invite; retries on (rare) collisions. */
@@ -115,13 +118,18 @@ class ProfileRepository @Inject constructor(
     }
 
     private suspend fun uniqueUsername(name: String): String {
-        val base = name.lowercase().filter { it.isLetterOrDigit() }.take(14).ifEmpty { "rave" }
+        var base = name.lowercase().filter { it.isLetterOrDigit() || it == '_' }.take(14)
+        if (base.length < 3) base = (base + "user").take(14)
+        if (base.length < 3) base = "rave"
         var candidate = base
         repeat(8) {
-            if (!isUsernameTaken(candidate)) return candidate
-            candidate = base + Random.nextInt(10, 9999)
+            val taken = runCatching { isUsernameTaken(candidate) }.getOrDefault(false)
+            if (!taken) return candidate
+            val suffix = Random.nextInt(100, 9999).toString()
+            candidate = base.take(20 - suffix.length) + suffix
         }
-        return base + System.currentTimeMillis() % 100000
+        val suffix = (System.currentTimeMillis() % 100000).toString()
+        return base.take(20 - suffix.length) + suffix
     }
 
     suspend fun isUsernameTaken(username: String, exceptUid: String? = null): Boolean {

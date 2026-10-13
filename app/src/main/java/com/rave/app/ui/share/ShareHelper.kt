@@ -50,7 +50,7 @@ object ShareHelper {
             } else {
                 setDataAndType(uri, "image/png")
             }
-            if (BuildConfig.FACEBOOK_APP_ID.isNotBlank()) putExtra("source_application", BuildConfig.FACEBOOK_APP_ID)
+            if (BuildConfig.FACEBOOK_APP_ID.isNotBlank() && BuildConfig.FACEBOOK_APP_ID != "YOUR_FACEBOOK_APP_ID") putExtra("source_application", BuildConfig.FACEBOOK_APP_ID)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.grantUriPermission(INSTAGRAM, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)

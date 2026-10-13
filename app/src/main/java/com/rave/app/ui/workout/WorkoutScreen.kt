@@ -146,7 +146,7 @@ fun WorkoutScreen(onBack: () -> Unit, onFinished: (Long) -> Unit, viewModel: Wor
                     }
                 }
             }
-            AnimatedVisibility(
+            androidx.compose.animation.AnimatedVisibility(
                 visible = state.restEndsAt != null,
                 enter = slideInVertically { it }, exit = slideOutVertically { it },
                 modifier = Modifier.align(Alignment.BottomCenter),

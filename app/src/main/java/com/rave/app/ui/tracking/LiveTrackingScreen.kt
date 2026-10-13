@@ -293,70 +293,28 @@ private fun LiveTrackingContent(viewModel: LiveTrackingViewModel, onBack: () -> 
 
 @Composable
 private fun TrackingMap(state: TrackingState, follow: Boolean, onUserMovedMap: () -> Unit) {
-    val context = LocalContext.current
-    val dark = RaveTheme.isDark
     val routeColor = MaterialTheme.colorScheme.primary
-    if (BuildConfig.MAPS_API_KEY.isBlank()) {
-        // No Maps key configured: still show the route shape so tracking is usable.
-        Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant)) {
-            RouteCanvas(state.segments, routeColor, Modifier.fillMaxSize().padding(vertical = 120.dp, horizontal = 32.dp), strokeWidth = 6.dp)
-            Text(stringResource(R.string.tracking_no_maps_key), style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.align(Alignment.Center))
-        }
-        return
-    }
-    val camera = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 2f) }
-    val properties = remember(dark) {
-        MapProperties(mapStyleOptions = MapStyleOptions.loadRawResourceStyle(context, if (dark) R.raw.map_style_dark else R.raw.map_style_light))
-    }
-    val ui = remember { MapUiSettings(zoomControlsEnabled = false, compassEnabled = false, myLocationButtonEnabled = false, mapToolbarEnabled = false) }
     val current = state.current
-    var firstFix by remember { mutableStateOf(true) }
+    val currentPt = current?.let { LatLngPoint(it.lat, it.lng) }
+    val startPt = state.start
 
-    LaunchedEffect(current?.lat, current?.lng, follow) {
-        if (current == null || !follow) return@LaunchedEffect
-        val target = LatLng(current.lat, current.lng)
-        if (firstFix) {
-            firstFix = false
-            camera.move(CameraUpdateFactory.newLatLngZoom(target, 17f))
-        } else {
-            camera.animate(CameraUpdateFactory.newLatLng(target), 600)
-        }
-    }
-    LaunchedEffect(camera.isMoving) {
-        if (camera.isMoving && camera.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) onUserMovedMap()
-    }
+    val centerLat = current?.lat ?: startPt?.lat ?: 51.5074
+    val centerLng = current?.lng ?: startPt?.lng ?: -0.1278
 
-    val pulse = rememberInfiniteTransition(label = "pulse")
-    val pulseRadius by pulse.animateFloat(4f, 16f, infiniteRepeatable(tween(1200), RepeatMode.Restart), label = "pulseRadius")
-    val pulseAlpha by pulse.animateFloat(0.45f, 0f, infiniteRepeatable(tween(1200), RepeatMode.Restart), label = "pulseAlpha")
-    val guideColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f)
-    val surface = MaterialTheme.colorScheme.surface
-    val startColor = MaterialTheme.colorScheme.tertiary
-
-    GoogleMap(
-        modifier = Modifier.fillMaxSize(),
-        cameraPositionState = camera,
-        properties = properties,
-        uiSettings = ui,
-    ) {
-        if (state.guide.size >= 2) {
-            Polyline(points = state.guide.toLatLng(), color = guideColor, width = 16f, jointType = JointType.ROUND,
-                startCap = RoundCap(), endCap = RoundCap())
-        }
-        state.segments.filter { it.size >= 2 }.forEach { seg ->
-            Polyline(points = seg.toLatLng(), color = routeColor, width = 14f, jointType = JointType.ROUND,
-                startCap = RoundCap(), endCap = RoundCap())
-        }
-        state.start?.let { s ->
-            Circle(center = LatLng(s.lat, s.lng), radius = 5.0, fillColor = startColor, strokeColor = surface, strokeWidth = 6f)
-        }
-        current?.let { c ->
-            val here = LatLng(c.lat, c.lng)
-            Circle(center = here, radius = pulseRadius.toDouble(), fillColor = routeColor.copy(alpha = pulseAlpha), strokeWidth = 0f)
-            Circle(center = here, radius = 4.0, fillColor = routeColor, strokeColor = surface, strokeWidth = 6f)
-        }
-    }
+    com.rave.app.ui.components.TileMapView(
+        centerLat = centerLat,
+        centerLng = centerLng,
+        initialZoom = 16f,
+        segments = state.segments,
+        currentLocation = currentPt,
+        startLocation = startPt,
+        guidePath = state.guide,
+        followLocation = follow,
+        interactive = true,
+        routeColor = routeColor,
+        onUserPanned = onUserMovedMap,
+        modifier = Modifier.fillMaxSize()
+    )
 }
 
 private fun List<LatLngPoint>.toLatLng(): List<LatLng> = map { LatLng(it.lat, it.lng) }

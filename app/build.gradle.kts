@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.room)
+    alias(libs.plugins.secrets)
 }
 
 // Firebase is optional: the app runs fully offline (guest mode) without it.
@@ -17,23 +18,42 @@ if (file("google-services.json").exists()) {
     apply(plugin = libs.plugins.google.services.get().pluginId)
 }
 
-// Secrets / machine-specific values live in local.properties (git-ignored). See README.md.
-val localProps = Properties().apply {
-    val file = rootProject.file("local.properties")
-    if (file.exists()) file.inputStream().use { load(it) }
+// Populate/sync .env from environment variables provided in AI Studio Secrets panel
+val envFile = rootProject.file(".env")
+val envExampleFile = rootProject.file(".env.example")
+if (envExampleFile.exists()) {
+    val props = Properties()
+    if (envFile.exists()) {
+        envFile.inputStream().use { input -> props.load(input) }
+    }
+    listOf(
+        "MAPS_API_KEY",
+        "MAPTILER_API_KEY",
+        "TOMTOM_API_KEY",
+        "GEOAPIFY_API_KEY",
+        "MAPBOX_ACCESS_TOKEN",
+        "INVITE_DOMAIN",
+        "FACEBOOK_APP_ID",
+    ).forEach { key ->
+        val v = System.getenv(key)
+        if (!v.isNullOrEmpty()) {
+            props.setProperty(key, v)
+        }
+    }
+    envFile.outputStream().use { output -> props.store(output, null) }
 }
-fun localProp(key: String, default: String = ""): String = localProps.getProperty(key) ?: default
 
-val mapsApiKey = localProp("MAPS_API_KEY")
-val inviteDomain = localProp("INVITE_DOMAIN", "rave.example.com")
-val facebookAppId = localProp("FACEBOOK_APP_ID")
+secrets {
+    propertiesFileName = ".env"
+    defaultPropertiesFileName = ".env.example"
+}
 
 android {
     namespace = "com.rave.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.rave.app"
+        applicationId = "com.rave.applet"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -42,18 +62,23 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
 
-        // Injected into AndroidManifest.xml.
-        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
-        manifestPlaceholders["INVITE_DOMAIN"] = inviteDomain
-        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
-        buildConfigField("String", "INVITE_DOMAIN", "\"$inviteDomain\"")
-        // Needed by Instagram's "share to story" intent. Optional.
-        buildConfigField("String", "FACEBOOK_APP_ID", "\"$facebookAppId\"")
         // Feature flag: reward inviter + invitee with a streak freeze.
         buildConfigField("boolean", "INVITE_REWARD_ENABLED", "true")
     }
 
+    signingConfigs {
+        create("debugConfig") {
+            storeFile = file("${rootDir}/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("debugConfig")
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -134,6 +159,7 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.play.services.maps)
     implementation(libs.maps.compose)
+    implementation(libs.coil.compose)
 
     // Widget
     implementation(libs.androidx.glance.appwidget)
@@ -153,6 +179,7 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
+    implementation("com.google.guava:guava:33.3.1-android")
     implementation(libs.mlkit.barcode.scanning)
     implementation(libs.zxing.core)
 

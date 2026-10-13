@@ -77,8 +77,31 @@ class SignInViewModel @Inject constructor(private val auth: AuthRepository) : Vi
         _state.update { it.copy(busy = true, error = null) }
         viewModelScope.launch {
             block()
-                .onSuccess { _state.update { it.copy(busy = false, done = true) } }
-                .onFailure { e -> _state.update { it.copy(busy = false, error = e.message ?: e.javaClass.simpleName) } }
+                .onSuccess {
+                    if (auth.currentUser.value != null) {
+                        _state.update { it.copy(busy = false, done = true) }
+                    } else {
+                        _state.update { it.copy(busy = false) }
+                    }
+                }
+                .onFailure { e ->
+                    if (e is androidx.credentials.exceptions.GetCredentialCancellationException) {
+                        android.util.Log.w("Auth", "Google Sign-In cancelled or dismissed: ${e.message}", e)
+                        _state.update { it.copy(busy = false) }
+                    } else {
+                        android.util.Log.e("Auth", "Sign-in failed", e)
+                        val msg = when {
+                            e.message?.contains("16") == true || e.message?.contains("Cannot find a matching credential") == true ->
+                                "No Google credential found on device. Ensure a Google account is logged in and SHA-1 is added in Firebase."
+                            e.message?.contains("10") == true || e.message?.contains("Developer error", ignoreCase = true) == true ->
+                                "Google Developer Error (10): Ensure SHA-1 fingerprint is added to your Android app in Firebase Console."
+                            e.message?.contains("PERMISSION_DENIED", ignoreCase = true) == true || e.message?.contains("insufficient permissions", ignoreCase = true) == true ->
+                                "Firestore Permission Error: Update your Firestore Security Rules in Firebase Console to allow read/write access."
+                            else -> e.message ?: e.javaClass.simpleName
+                        }
+                        _state.update { it.copy(busy = false, error = msg) }
+                    }
+                }
         }
     }
 }

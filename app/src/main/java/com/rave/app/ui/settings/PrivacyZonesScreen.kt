@@ -1,6 +1,8 @@
 package com.rave.app.ui.settings
 
 import android.annotation.SuppressLint
+import com.rave.app.domain.model.LatLngPoint
+import com.rave.app.ui.components.TileMapView
 import com.rave.app.ui.theme.Dimens
 import android.content.Context
 import androidx.compose.foundation.background
@@ -129,36 +131,33 @@ fun PrivacyZonesScreen(onBack: () -> Unit, viewModel: PrivacyZonesViewModel = hi
 
             Text(stringResource(R.string.privacy_add_help), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Box(Modifier.fillMaxWidth().height(260.dp).clip(MaterialTheme.shapes.large).background(MaterialTheme.colorScheme.surfaceVariant)) {
-                if (BuildConfig.MAPS_API_KEY.isNotBlank()) {
-                    val zoneColor = MaterialTheme.colorScheme.primary
-                    GoogleMap(
-                        modifier = Modifier.fillMaxSize(),
-                        cameraPositionState = camera,
-                        uiSettings = MapUiSettings(zoomControlsEnabled = false, mapToolbarEnabled = false),
-                        onMapClick = { pendingLat = it.latitude; pendingLng = it.longitude },
-                    ) {
-                        zones.forEach {
-                            Circle(LatLng(it.lat, it.lng), radius = it.radiusM, fillColor = zoneColor.copy(alpha = 0.18f),
-                                strokeColor = zoneColor, strokeWidth = 3f)
-                        }
-                        val lat = pendingLat
-                        val lng = pendingLng
-                        if (lat != null && lng != null) {
-                            Circle(LatLng(lat, lng), radius = radius.toDouble(), fillColor = zoneColor.copy(alpha = 0.3f),
-                                strokeColor = zoneColor, strokeWidth = 4f)
-                        }
-                    }
-                } else {
-                    Text(stringResource(R.string.tracking_no_maps_key), modifier = Modifier.align(Alignment.Center).padding(16.dp),
-                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
+                val zoneColor = MaterialTheme.colorScheme.primary
+                val pLat = pendingLat
+                val pLng = pendingLng
+                val pendingCircle: Pair<LatLngPoint, Float>? = if (pLat != null && pLng != null) LatLngPoint(pLat, pLng) to radius else null
+                val zoneCircles: List<Pair<LatLngPoint, Float>> = zones.map { LatLngPoint(it.lat, it.lng) to it.radiusM.toFloat() } + listOfNotNull(pendingCircle)
+                val cLat = pendingLat ?: zones.firstOrNull()?.lat ?: 51.5074
+                val cLng = pendingLng ?: zones.firstOrNull()?.lng ?: -0.1278
+
+                TileMapView(
+                    centerLat = cLat,
+                    centerLng = cLng,
+                    initialZoom = 14f,
+                    circles = zoneCircles,
+                    interactive = true,
+                    routeColor = zoneColor,
+                    onMapClick = { lat, lng ->
+                        pendingLat = lat
+                        pendingLng = lng
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
             }
             TextButton(onClick = {
                 scope.launch {
                     currentLocation(context)?.let { here ->
                         pendingLat = here.latitude
                         pendingLng = here.longitude
-                        runCatching { camera.animate(CameraUpdateFactory.newLatLngZoom(here, 15f)) }
                     }
                 }
             }) {
