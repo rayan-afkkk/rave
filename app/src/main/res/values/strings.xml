@@ -202,6 +202,7 @@
     <string name="share_saved">Saved to gallery</string>
     <string name="share_save_failed">Couldn\'t save the image</string>
     <string name="share_streak">day streak</string>
+    <string name="map_tiles_failed">Map can\'t load. Check your internet connection.</string>
     <string name="share_route_hidden">Route hidden by your privacy zones</string>
     <string name="share_activity_text">%1$s: %2$s %3$s on %4$s 🔥</string>
     <string name="template_warm">Warm</string>

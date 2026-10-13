@@ -39,8 +39,16 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import coil.ImageLoader
 import coil.compose.AsyncImage
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
 import com.rave.app.BuildConfig
+import com.rave.app.R
+import okhttp3.OkHttpClient
 import com.rave.app.domain.model.LatLngPoint
 import com.rave.app.ui.theme.RaveTheme
 import kotlin.math.PI
@@ -97,6 +105,11 @@ fun TileMapView(
 
     val dark = RaveTheme.isDark
     val density = LocalDensity.current
+    val context = LocalContext.current
+    val tileLoader = remember { TileImageLoader.get(context) }
+    val provider = remember { TileProvider.resolve() }
+    var anyTileLoaded by remember { mutableStateOf(false) }
+    var anyTileFailed by remember { mutableStateOf(false) }
 
     val pulse = rememberInfiniteTransition(label = "pulse")
     val pulseRadius by pulse.animateFloat(
@@ -185,10 +198,13 @@ fun TileMapView(
                     val screenTileLeftPx = (rawTileX * tileSizePx - centerWorldX + widthPx / 2.0).roundToInt()
                     val screenTileTopPx = (tileY * tileSizePx - centerWorldY + heightPx / 2.0).roundToInt()
 
-                    val tileUrl = resolveTileUrl(intZoom, tileX, tileY, dark)
+                    val tileUrl = provider.url(intZoom, tileX, tileY, dark)
 
                     AsyncImage(
                         model = tileUrl,
+                        imageLoader = tileLoader,
+                        onSuccess = { if (!anyTileLoaded) anyTileLoaded = true },
+                        onError = { if (!anyTileFailed) anyTileFailed = true },
                         contentDescription = null,
                         contentScale = ContentScale.FillBounds,
                         modifier = Modifier
@@ -285,9 +301,23 @@ fun TileMapView(
                 }
             }
 
-            // Discreet attribution notice
+            // No tile has loaded yet and some failed: tell the user instead of showing a blank map.
+            if (!anyTileLoaded && anyTileFailed) {
+                Text(
+                    text = stringResource(R.string.map_tiles_failed),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 12.dp)
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.92f), shape = MaterialTheme.shapes.small)
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                )
+            }
+
+            // Attribution required by the tile provider
             Text(
-                text = "Map: Mapbox / OpenStreetMap",
+                text = provider.attribution,
                 style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
                 modifier = Modifier
@@ -299,29 +329,72 @@ fun TileMapView(
     }
 }
 
+/** Tile source in priority order: Mapbox -> MapTiler -> TomTom -> OpenStreetMap (no key needed). */
+private enum class TileProvider(val attribution: String) {
+    MAPBOX("© Mapbox © OpenStreetMap"),
+    MAPTILER("© MapTiler © OpenStreetMap contributors"),
+    TOMTOM("© TomTom"),
+    OSM("© OpenStreetMap contributors");
+
+    /** Uses @2x retina tiles where the provider offers them. */
+    fun url(zoom: Int, x: Int, y: Int, dark: Boolean): String = when (this) {
+        MAPBOX -> {
+            val styleId = if (dark) "dark-v11" else "streets-v12"
+            "https://api.mapbox.com/styles/v1/mapbox/$styleId/tiles/256/$zoom/$x/$y@2x?access_token=${BuildConfig.MAPBOX_ACCESS_TOKEN}"
+        }
+        MAPTILER -> {
+            val style = if (dark) "dataviz-dark" else "streets-v2"
+            "https://api.maptiler.com/maps/$style/$zoom/$x/$y@2x.png?key=${BuildConfig.MAPTILER_API_KEY}"
+        }
+        TOMTOM -> "https://api.tomtom.com/map/1/tile/basic/main/$zoom/$x/$y.png?key=${BuildConfig.TOMTOM_API_KEY}"
+        OSM -> "https://tile.openstreetmap.org/$zoom/$x/$y.png"
+    }
+
+    companion object {
+        private fun configured(key: String) = key.isNotBlank() && !key.startsWith("YOUR_")
+
+        fun resolve(): TileProvider = when {
+            configured(BuildConfig.MAPBOX_ACCESS_TOKEN) -> MAPBOX
+            configured(BuildConfig.MAPTILER_API_KEY) -> MAPTILER
+            configured(BuildConfig.TOMTOM_API_KEY) -> TOMTOM
+            else -> OSM
+        }
+    }
+}
+
 /**
- * Resolves map tile URL in priority order (Mapbox -> MapTiler -> TomTom -> OpenStreetMap).
- * Uses @2x retina tiles for high-DPI smartphone displays.
+ * Image loader just for map tiles:
+ * - sends an identifying User-Agent (OpenStreetMap blocks the generic OkHttp one, which left the map blank),
+ * - keeps up to 250 MB of tiles on disk and reuses them without re-checking, so areas you have
+ *   already seen still show when you are offline.
  */
-private fun resolveTileUrl(zoom: Int, x: Int, y: Int, dark: Boolean): String {
-    val mapboxToken = BuildConfig.MAPBOX_ACCESS_TOKEN
-    if (mapboxToken.isNotBlank() && mapboxToken != "YOUR_MAPBOX_ACCESS_TOKEN") {
-        val styleId = if (dark) "dark-v11" else "streets-v12"
-        return "https://api.mapbox.com/styles/v1/mapbox/$styleId/tiles/256/$zoom/$x/$y@2x?access_token=$mapboxToken"
+private object TileImageLoader {
+    @Volatile private var instance: ImageLoader? = null
+
+    fun get(context: Context): ImageLoader = instance ?: synchronized(this) {
+        instance ?: build(context.applicationContext).also { instance = it }
     }
 
-    val mapTilerKey = BuildConfig.MAPTILER_API_KEY
-    if (mapTilerKey.isNotBlank() && mapTilerKey != "YOUR_MAPTILER_API_KEY") {
-        val style = if (dark) "dataviz-dark" else "streets-v2"
-        return "https://api.maptiler.com/maps/$style/$zoom/$x/$y@2x.png?key=$mapTilerKey"
+    private fun build(context: Context): ImageLoader {
+        val userAgent = "Rave/${BuildConfig.VERSION_NAME} (Android; ${BuildConfig.APPLICATION_ID})"
+        return ImageLoader.Builder(context)
+            .okHttpClient {
+                OkHttpClient.Builder()
+                    .addInterceptor { chain ->
+                        chain.proceed(chain.request().newBuilder().header("User-Agent", userAgent).build())
+                    }
+                    .build()
+            }
+            .memoryCache { MemoryCache.Builder(context).maxSizePercent(0.15).build() }
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(context.cacheDir.resolve("map_tiles"))
+                    .maxSizeBytes(250L * 1024 * 1024)
+                    .build()
+            }
+            .respectCacheHeaders(false)
+            .build()
     }
-
-    val tomTomKey = BuildConfig.TOMTOM_API_KEY
-    if (tomTomKey.isNotBlank() && tomTomKey != "YOUR_TOMTOM_API_KEY") {
-        return "https://api.tomtom.com/map/1/tile/basic/main/$zoom/$x/$y.png?key=$tomTomKey"
-    }
-
-    return "https://tile.openstreetmap.org/$zoom/$x/$y.png"
 }
 
 private fun lngToWorldX(lng: Double, scale: Double): Double {
