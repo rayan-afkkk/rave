@@ -98,6 +98,24 @@ class ProfileRepository @Inject constructor(
         }
     }
 
+    /**
+     * Makes sure the signed-in user has a profile and an invite code. Unlike [ensureProfile]
+     * (which runs at sign-in and never fails it), errors are thrown so the Invite screen can
+     * show them and retry, e.g. when Firestore rules weren't published at first sign-in.
+     */
+    suspend fun ensureMyInviteCode() {
+        val user = auth.get().currentUser.value ?: throw NotSignedInException()
+        val ref = users().document(user.uid)
+        if (!ref.get().await().exists()) ensureProfile(user)
+        val doc = ref.get().await()
+        if (!doc.exists()) error("Profile could not be created")
+        if (doc.getString("inviteCode").isNullOrBlank()) {
+            val name = settings.current().displayName.ifBlank { user.name }.ifBlank { "Rave friend" }
+            val code = createInviteCode(user.uid, name)
+            ref.set(mapOf("inviteCode" to code), SetOptions.merge()).await()
+        }
+    }
+
     /** Reserves `invites/{code}` for this user's app invite; retries on (rare) collisions. */
     private suspend fun createInviteCode(uid: String, name: String): String {
         val db = firebase.requireFirestore()

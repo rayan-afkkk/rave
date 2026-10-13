@@ -7,6 +7,7 @@ import com.rave.app.domain.model.LatLngPoint
 import com.rave.app.domain.model.TrackPoint
 import com.rave.app.domain.tracking.PrivacyArea
 import com.rave.app.domain.tracking.PrivacyFilter
+import com.rave.app.domain.tracking.RouteCleaner
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,19 +31,12 @@ class PrivacyZoneRepository @Inject constructor(
     }
 
     /**
-     * The route for a share card. Cards show only the line on a plain background (no map),
-     * so short walks keep their shape: at most 20% of the route is hidden at each end
-     * instead of a flat 200 m. Privacy zones are still removed.
+     * The route for a share card: cleaned of GPS noise (see [RouteCleaner]) so it matches the
+     * shape you walked. Cards show only the line on a plain background, with no map or
+     * coordinates, so the start and end aren't trimmed; privacy zones are still removed.
      */
     suspend fun shareCardSegments(points: List<TrackPoint>): List<List<LatLngPoint>> {
         val zones = dao.getAll().map { PrivacyArea(it.lat, it.lng, it.radiusM) }
-        val hideEnds = settings.current().hideStartEnd
-        return PrivacyFilter.apply(
-            points.map { LatLngPoint(it.lat, it.lng) }, zones, trimEnds = hideEnds, maxTrimFraction = SHARE_CARD_MAX_TRIM,
-        )
-    }
-
-    private companion object {
-        const val SHARE_CARD_MAX_TRIM = 0.2
+        return RouteCleaner.clean(points).flatMap { PrivacyFilter.apply(it, zones, trimEnds = false) }
     }
 }

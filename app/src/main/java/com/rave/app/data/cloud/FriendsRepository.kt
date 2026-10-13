@@ -87,8 +87,9 @@ class FriendsRepository @Inject constructor(
         require(toUid != me) { "self" }
         val myName = settings.current().displayName
         // If they already asked us, accept instead of creating a mirror request.
-        val reverse = db().collection(REQUESTS).document("${toUid}_$me").get().await()
-        if (reverse.exists() && reverse.getString("status") == RequestStatus.PENDING.name) {
+        // Older security rules deny reading a request that doesn't exist; treat that as "no request".
+        val reverse = runCatching { db().collection(REQUESTS).document("${toUid}_$me").get().await() }.getOrNull()
+        if (reverse != null && reverse.exists() && reverse.getString("status") == RequestStatus.PENDING.name) {
             accept(reverse.toRequest()!!).getOrThrow()
             return@runCatching
         }

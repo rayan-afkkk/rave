@@ -1,5 +1,9 @@
 package com.rave.app.ui.invite
 
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.material3.MaterialTheme
+import com.google.firebase.firestore.FirebaseFirestoreException
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,7 +58,8 @@ data class LandingState(
     val invalid: Boolean = false,
     val busy: Boolean = false,
     val result: RedeemResult? = null,
-    val error: Boolean = false,
+    /** String resource explaining why accepting failed, or null. */
+    val error: Int? = null,
 )
 
 @HiltViewModel
@@ -85,11 +90,15 @@ class InviteLandingViewModel @Inject constructor(
 
     fun accept() {
         val info = _state.value.info ?: return
-        _state.update { it.copy(busy = true) }
+        _state.update { it.copy(busy = true, error = null) }
         viewModelScope.launch {
             invites.redeem(info)
                 .onSuccess { r -> settings.setPendingInvite(null); _state.update { it.copy(busy = false, result = r) } }
-                .onFailure { _state.update { it.copy(busy = false, error = true) } }
+                .onFailure { e ->
+                    Log.w("Invite", "Accepting invite failed", e)
+                    val denied = (e as? FirebaseFirestoreException)?.code == FirebaseFirestoreException.Code.PERMISSION_DENIED
+                    _state.update { it.copy(busy = false, error = if (denied) R.string.invite_error_rules else R.string.error_generic) }
+                }
         }
     }
 
@@ -134,7 +143,9 @@ fun InviteLandingScreen(
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         EmptyState(icon, title, stringResource(R.string.invite_landing_body), tile = RaveTheme.colors.tilePeach)
-                        if (state.error) Text(stringResource(R.string.error_generic))
+                        state.error?.let {
+                            Text(stringResource(it), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
+                        }
                         PillButton(stringResource(R.string.action_accept), onClick = viewModel::accept, enabled = !state.busy, modifier = Modifier.fillMaxWidth())
                         TextButton(onClick = { viewModel.decline(); onClose() }) { Text(stringResource(R.string.action_decline)) }
                     }

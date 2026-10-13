@@ -5,6 +5,7 @@ import com.rave.app.ui.theme.Dimens
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -48,6 +49,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.rave.app.R
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.rave.app.data.cloud.AuthRepository
 import com.rave.app.data.cloud.InviteRepository
 import com.rave.app.data.cloud.ProfileRepository
 import com.rave.app.data.cloud.UserProfile
@@ -55,19 +58,53 @@ import com.rave.app.ui.components.EmptyState
 import com.rave.app.ui.components.LoadingState
 import com.rave.app.ui.components.RaveScreen
 import com.rave.app.ui.components.SectionCard
+import com.rave.app.ui.components.TonalPillButton
 import com.rave.app.ui.share.ShareHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class InviteViewModel @Inject constructor(
-    profiles: ProfileRepository,
+    private val profiles: ProfileRepository,
+    auth: AuthRepository,
     val invites: InviteRepository,
 ) : ViewModel() {
     val profile: StateFlow<UserProfile?> = profiles.observeMyProfile().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val cloudAvailable = auth.isAvailable
+    val signedIn: StateFlow<Boolean> = auth.currentUser.map { it != null }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), auth.currentUser.value != null)
+
+    /** Why the invite code couldn't be set up (string resource), or null. */
+    private val _error = MutableStateFlow<Int?>(null)
+    val error: StateFlow<Int?> = _error.asStateFlow()
+    private val _working = MutableStateFlow(false)
+    val working: StateFlow<Boolean> = _working.asStateFlow()
+
+    init { retry() }
+
+    fun retry() {
+        if (!cloudAvailable || !signedIn.value || _working.value) return
+        viewModelScope.launch {
+            _working.value = true
+            _error.value = null
+            runCatching { profiles.ensureMyInviteCode() }.onFailure { e ->
+                Log.w("Invite", "Invite code setup failed", e)
+                _error.value = if ((e as? FirebaseFirestoreException)?.code == FirebaseFirestoreException.Code.PERMISSION_DENIED) {
+                    R.string.invite_error_rules
+                } else {
+                    R.string.invite_error_generic
+                }
+            }
+            _working.value = false
+        }
+    }
 }
 
 fun copyToClipboard(context: Context, text: String) {
@@ -79,15 +116,28 @@ fun copyToClipboard(context: Context, text: String) {
 @Composable
 fun InviteScreen(onBack: () -> Unit, viewModel: InviteViewModel = hiltViewModel()) {
     val profile by viewModel.profile.collectAsStateWithLifecycle()
+    val signedIn by viewModel.signedIn.collectAsStateWithLifecycle()
+    val error by viewModel.error.collectAsStateWithLifecycle()
+    val working by viewModel.working.collectAsStateWithLifecycle()
     val context = LocalContext.current
     RaveScreen(title = stringResource(R.string.invite_title), onBack = onBack) {
-        val p = profile
-        if (p == null) {
-            LoadingState()
+        if (!viewModel.cloudAvailable || !signedIn) {
+            EmptyState(Icons.Rounded.IosShare, stringResource(R.string.invite_sign_in_title), stringResource(R.string.invite_sign_in_body))
             return@RaveScreen
         }
-        if (p.inviteCode.isBlank()) {
-            EmptyState(Icons.Rounded.IosShare, stringResource(R.string.invite_preparing), stringResource(R.string.invite_preparing_body))
+        val p = profile
+        if (p == null || p.inviteCode.isBlank()) {
+            val err = error
+            if (err != null && !working) {
+                Column(Modifier.fillMaxWidth().padding(horizontal = Dimens.ScreenPadding), horizontalAlignment = Alignment.CenterHorizontally) {
+                    EmptyState(Icons.Rounded.IosShare, stringResource(R.string.invite_error_title), stringResource(err))
+                    TonalPillButton(stringResource(R.string.action_retry), onClick = viewModel::retry)
+                }
+            } else if (p == null) {
+                LoadingState()
+            } else {
+                EmptyState(Icons.Rounded.IosShare, stringResource(R.string.invite_preparing), stringResource(R.string.invite_preparing_body))
+            }
             return@RaveScreen
         }
         val link = viewModel.invites.appLink(p.inviteCode)

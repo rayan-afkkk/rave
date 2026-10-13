@@ -407,6 +407,11 @@ Permission was denied. You can turn it on in Settings.</string>
     <string name="invite_code_copied">Code copied</string>
     <string name="invite_preparing">Setting up your invite code</string>
     <string name="invite_preparing_body">This only takes a moment after your first sign-in.</string>
+    <string name="invite_sign_in_title">Sign in to invite friends</string>
+    <string name="invite_sign_in_body">Your invite code, link and QR appear here once you sign in from Profile.</string>
+    <string name="invite_error_title">Couldn\'t set up your invite code</string>
+    <string name="invite_error_rules">Firestore blocked it. In Firebase Console open Firestore Database → Rules, paste the rules from firestore.rules, tap Publish, then try again.</string>
+    <string name="invite_error_generic">Check your internet connection and try again.</string>
     <string name="invite_reward_note">When a friend joins and finishes their first activity, you both get a streak freeze ❄️</string>
     <string name="invite_share_message">Join me on %1$s — let\'s keep our streaks together! Use my code %2$s: %3$s</string>
     <string name="invite_share_message_code_only">Join me on %1$s — let\'s keep our streaks together! Add me with my invite code %2$s</string>

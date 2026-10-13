@@ -2,6 +2,7 @@ package com.rave.app
 
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -16,6 +17,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.rave.app.core.DeepLinkHandler
@@ -39,6 +43,7 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        hideNavigationBar()
         if (savedInstanceState == null) handleIntent(intent)
         lifecycleScope.launch { deepLinks.checkInstallReferrer(applicationContext) }
 
@@ -60,6 +65,7 @@ class MainActivity : ComponentActivity() {
                     statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { darkBars },
                     navigationBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { darkBars },
                 )
+                hideNavigationBar()
                 onDispose { }
             }
 
@@ -69,6 +75,27 @@ class MainActivity : ComponentActivity() {
                     if (showSplash) SplashOverlay(onFinished = { showSplash = false })
                 }
             }
+        }
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        // Coming back from another app, a dialog or the keyboard can bring the bar back.
+        if (hasFocus) hideNavigationBar()
+    }
+
+    /**
+     * Full-screen feel: the system navigation bar (buttons or gesture handle) is hidden.
+     * Swiping up from the bottom shows it briefly, so home/back/recents stay one swipe away.
+     */
+    private fun hideNavigationBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // No grey scrim behind the bar when it is swiped into view.
+            window.isNavigationBarContrastEnforced = false
+        }
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            hide(WindowInsetsCompat.Type.navigationBars())
         }
     }
 

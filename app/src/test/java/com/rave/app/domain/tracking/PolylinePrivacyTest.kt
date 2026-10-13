@@ -43,16 +43,6 @@ class PolylinePrivacyTest {
     }
 
     @Test
-    fun `share cards keep the shape of short routes`() {
-        val short = route.take(8) // ~390 m: a flat 200 m trim would hide everything
-        val segments = PrivacyFilter.apply(short, zones = emptyList(), maxTrimFraction = 0.2)
-        assertEquals(1, segments.size)
-        assertTrue(segments[0].size >= 2)
-        val first = segments[0].first()
-        assertTrue(GeoMath.haversine(short.first().lat, short.first().lng, first.lat, first.lng) > 0)
-    }
-
-    @Test
     fun `zones split the route into separate segments`() {
         val mid = route[15]
         val segments = PrivacyFilter.apply(route, listOf(PrivacyArea(mid.lat, mid.lng, 120.0)), trimEnds = false)

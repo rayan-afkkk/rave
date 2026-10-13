@@ -41,7 +41,10 @@ service cloud.firestore {
 
     // ---- Friend requests: id = {from}_{to} ----
     match /friendRequests/{id} {
-      allow read: if signedIn() && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+      // `get` checks the id ({from}_{to}) rather than the data, so reading a request that doesn't
+      // exist yet (e.g. "has this person already asked me?") is allowed instead of denied.
+      allow get: if signedIn() && request.auth.uid in id.split('_');
+      allow list: if signedIn() && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
       allow create: if signedIn()
         && request.resource.data.from == request.auth.uid
         && id == request.auth.uid + '_' + request.resource.data.to

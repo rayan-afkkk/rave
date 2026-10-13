@@ -7,8 +7,7 @@ data class PrivacyArea(val lat: Double, val lng: Double, val radiusM: Double)
 
 /**
  * Applies privacy rules before a route leaves the device or is drawn on a share card:
- * - trims the first and last [trimMeters] of the route (if [trimEnds]); with [maxTrimFraction]
- *   the trim shrinks on short routes so at most that fraction is hidden at each end,
+ * - trims the first and last [trimMeters] of the route (if [trimEnds]),
  * - removes every point inside a [PrivacyArea].
  *
  * Returns visible segments; a gap is left wherever points were removed, so no straight
@@ -22,7 +21,6 @@ object PrivacyFilter {
         zones: List<PrivacyArea>,
         trimEnds: Boolean = true,
         trimMeters: Double = DEFAULT_TRIM_M,
-        maxTrimFraction: Double? = null,
     ): List<List<LatLngPoint>> {
         if (points.size < 2) return emptyList()
         var visible = points
@@ -34,11 +32,10 @@ object PrivacyFilter {
                 )
             }
             val total = cumulative.last()
-            val trim = maxTrimFraction?.let { minOf(trimMeters, total * it) } ?: trimMeters
             // Route too short to show anything once both ends are hidden.
-            if (total <= trim * 2) return emptyList()
+            if (total <= trimMeters * 2) return emptyList()
             visible = points.filterIndexed { i, _ ->
-                cumulative[i] >= trim && cumulative[i] <= total - trim
+                cumulative[i] >= trimMeters && cumulative[i] <= total - trimMeters
             }
         }
 
