@@ -22,6 +22,8 @@ if (file("google-services.json").exists()) {
 val envFile = rootProject.file(".env")
 val envExampleFile = rootProject.file(".env.example")
 if (envExampleFile.exists()) {
+    // First sync: start .env as a copy of .env.example so every key is there, ready to fill in.
+    if (!envFile.exists()) envExampleFile.copyTo(envFile)
     val props = Properties()
     if (envFile.exists()) {
         envFile.inputStream().use { input -> props.load(input) }
