@@ -2,6 +2,8 @@
 <resources>
     <!-- Window / launcher colours only. Compose UI uses the Kotlin theme tokens. -->
     <color name="window_background">#FFFFF6EC</color>
-    <color name="ic_launcher_background">#FFF26B1D</color>
-    <color name="ic_launcher_foreground">#FFFFFFFF</color>
+    <color name="ic_launcher_background">#FF17110E</color>
+    <color name="ic_launcher_foreground">#FFFF7A2E</color>
+    <!-- Accent tint for notification icons (the launcher background is black). -->
+    <color name="notification_accent">#FFF26B1D</color>
 </resources>

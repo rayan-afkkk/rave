@@ -75,7 +75,7 @@ class Notifier @Inject constructor(
     fun builder(channel: String): NotificationCompat.Builder =
         NotificationCompat.Builder(context, channel)
             .setSmallIcon(R.drawable.ic_notification)
-            .setColor(ContextCompat.getColor(context, R.color.ic_launcher_background))
+            .setColor(ContextCompat.getColor(context, R.color.notification_accent))
             .setAutoCancel(true)
 
     /** Posts unless the category is switched off or permission is missing. */

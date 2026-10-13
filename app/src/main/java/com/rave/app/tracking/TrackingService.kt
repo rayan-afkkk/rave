@@ -164,7 +164,7 @@ class TrackingService : Service() {
         }
         val builder = NotificationCompat.Builder(this, Notifier.Channels.TRACKING)
             .setSmallIcon(R.drawable.ic_notification)
-            .setColor(ContextCompat.getColor(this, R.color.ic_launcher_background))
+            .setColor(ContextCompat.getColor(this, R.color.notification_accent))
             .setContentTitle(title)
             .setContentText(text)
             .setOngoing(true)
