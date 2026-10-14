@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -37,6 +36,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
@@ -67,26 +67,26 @@ fun BuddyCard(modifier: Modifier = Modifier, viewModel: BuddyViewModel = hiltVie
     val s = state ?: return
     SectionCard(modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            BuddyAvatar(s.stage, s.mood, Modifier.size(96.dp))
-            Spacer(Modifier.width(14.dp))
+            BuddyAvatar(s.stage, s.mood, Modifier.size(60.dp))
+            Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(stringResource(R.string.buddy_name), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(
-                    stringResource(R.string.buddy_level, s.level, stringResource(stageName(s.stage))),
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(stringResource(moodLine(s.mood)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(Modifier.height(8.dp))
-                val progress by animateFloatAsState(s.levelProgress, tween(900), label = "xp")
-                Box(Modifier.fillMaxWidth().height(8.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant)) {
-                    Box(Modifier.fillMaxWidth(progress.coerceAtLeast(0.03f)).height(8.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        stringResource(R.string.buddy_level, s.level, stringResource(stageName(s.stage))),
+                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold), modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        stringResource(R.string.buddy_xp_short, s.xpIntoLevel, s.xpForNextLevel),
+                        style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
-                Text(
-                    stringResource(R.string.buddy_xp, s.xpIntoLevel, s.xpForNextLevel),
-                    style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 3.dp),
-                )
+                Text(stringResource(moodLine(s.mood)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Spacer(Modifier.height(6.dp))
+                val progress by animateFloatAsState(s.levelProgress, tween(900), label = "xp")
+                Box(Modifier.fillMaxWidth().height(5.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant)) {
+                    Box(Modifier.fillMaxWidth(progress.coerceAtLeast(0.03f)).height(5.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary))
+                }
             }
         }
     }

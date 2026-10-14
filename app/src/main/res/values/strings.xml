@@ -358,9 +358,8 @@
     <string name="persona_steps">The Step Machine</string>
     <string name="persona_all">The All-Rounder</string>
     <string name="persona_fresh">The Fresh Starter</string>
-    <string name="buddy_name">Your Rave buddy</string>
     <string name="buddy_level">Level %1$d · %2$s</string>
-    <string name="buddy_xp">%1$d / %2$d XP to the next level</string>
+    <string name="buddy_xp_short">%1$d/%2$d XP</string>
     <string name="buddy_stage_sprout">Sprout</string>
     <string name="buddy_stage_buddy">Buddy</string>
     <string name="buddy_stage_runner">Runner</string>

@@ -78,7 +78,7 @@ fun LeagueCard(modifier: Modifier = Modifier, viewModel: LeagueViewModel = hiltV
             IconTile(Icons.Rounded.EmojiEvents, RaveTheme.colors.tilePeach, size = 32.dp, iconSize = 18.dp)
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
-                Text(stringResource(R.string.league_title), style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.league_title), style = MaterialTheme.typography.titleSmall)
                 val sub = when (val u = ui) {
                     is LeagueUi.Ready -> if (u.standings.daysLeft == 0) stringResource(R.string.league_last_day)
                         else stringResource(R.string.league_days_left, u.standings.daysLeft)
@@ -87,7 +87,7 @@ fun LeagueCard(modifier: Modifier = Modifier, viewModel: LeagueViewModel = hiltV
                 Text(sub, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(12.dp))
         when (val u = ui) {
             LeagueUi.Loading -> Text(stringResource(R.string.league_loading), style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -101,13 +101,13 @@ fun LeagueCard(modifier: Modifier = Modifier, viewModel: LeagueViewModel = hiltV
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 val leader = u.standings.entries.firstOrNull()?.steps?.coerceAtLeast(1) ?: 1
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    u.standings.entries.take(5).forEachIndexed { i, e ->
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    u.standings.entries.take(TOP).forEachIndexed { i, e ->
                         LeagueRow(i + 1, e.name, e.steps, e.steps / leader.toFloat(), e.isMe)
                     }
-                    // Always show yourself, even outside the top 5.
+                    // Always show yourself, even outside the top 3.
                     val meIndex = u.standings.entries.indexOfFirst { it.isMe }
-                    if (meIndex >= 5) {
+                    if (meIndex >= TOP) {
                         val me = u.standings.entries[meIndex]
                         LeagueRow(meIndex + 1, me.name, me.steps, me.steps / leader.toFloat(), true)
                     }
@@ -127,7 +127,7 @@ private fun LeagueRow(rank: Int, name: String, steps: Int, fraction: Float, isMe
     }
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(
-            Modifier.size(26.dp).clip(CircleShape)
+            Modifier.size(24.dp).clip(CircleShape)
                 .background(medal?.container ?: MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center,
         ) {
@@ -145,12 +145,15 @@ private fun LeagueRow(rank: Int, name: String, steps: Int, fraction: Float, isMe
                 Text(NumberFormat.getIntegerInstance().format(steps), style = MaterialTheme.typography.labelLarge,
                     color = if (isMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
             }
-            Box(Modifier.fillMaxWidth().padding(top = 4.dp).height(6.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant)) {
+            Box(Modifier.fillMaxWidth().padding(top = 4.dp).height(4.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant)) {
                 Box(
-                    Modifier.fillMaxWidth(fraction.coerceIn(0.02f, 1f)).height(6.dp).clip(CircleShape)
+                    Modifier.fillMaxWidth(fraction.coerceIn(0.02f, 1f)).height(4.dp).clip(CircleShape)
                         .background(if (isMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.45f)),
                 )
             }
         }
     }
 }
+
+/** Rows shown on Home; you are always added below if you're further down. */
+private const val TOP = 3
