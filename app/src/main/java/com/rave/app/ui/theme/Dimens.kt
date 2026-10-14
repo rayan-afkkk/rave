@@ -23,7 +23,6 @@ object Dimens {
     /** Icon tiles on cards. */
     val IconTile = 38.dp
     val IconTileIcon = 21.dp
-    /** Floating bottom navigation. */
-    val NavBarHeight = 62.dp
-    val StartButton = 56.dp
+    /** Bottom navigation bar (without system insets). */
+    val NavBarHeight = 64.dp
 }

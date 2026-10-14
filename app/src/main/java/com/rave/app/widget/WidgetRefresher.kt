@@ -18,12 +18,25 @@ class WidgetRefresher @Inject constructor(
     @ApplicationScope private val scope: CoroutineScope,
 ) {
     private var pending: Job? = null
+    private var pendingSteps: Job? = null
 
+    /** Habits, steps and last-route widgets (habit ticks, finished activities, day changes). */
     fun refresh() {
         pending?.cancel()
         pending = scope.launch {
             delay(300)
             runCatching { HabitWidget().updateAll(context) }
+            runCatching { StepsWidget().updateAll(context) }
+            runCatching { RouteWidget().updateAll(context) }
+        }
+    }
+
+    /** Steps change often while walking: batch them into at most one redraw every few seconds. */
+    fun refreshSteps() {
+        if (pendingSteps?.isActive == true) return
+        pendingSteps = scope.launch {
+            delay(3_000)
+            runCatching { StepsWidget().updateAll(context) }
         }
     }
 }

@@ -72,11 +72,15 @@ interface WidgetEntryPoint {
     fun habits(): HabitRepository
     fun streaks(): StreakRepository
     fun time(): TimeProvider
+    fun steps(): com.rave.app.data.repository.StepRepository
+    fun stepSensor(): com.rave.app.tracking.steps.StepSensor
+    fun settings(): com.rave.app.data.preferences.SettingsRepository
+    fun activities(): com.rave.app.data.repository.ActivityRepository
 }
 
-private fun entryPoint(context: Context) = EntryPointAccessors.fromApplication(context.applicationContext, WidgetEntryPoint::class.java)
+internal fun entryPoint(context: Context) = EntryPointAccessors.fromApplication(context.applicationContext, WidgetEntryPoint::class.java)
 
-private val WidgetColors = ColorProviders(light = LightColors, dark = DarkColors)
+internal val WidgetColors = ColorProviders(light = LightColors, dark = DarkColors)
 
 private data class WidgetData(val habits: List<Pair<Habit, HabitLog?>>, val done: Int, val total: Int, val streak: Int)
 

@@ -553,6 +553,14 @@ Permission was denied. You can turn it on in Settings.</string>
     <string name="widget_description">Your streak, today\'s progress and one-tap habits</string>
     <string name="widget_today">Today</string>
     <string name="widget_empty">No habits due today</string>
+    <string name="widget_steps_name">Steps today</string>
+    <string name="widget_steps_description">Today\'s steps, goal progress, distance and calories</string>
+    <string name="widget_steps_of_goal">of %1$s steps</string>
+    <string name="widget_steps_off">Open the app to turn on step counting</string>
+    <string name="widget_route_name">Last route</string>
+    <string name="widget_route_description">The route of your latest walk or run, with distance and time</string>
+    <string name="widget_route_title">Walk</string>
+    <string name="widget_route_empty">No walks yet</string>
     <string name="activity_workout">Workout</string>
     <string name="workout_title">Workout</string>
     <string name="workouts_title">Workouts</string>

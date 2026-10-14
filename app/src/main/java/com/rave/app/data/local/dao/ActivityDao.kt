@@ -30,6 +30,9 @@ interface ActivityDao {
     @Query("SELECT * FROM activities WHERE id = :id")
     suspend fun getById(id: Long): ActivityEntity?
 
+    @Query("SELECT * FROM activities WHERE status = 'COMPLETED' ORDER BY startTime DESC LIMIT 1")
+    suspend fun latestCompleted(): ActivityEntity?
+
     @Query("SELECT * FROM activities WHERE status IN ('ACTIVE', 'PAUSED') ORDER BY startTime DESC LIMIT 1")
     suspend fun getInProgress(): ActivityEntity?
 

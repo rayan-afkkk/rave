@@ -33,7 +33,7 @@ import kotlinx.coroutines.delay
 /**
  * Animated launch screen shown once per cold start, on top of the app:
  * the three pills grow in one after another, the wordmark slides out beside them, then the
- * whole screen fades into the app. About 1.6 s; taps are blocked while it shows.
+ * whole screen fades into the app. About 0.9 s; a tap skips it.
  */
 @Composable
 fun SplashOverlay(onFinished: () -> Unit) {
@@ -45,15 +45,15 @@ fun SplashOverlay(onFinished: () -> Unit) {
 
     LaunchedEffect(Unit) {
         coroutineScope {
-            async { pills.animateTo(1f, tween(750, easing = FastOutSlowInEasing)) }
-            async { logoScale.animateTo(1f, tween(750, easing = LinearOutSlowInEasing)) }
+            async { pills.animateTo(1f, tween(450, easing = FastOutSlowInEasing)) }
+            async { logoScale.animateTo(1f, tween(450, easing = LinearOutSlowInEasing)) }
             async {
-                delay(450)
-                word.animateTo(1f, tween(450, easing = LinearOutSlowInEasing))
+                delay(200)
+                word.animateTo(1f, tween(300, easing = LinearOutSlowInEasing))
             }
         }
-        delay(300)
-        exit.animateTo(1f, tween(350, easing = FastOutSlowInEasing))
+        delay(120)
+        exit.animateTo(1f, tween(250, easing = FastOutSlowInEasing))
         onFinished()
     }
 
@@ -62,7 +62,7 @@ fun SplashOverlay(onFinished: () -> Unit) {
             .fillMaxSize()
             .graphicsLayer { alpha = 1f - exit.value }
             .background(colors.splashBackground)
-            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {},
+            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onFinished() },
         contentAlignment = Alignment.Center,
     ) {
         // Horizontal lockup, like the logo: mark on the left, wordmark sliding out from behind it.

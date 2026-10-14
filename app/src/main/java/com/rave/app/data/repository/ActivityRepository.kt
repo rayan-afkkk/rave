@@ -38,6 +38,8 @@ class ActivityRepository @Inject constructor(
 
     suspend fun get(id: Long): ActivityEntity? = activityDao.getById(id)
 
+    suspend fun latestCompleted(): ActivityEntity? = activityDao.latestCompleted()
+
     suspend fun points(id: Long): List<TrackPoint> = pointDao.forActivity(id).map { it.toTrackPoint() }
 
     fun observePoints(id: Long): Flow<List<TrackPoint>> = pointDao.observeForActivity(id).map { l -> l.map { it.toTrackPoint() } }

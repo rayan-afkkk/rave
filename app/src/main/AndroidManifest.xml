@@ -137,6 +137,30 @@
                 android:resource="@xml/habit_widget_info" />
         </receiver>
 
+        <receiver
+            android:name=".widget.StepsWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_steps_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/steps_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.RouteWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_route_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/route_widget_info" />
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

@@ -5,6 +5,7 @@ import com.rave.app.data.local.dao.StepsDao
 import com.rave.app.data.local.entity.DailyStepsEntity
 import com.rave.app.data.preferences.SettingsRepository
 import com.rave.app.domain.fitness.FitnessMath
+import com.rave.app.widget.WidgetRefresher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -25,6 +26,7 @@ class StepRepository @Inject constructor(
     private val dao: StepsDao,
     private val settings: SettingsRepository,
     private val time: TimeProvider,
+    private val widget: WidgetRefresher,
 ) {
     private val mutex = Mutex()
 
@@ -36,7 +38,10 @@ class StepRepository @Inject constructor(
         val today = time.today().toString()
         val current = dao.get(today)?.steps ?: 0
         dao.upsert(DailyStepsEntity(today, (current + delta).coerceAtMost(Int.MAX_VALUE.toLong()).toInt(), time.nowMs()))
+        widget.refreshSteps()
     }
+
+    suspend fun todaySteps(): Int = dao.get(time.today().toString())?.steps ?: 0
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun observeToday(): Flow<Int> = time.todayFlow.flatMapLatest { today ->

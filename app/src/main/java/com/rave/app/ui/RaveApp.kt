@@ -46,8 +46,8 @@ import com.rave.app.ui.components.AppBackground
 import com.rave.app.ui.components.LoadingState
 import com.rave.app.ui.navigation.ActivitySummaryRoute
 import com.rave.app.ui.navigation.CompetitionDetailRoute
-import com.rave.app.ui.navigation.FloatingBottomBar
-import com.rave.app.ui.navigation.FloatingBottomBarClearance
+import com.rave.app.ui.navigation.BottomBarClearance
+import com.rave.app.ui.navigation.RaveBottomBar
 import com.rave.app.ui.navigation.FriendRequestsRoute
 import com.rave.app.ui.navigation.HomeRoute
 import com.rave.app.ui.navigation.InviteLandingRoute
@@ -126,7 +126,7 @@ fun RaveApp(viewModel: MainViewModel, navController: NavHostController = remembe
     val navBar = WindowInsets.navigationBars.asPaddingValues()
     val contentPadding = PaddingValues(
         top = statusBar.calculateTopPadding(),
-        bottom = navBar.calculateBottomPadding() + FloatingBottomBarClearance,
+        bottom = navBar.calculateBottomPadding() + BottomBarClearance,
     )
 
     AppBackground {
@@ -144,7 +144,7 @@ fun RaveApp(viewModel: MainViewModel, navController: NavHostController = remembe
             enter = slideInVertically { it },
             exit = slideOutVertically { it },
         ) {
-            FloatingBottomBar(
+            RaveBottomBar(
                 selected = selectedTab,
                 onSelect = { dest -> navController.navigateToTopLevel(dest) },
                 onStartClick = { if (tracking.isTracking) startActivity(tracking.type) else showPicker = true },
