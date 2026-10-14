@@ -1,6 +1,5 @@
 package com.rave.app.ui.food
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,12 +11,10 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -68,8 +65,6 @@ data class MealPlanUi(
     val target: DailyTarget? = null,
     val settings: UserSettings = UserSettings(),
     val week: List<DayPlan> = emptyList(),
-    val groceries: List<Pair<String, Int>> = emptyList(),
-    val checked: Set<String> = emptySet(),
 )
 
 @HiltViewModel
@@ -80,38 +75,27 @@ class MealPlanViewModel @Inject constructor(
 ) : ViewModel() {
     private val weekStart = time.weekStart()
     private val seedKey = "meal_seed_$weekStart"
-    private val checkedKey = "meal_checked_$weekStart"
     private val seed = MutableStateFlow<Long?>(null)
-    private val checked = MutableStateFlow<Set<String>>(emptySet())
 
     init {
         viewModelScope.launch {
             seed.value = settings.getString(seedKey)?.toLongOrNull() ?: weekStart.toEpochDay()
-            checked.value = settings.getString(checkedKey).orEmpty().split('|').filter { it.isNotBlank() }.toSet()
         }
     }
 
-    val ui: StateFlow<MealPlanUi> = combine(food.observeTarget(), settings.settings, seed, checked) { target, s, sd, chk ->
+    val ui: StateFlow<MealPlanUi> = combine(food.observeTarget(), settings.settings, seed) { target, s, sd ->
         if (sd == null) return@combine MealPlanUi(target, s)
         val options = PlannerOptions(
             dailyKcal = target.kcal, vegetarian = s.food.vegetarian, ramadan = s.ramadanMeals, goal = s.food.goal, budget = s.budgetMeals,
         )
         val week = MealPlanner.week(weekStart, options, sd)
-        MealPlanUi(target, s, week, MealPlanner.groceries(week), chk)
+        MealPlanUi(target, s, week)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), MealPlanUi())
 
     fun regenerate() = viewModelScope.launch {
         val next = Random.nextLong()
         settings.putString(seedKey, next.toString())
-        settings.putString(checkedKey, null)
-        checked.value = emptySet()
         seed.value = next
-    }
-
-    fun toggle(item: String) = viewModelScope.launch {
-        val next = if (item in checked.value) checked.value - item else checked.value + item
-        checked.value = next
-        settings.putString(checkedKey, next.joinToString("|"))
     }
 
     fun ate(meal: PlannedMeal) = viewModelScope.launch {
@@ -127,7 +111,6 @@ class MealPlanViewModel @Inject constructor(
 @Composable
 fun MealPlanScreen(onBack: () -> Unit, onOpenSettings: () -> Unit, viewModel: MealPlanViewModel = hiltViewModel()) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
-    var tab by rememberSaveable { mutableIntStateOf(0) }
     var day by rememberSaveable { mutableIntStateOf(viewModel.todayIndex()) }
     var eaten by rememberSaveable { mutableIntStateOf(-1) }
     RaveScreen(
@@ -143,41 +126,21 @@ fun MealPlanScreen(onBack: () -> Unit, onOpenSettings: () -> Unit, viewModel: Me
                 Text(stringResource(R.string.plan_target, "%,d".format(t.kcal), goalName(ui.settings.food.goal)),
                     style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            Row(Modifier.padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                PillChip(tab == 0, stringResource(R.string.plan_tab_plan), { tab = 0 })
-                PillChip(tab == 1, stringResource(R.string.plan_tab_groceries), { tab = 1 })
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                itemsIndexed(ui.week) { i, d ->
+                    PillChip(day == i, d.date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()) + " " + d.date.dayOfMonth,
+                        { day = i; eaten = -1 })
+                }
             }
-            if (tab == 0) {
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    itemsIndexed(ui.week) { i, d ->
-                        PillChip(day == i, d.date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()) + " " + d.date.dayOfMonth,
-                            { day = i; eaten = -1 })
+            val plan = ui.week.getOrNull(day)
+            LazyColumn(Modifier.fillMaxSize().navigationBarsPadding().padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap)) {
+                if (plan != null) {
+                    item { Text(stringResource(R.string.plan_day_total, "%,d".format(plan.kcal), plan.protein.toInt()), style = MaterialTheme.typography.titleSmall) }
+                    itemsIndexed(plan.meals) { i, meal ->
+                        MealCard(meal, done = eaten == day * 10 + i) { viewModel.ate(meal); eaten = day * 10 + i }
                     }
                 }
-                val plan = ui.week.getOrNull(day)
-                LazyColumn(Modifier.fillMaxSize().navigationBarsPadding().padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap)) {
-                    if (plan != null) {
-                        item { Text(stringResource(R.string.plan_day_total, "%,d".format(plan.kcal), plan.protein.toInt()), style = MaterialTheme.typography.titleSmall) }
-                        itemsIndexed(plan.meals) { i, meal ->
-                            MealCard(meal, done = eaten == day * 10 + i) { viewModel.ate(meal); eaten = day * 10 + i }
-                        }
-                    }
-                    item { Spacer(Modifier.height(24.dp)) }
-                }
-            } else {
-                LazyColumn(Modifier.fillMaxSize().navigationBarsPadding()) {
-                    item { Text(stringResource(R.string.plan_groceries_body), style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 6.dp)) }
-                    items(ui.groceries, key = { it.first }) { (name, count) ->
-                        Row(Modifier.fillMaxWidth().clickable { viewModel.toggle(name) }, verticalAlignment = Alignment.CenterVertically) {
-                            Checkbox(checked = name in ui.checked, onCheckedChange = { viewModel.toggle(name) })
-                            Text(name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-                            Text(stringResource(R.string.plan_used_in, count), style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                    }
-                    item { Spacer(Modifier.height(24.dp)) }
-                }
+                item { Spacer(Modifier.height(24.dp)) }
             }
         }
     }

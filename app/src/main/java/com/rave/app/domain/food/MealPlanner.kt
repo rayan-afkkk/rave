@@ -111,9 +111,4 @@ object MealPlanner {
         }
         return PlannedMeal(slot, items)
     }
-
-    /** Shopping list for the plan: each grocery with how many meals use it, most used first. */
-    fun groceries(plan: List<DayPlan>): List<Pair<String, Int>> =
-        plan.flatMap { d -> d.meals.flatMap { m -> m.items.flatMap { it.food.groceries } } }
-            .groupingBy { it }.eachCount().toList().sortedWith(compareByDescending<Pair<String, Int>> { it.second }.thenBy { it.first })
 }

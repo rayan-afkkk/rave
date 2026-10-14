@@ -383,7 +383,7 @@
     <string name="food_snap_meal">Snap meal</string>
     <string name="food_add">Add food</string>
     <string name="food_meal_plan">Meal plan</string>
-    <string name="food_meal_plan_body">A week of desi meals that fit your calories, with a grocery list.</string>
+    <string name="food_meal_plan_body">A week of desi meals that fit your calories.</string>
     <string name="food_settings">Food settings</string>
     <string name="food_today_log">Today\'s food</string>
     <string name="food_empty_log">Nothing logged yet. Scan a snack or add what you ate.</string>
@@ -472,14 +472,10 @@
     <string name="goal_maintain">Stay healthy</string>
     <string name="goal_gain">Build muscle</string>
     <string name="plan_title">Meal plan</string>
-    <string name="plan_tab_plan">Plan</string>
-    <string name="plan_tab_groceries">Groceries</string>
     <string name="plan_target">%1$s kcal a day · %2$s</string>
     <string name="plan_new">New plan</string>
     <string name="plan_ate_this">I ate this</string>
     <string name="plan_day_total">%1$s kcal · %2$d g protein</string>
-    <string name="plan_groceries_body">Everything for this week\'s plan. Tick items as you shop.</string>
-    <string name="plan_used_in">for %1$d meals</string>
     <string name="food_settings_title">Food settings</string>
     <string name="food_goal">Your goal</string>
     <string name="food_sex">Sex (for calorie targets)</string>

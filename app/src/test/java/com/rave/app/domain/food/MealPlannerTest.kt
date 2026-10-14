@@ -51,12 +51,9 @@ class MealPlannerTest {
     }
 
     @Test
-    fun `plan is stable for a date and grocery list aggregates`() {
+    fun `plan is stable for a date`() {
         val a = MealPlanner.week(monday, PlannerOptions(dailyKcal = 2000))
         val b = MealPlanner.week(monday, PlannerOptions(dailyKcal = 2000))
         assertEquals(a, b)
-        val list = MealPlanner.groceries(a)
-        assertTrue(list.isNotEmpty())
-        assertTrue(list.zipWithNext().all { (x, y) -> x.second >= y.second })
     }
 }
