@@ -5,7 +5,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -68,13 +67,6 @@ fun RaveNavHost(
                 onOpenProgress = { navController.navigate(ProgressRoute) },
                 onOpenBatteryGuide = { navController.navigate(BatteryGuideRoute) },
                 onOpenWrapped = { navController.navigate(WrappedRoute(it)) },
-                onOpenFood = {
-                    navController.navigate(FoodRoute) {
-                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
             )
         }
         composable<RoutesRoute> {

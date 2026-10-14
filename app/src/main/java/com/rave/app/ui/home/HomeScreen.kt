@@ -21,6 +21,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.DirectionsRun
+import androidx.compose.material.icons.automirrored.rounded.DirectionsWalk
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.Check
@@ -73,6 +75,7 @@ import com.rave.app.ui.components.ProgressRing
 import com.rave.app.ui.components.SectionCard
 import com.rave.app.ui.components.SectionHeader
 import com.rave.app.ui.components.StreakChip
+import com.rave.app.ui.components.TonalPillButton
 import com.rave.app.ui.components.tile
 import com.rave.app.ui.theme.Dimens
 import com.rave.app.ui.theme.RaveTheme
@@ -94,7 +97,6 @@ fun HomeScreen(
     onOpenProgress: () -> Unit,
     onOpenBatteryGuide: () -> Unit,
     onOpenWrapped: (Int) -> Unit,
-    onOpenFood: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -118,8 +120,21 @@ fun HomeScreen(
                 item(key = "wrapped") { WrappedBanner(year) { onOpenWrapped(year) } }
             }
             item(key = "progress") { ProgressCard(state, onOpenProgress) }
+            item(key = "quick") {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    PillButton(
+                        stringResource(R.string.start_walk), onClick = { onStartActivity(ActivityType.WALK) },
+                        icon = Icons.AutoMirrored.Rounded.DirectionsWalk, modifier = Modifier.weight(1f),
+                    )
+                    TonalPillButton(
+                        stringResource(R.string.start_run), onClick = { onStartActivity(ActivityType.RUN) },
+                        icon = Icons.AutoMirrored.Rounded.DirectionsRun, modifier = Modifier.weight(1f),
+                    )
+                }
+            }
             item(key = "fitness") { TodayActivityCard(onOpenBatteryGuide) }
-            item(key = "food") { FoodTodayCard(onOpenFood) }
+            item(key = "buddy") { BuddyCard() }
+            item(key = "league") { LeagueCard() }
             item(key = "week") { WeekStrip(state, viewModel::selectDate) }
             item(key = "routine_header") {
                 val title = if (state.selectedDate == state.today) stringResource(R.string.home_routine_today)

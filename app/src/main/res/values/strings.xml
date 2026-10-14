@@ -372,7 +372,6 @@
     <string name="buddy_mood_sleepy">Getting sleepy… a quick walk would wake me up.</string>
     <string name="food_title">Food</string>
     <string name="food_today_title">Food today</string>
-    <string name="home_food_summary">%1$s of %2$s kcal</string>
     <string name="food_eaten">eaten</string>
     <string name="food_of_target">of %1$s kcal</string>
     <string name="food_left">%1$s kcal left</string>
