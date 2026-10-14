@@ -20,19 +20,30 @@ class LabelReader @Inject constructor(@ApplicationContext private val context: C
     /** The label's nutrients, or null if no nutrition values could be read. */
     suspend fun read(photo: Uri, name: String): ScannedFood? {
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-        val text = try {
-            recognizer.process(InputImage.fromFilePath(context, photo)).await().text
+        val result = try {
+            recognizer.process(InputImage.fromFilePath(context, photo)).await()
         } finally {
             recognizer.close()
         }
-        val parsed = NutritionLabelParser.parse(text)
-        if (parsed.nutrients.isEmpty) return null
+        // Rebuild the table rows from the line positions; OCR reads label columns one after another.
+        val lines = result.textBlocks.flatMap { it.lines }.mapNotNull { line ->
+            line.boundingBox?.let { b -> NutritionLabelParser.OcrLine(line.text, b.left, b.top, b.right, b.bottom) }
+        }
+        val text = if (lines.isNotEmpty()) NutritionLabelParser.rows(lines) else result.text
+        val parsed = NutritionLabelParser.parse(text).takeIf { it.found >= MIN_VALUES }
+            ?: NutritionLabelParser.parse(result.text).takeIf { it.found >= MIN_VALUES }
+            ?: return null
         return ScannedFood(
             name = name,
             per100g = if (parsed.per100) parsed.nutrients else null,
             perServing = if (parsed.per100) null else parsed.nutrients,
-            ingredients = text.substringAfter("ingredients", "").take(600),
+            ingredients = result.text.substringAfter("ingredients", "", ignoreCase = true).take(600),
             source = FoodSource.LABEL,
         )
+    }
+
+    private companion object {
+        /** Fewer values than this is usually a blurry or partial photo; the AI reader gets a try instead. */
+        const val MIN_VALUES = 3
     }
 }

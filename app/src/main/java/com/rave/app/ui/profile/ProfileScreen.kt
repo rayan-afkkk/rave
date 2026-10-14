@@ -142,6 +142,8 @@ fun ProfileScreen(
                 icon = Icons.Rounded.AutoAwesome, modifier = Modifier.fillMaxWidth())
         }
 
+        com.rave.app.ui.home.BuddyCard()
+
         // Streak freezes
         SectionCard(color = RaveTheme.colors.tileBlue.container) {
             Row(verticalAlignment = Alignment.CenterVertically) {

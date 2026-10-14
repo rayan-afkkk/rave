@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -67,12 +68,18 @@ fun RaveNavHost(
                 onOpenProgress = { navController.navigate(ProgressRoute) },
                 onOpenBatteryGuide = { navController.navigate(BatteryGuideRoute) },
                 onOpenWrapped = { navController.navigate(WrappedRoute(it)) },
-                onOpenFood = { navController.navigate(FoodRoute) },
-                onScanFood = { navController.navigate(FoodScanRoute) },
+                onOpenFood = {
+                    navController.navigate(FoodRoute) {
+                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
             )
         }
         composable<RoutesRoute> {
             RoutesScreen(
+                onBack = back,
                 contentPadding = contentPadding,
                 onOpenActivity = { navController.navigate(ActivitySummaryRoute(it)) },
                 onOpenWorkouts = { navController.navigate(WorkoutHistoryRoute) },
@@ -161,7 +168,7 @@ fun RaveNavHost(
         // ---- Food ----
         composable<FoodRoute> {
             com.rave.app.ui.food.FoodScreen(
-                onBack = back,
+                contentPadding = contentPadding,
                 onScanBarcode = { navController.navigate(FoodScanRoute) },
                 onOpenResult = { navController.navigate(FoodResultRoute(it)) },
                 onOpenPlan = { navController.navigate(MealPlanRoute) },

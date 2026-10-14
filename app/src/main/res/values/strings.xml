@@ -4,6 +4,7 @@
     <string name="app_name">Rave</string>
     <string name="nav_home">Home</string>
     <string name="nav_routes">Routes</string>
+    <string name="nav_scan">Scan</string>
     <string name="nav_friends">Friends</string>
     <string name="nav_profile">Profile</string>
     <string name="nav_start">Start an activity</string>
@@ -51,6 +52,8 @@
     <string name="start_run">Start run</string>
     <string name="picker_title">Ready to move?</string>
     <string name="picker_subtitle">Pick an activity and we\'ll start tracking.</string>
+    <string name="picker_routes">My routes</string>
+    <string name="picker_routes_body">Your past walks and runs</string>
     <string name="name_morning_walk">Morning walk</string>
     <string name="name_morning_run">Morning run</string>
     <string name="name_afternoon_walk">Afternoon walk</string>
@@ -369,6 +372,7 @@
     <string name="buddy_mood_sleepy">Getting sleepy… a quick walk would wake me up.</string>
     <string name="food_title">Food</string>
     <string name="food_today_title">Food today</string>
+    <string name="home_food_summary">%1$s of %2$s kcal</string>
     <string name="food_eaten">eaten</string>
     <string name="food_of_target">of %1$s kcal</string>
     <string name="food_left">%1$s kcal left</string>
@@ -380,6 +384,7 @@
     <string name="food_macro">%1$d / %2$d g</string>
     <string name="food_scan_barcode">Scan barcode</string>
     <string name="food_scan_label">Scan label</string>
+    <string name="food_scan_hero_body">Point at any snack or drink to see if it\'s worth it</string>
     <string name="food_snap_meal">Snap meal</string>
     <string name="food_add">Add food</string>
     <string name="food_meal_plan">Meal plan</string>
@@ -475,7 +480,6 @@
     <string name="plan_target">%1$s kcal a day · %2$s</string>
     <string name="plan_new">New plan</string>
     <string name="plan_ate_this">I ate this</string>
-    <string name="plan_day_total">%1$s kcal · %2$d g protein</string>
     <string name="food_settings_title">Food settings</string>
     <string name="food_goal">Your goal</string>
     <string name="food_sex">Sex (for calorie targets)</string>

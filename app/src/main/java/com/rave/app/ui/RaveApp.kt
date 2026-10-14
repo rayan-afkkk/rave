@@ -54,6 +54,7 @@ import com.rave.app.ui.navigation.InviteLandingRoute
 import com.rave.app.ui.navigation.LiveTrackingRoute
 import com.rave.app.ui.navigation.OnboardingRoute
 import com.rave.app.ui.navigation.RaveNavHost
+import com.rave.app.ui.navigation.RoutesRoute
 import com.rave.app.ui.navigation.SharedStreaksRoute
 import com.rave.app.ui.navigation.TopLevelDestination
 import com.rave.app.ui.navigation.WorkoutRoute
@@ -159,7 +160,12 @@ fun RaveApp(viewModel: MainViewModel, navController: NavHostController = remembe
         }
 
         if (showPicker) {
-            ActivityPickerSheet(onPick = startActivity, onWorkout = startWorkout, onDismiss = { showPicker = false })
+            ActivityPickerSheet(
+                onPick = startActivity,
+                onWorkout = startWorkout,
+                onRoutes = { showPicker = false; navController.navigate(RoutesRoute) { launchSingleTop = true } },
+                onDismiss = { showPicker = false },
+            )
         }
     }
 }

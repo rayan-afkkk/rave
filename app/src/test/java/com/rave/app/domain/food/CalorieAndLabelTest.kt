@@ -65,4 +65,37 @@ class CalorieAndLabelTest {
         assertEquals(7.0, r.nutrients.protein!!, 1e-9)
         assertEquals(5.0, r.nutrients.fat!!, 1e-9)
     }
+
+    @Test
+    fun `columns read separately by OCR are rebuilt into rows`() {
+        fun l(t: String, x: Int, y: Int) = NutritionLabelParser.OcrLine(t, x, y, x + 120, y + 30)
+        // OCR order: whole name column first, then the value column, then the %DV column.
+        val lines = listOf(
+            l("Nutrition Facts per 100g", 10, 0),
+            l("Energy", 10, 50), l("Fat", 10, 100), l("Sugars", 10, 150), l("Protein", 10, 200),
+            l("480 kcal", 200, 52), l("22 g", 200, 98), l("35 g", 200, 151), l("6 g", 200, 203),
+            l("24%", 380, 50), l("31%", 380, 101), l("39%", 380, 149), l("12%", 380, 201),
+        )
+        val text = NutritionLabelParser.rows(lines)
+        assertEquals("Fat 22 g 31%", text.lines()[2])
+        val r = NutritionLabelParser.parse(text).nutrients
+        assertEquals(480.0, r.kcal!!, 1e-9)
+        assertEquals(22.0, r.fat!!, 1e-9)
+        assertEquals(35.0, r.sugar!!, 1e-9)
+        assertEquals(6.0, r.protein!!, 1e-9)
+    }
+
+    @Test
+    fun `percent daily values and OCR letter slips are handled`() {
+        val r = NutritionLabelParser.parse("Calories 250\nTotal Fat 12% 8g\nSodium 15% 360mg\nTotal Carbohydrate 3Og\nIncludes 5g Added Sugars\nTotal Sugars 9g\nProtein 1Og")
+        with(r.nutrients) {
+            assertEquals(250.0, kcal!!, 1e-9)
+            assertEquals(8.0, fat!!, 1e-9)
+            assertEquals(0.9, salt!!, 1e-9)
+            assertEquals(30.0, carbs!!, 1e-9)
+            assertEquals(9.0, sugar!!, 1e-9)
+            assertEquals(10.0, protein!!, 1e-9)
+        }
+        assertEquals(6, r.found)
+    }
 }

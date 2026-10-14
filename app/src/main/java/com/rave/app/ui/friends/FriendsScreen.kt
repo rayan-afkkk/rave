@@ -143,6 +143,8 @@ fun FriendsScreen(
             }
         }
 
+        item { com.rave.app.ui.home.LeagueCard() }
+
         if (state.shared.isNotEmpty()) {
             item { SectionHeader(stringResource(R.string.shared_title)) }
             items(state.shared, key = { "s_" + it.id }) { s ->

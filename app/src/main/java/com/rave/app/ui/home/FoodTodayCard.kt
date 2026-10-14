@@ -1,15 +1,25 @@
 package com.rave.app.ui.home
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.QrCodeScanner
 import androidx.compose.material.icons.rounded.RestaurantMenu
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -21,14 +31,16 @@ import com.rave.app.data.food.FoodRepository
 import com.rave.app.data.preferences.SettingsRepository
 import com.rave.app.data.repository.StepRepository
 import com.rave.app.domain.fitness.FitnessMath
-import com.rave.app.ui.components.TonalPillButton
-import com.rave.app.ui.food.CaloriesCard
+import com.rave.app.ui.components.IconTile
+import com.rave.app.ui.components.SectionCard
 import com.rave.app.ui.food.FoodUiState
+import com.rave.app.ui.theme.RaveTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import java.text.NumberFormat
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,14 +56,38 @@ class FoodTodayViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), FoodUiState())
 }
 
-/** Home: calories eaten vs today's target, with shortcuts to scan a snack or open the food hub. */
+/** Home: one slim row with calories eaten vs today's target. Tap opens the Scan tab. */
 @Composable
-fun FoodTodayCard(onOpenFood: () -> Unit, onScanFood: () -> Unit, viewModel: FoodTodayViewModel = hiltViewModel()) {
+fun FoodTodayCard(onOpenFood: () -> Unit, viewModel: FoodTodayViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    CaloriesCard(state, onClick = onOpenFood) {
-        Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TonalPillButton(stringResource(R.string.food_scan_barcode), onScanFood, Modifier.weight(1f), icon = Icons.Rounded.QrCodeScanner)
-            TonalPillButton(stringResource(R.string.food_title), onOpenFood, Modifier.weight(1f), icon = Icons.Rounded.RestaurantMenu)
+    val target = state.target ?: return
+    val eaten = state.day.kcal
+    val over = eaten > target.kcal
+    val accent = if (over) RaveTheme.colors.verdictSkip.content else MaterialTheme.colorScheme.primary
+    val track = MaterialTheme.colorScheme.surfaceVariant
+    val progress = (eaten / target.kcal.toFloat()).coerceIn(0f, 1f)
+    val nf = NumberFormat.getIntegerInstance()
+    SectionCard(Modifier.fillMaxWidth(), onClick = onOpenFood) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconTile(Icons.Rounded.RestaurantMenu, RaveTheme.colors.tileGreen)
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.food_today_title), style = MaterialTheme.typography.titleSmall)
+                Text(
+                    stringResource(R.string.home_food_summary, nf.format(eaten), nf.format(target.kcal)),
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Box(Modifier.size(44.dp), contentAlignment = Alignment.Center) {
+                Canvas(Modifier.size(44.dp)) {
+                    val stroke = 5.dp.toPx()
+                    val inset = Offset(stroke / 2, stroke / 2)
+                    val arc = Size(size.width - stroke, size.height - stroke)
+                    drawArc(track, 0f, 360f, false, inset, arc, style = Stroke(stroke))
+                    if (progress > 0f) drawArc(accent, -90f, 360f * progress, false, inset, arc, style = Stroke(stroke, cap = StrokeCap.Round))
+                }
+                Text("${(progress * 100).toInt()}%", style = MaterialTheme.typography.labelSmall)
+            }
         }
     }
 }

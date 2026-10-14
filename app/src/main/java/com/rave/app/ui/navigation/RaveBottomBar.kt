@@ -58,7 +58,7 @@ val BottomBarClearance = BarHeight + StartButtonRaise
 
 /**
  * Standard bottom navigation: full width, docked to the bottom edge with a hairline on top.
- * Home and Routes on the left, Friends and Profile on the right, and a round orange Start
+ * Home and Scan on the left, Friends and Profile on the right, and a round orange Start
  * button in the middle that pops up above the bar.
  */
 @Composable

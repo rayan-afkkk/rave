@@ -36,6 +36,12 @@ class FoodAi @Inject constructor(private val firebase: FirebaseProvider) {
         return parse(response.text ?: return null)
     }
 
+    /** Reads a photographed nutrition label when on-device OCR couldn't. Null if no label is visible. */
+    suspend fun readLabel(photo: Bitmap, name: String): ScannedFood? {
+        val response = model.generateContent(content { image(photo); text(LABEL_PROMPT) })
+        return parseLabel(response.text ?: return null, name)
+    }
+
     companion object {
         const val MODEL = "gemini-2.5-flash"
 
@@ -49,6 +55,33 @@ class FoodAi @Inject constructor(private val firebase: FirebaseProvider) {
              "ingredients": "main ingredients, comma separated"}
             Numbers are for the whole visible portion (grams, kcal). If it is not food, reply {"isFood": false}.
         """.trimIndent()
+
+        private val LABEL_PROMPT = """
+            Read the nutrition facts label in the photo. Reply with JSON only:
+            {"isLabel": true, "name": "product name if printed, else empty", "per100": true,
+             "servingGrams": 0, "kcal": 0, "protein": 0, "carbs": 0, "sugar": 0, "fat": 0, "satFat": 0,
+             "fiber": 0, "salt": 0, "ingredients": "ingredients text if visible"}
+            Use the per 100 g / 100 ml column when the label has one (per100 = true), otherwise the per serving
+            column (per100 = false). Salt in grams; if only sodium is printed, salt = sodium × 2.5.
+            Leave out any value that isn't printed. If there is no nutrition label, reply {"isLabel": false}.
+        """.trimIndent()
+
+        fun parseLabel(json: String, name: String): ScannedFood? {
+            val o = runCatching { JSONObject(json.trim().removePrefix("```json").removeSuffix("```")) }.getOrNull() ?: return null
+            if (!o.optBoolean("isLabel", false)) return null
+            fun d(k: String) = if (o.has(k)) o.optDouble(k).takeIf { !it.isNaN() && it >= 0 } else null
+            val n = Nutrients(d("kcal"), d("protein"), d("carbs"), d("sugar"), d("fat"), d("satFat"), d("fiber"), d("salt"))
+            if (n.isEmpty) return null
+            val per100 = o.optBoolean("per100", true)
+            return ScannedFood(
+                name = o.optString("name").ifBlank { name },
+                per100g = if (per100) n else null,
+                perServing = if (per100) null else n,
+                servingGrams = d("servingGrams")?.takeIf { it > 0 },
+                ingredients = o.optString("ingredients"),
+                source = FoodSource.LABEL,
+            )
+        }
 
         fun parse(json: String): ScannedFood? {
             val o = runCatching { JSONObject(json.trim().removePrefix("```json").removeSuffix("```")) }.getOrNull() ?: return null

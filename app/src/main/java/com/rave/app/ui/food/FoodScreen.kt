@@ -7,21 +7,17 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -55,15 +51,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -144,9 +135,16 @@ class FoodViewModel @Inject constructor(
         return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
     }
 
-    /** Label photo → on-device OCR → result screen. */
+    /** Label photo → on-device OCR (AI reader as a fallback for hard photos) → result screen. */
     fun readLabel(uri: Uri, labelName: String, onReady: () -> Unit) = runScan(FoodSource.LABEL, onReady) {
-        labels.read(uri, labelName) ?: run { _message.value = R.string.food_label_failed; null }
+        val ocr = runCatching { labels.read(uri, labelName) }.getOrNull()
+        val result = ocr ?: if (ai.isAvailable) {
+            withContext(Dispatchers.IO) { loadScaled(uri, 1600) }?.let { bmp -> runCatching { ai.readLabel(bmp, labelName) }.getOrNull() }
+        } else {
+            null
+        }
+        if (result == null) _message.value = R.string.food_label_failed
+        result
     }
 
     /** Meal photo → Gemini → result screen. */
@@ -161,7 +159,7 @@ class FoodViewModel @Inject constructor(
         viewModelScope.launch {
             if (!food.canScan(source)) { _message.value = R.string.food_limit_reached; return@launch }
             _busy.value = true
-            val result = runCatching { block() }.getOrNull()
+            val result = runCatching { block() }.getOrElse { _message.value = R.string.food_label_failed; null }
             _busy.value = false
             if (result != null) {
                 food.pendingScan.value = result
@@ -195,7 +193,7 @@ private enum class PendingCapture { LABEL, PHOTO }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FoodScreen(
-    onBack: () -> Unit,
+    contentPadding: PaddingValues,
     onScanBarcode: () -> Unit,
     onOpenResult: (barcode: String) -> Unit,
     onOpenPlan: () -> Unit,
@@ -232,19 +230,22 @@ fun FoodScreen(
     }
 
     RaveScreen(
-        title = stringResource(R.string.food_title),
-        onBack = onBack,
+        title = stringResource(R.string.nav_scan),
+        onBack = null,
         actions = { IconButton(onClick = onOpenSettings) { Icon(Icons.Rounded.Settings, stringResource(R.string.food_settings)) } },
     ) {
         Box(Modifier.fillMaxSize()) {
             LazyColumn(
-                Modifier.fillMaxSize().navigationBarsPadding().padding(horizontal = Dimens.ScreenPadding),
+                Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(
+                    start = Dimens.ScreenPadding, end = Dimens.ScreenPadding,
+                    bottom = contentPadding.calculateBottomPadding() + 16.dp,
+                ),
                 verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap),
             ) {
-                item { CaloriesCard(state) }
+                item { BarcodeHero(onScanBarcode) }
                 item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ScanTile(Icons.Rounded.QrCodeScanner, stringResource(R.string.food_scan_barcode), Modifier.weight(1f), onScanBarcode)
+                    Row(horizontalArrangement = Arrangement.spacedBy(Dimens.SectionGap)) {
                         ScanTile(Icons.Rounded.DocumentScanner, stringResource(R.string.food_scan_label), Modifier.weight(1f)) { start(PendingCapture.LABEL) }
                         ScanTile(Icons.Rounded.PhotoCamera, stringResource(R.string.food_snap_meal), Modifier.weight(1f)) { start(PendingCapture.PHOTO) }
                     }
@@ -256,46 +257,22 @@ fun FoodScreen(
                         }
                     }
                 }
-                item {
-                    SectionCard(Modifier.fillMaxWidth(), onClick = onOpenPlan) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            com.rave.app.ui.components.IconTile(Icons.Rounded.RestaurantMenu, RaveTheme.colors.tileGreen)
-                            Spacer(Modifier.width(12.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text(stringResource(R.string.food_meal_plan), style = MaterialTheme.typography.titleSmall)
-                                Text(stringResource(R.string.food_meal_plan_body), style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                        }
-                    }
-                }
-                item {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(R.string.food_today_log), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                        TextButton(onClick = { showAdd = true }) {
-                            Icon(Icons.Rounded.Add, null, Modifier.size(18.dp))
-                            Spacer(Modifier.width(4.dp))
-                            Text(stringResource(R.string.food_add))
-                        }
-                    }
-                }
-                if (state.day.entries.isEmpty()) {
-                    item { Text(stringResource(R.string.food_empty_log), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
-                } else {
+                item { TodaySummary(state, onAdd = { showAdd = true }, onOpenPlan = onOpenPlan) }
+                if (state.day.entries.isNotEmpty()) {
                     val bySlot = state.day.entries.groupBy { runCatching { MealSlot.valueOf(it.slot) }.getOrDefault(MealSlot.SNACK) }
                     MealSlot.entries.filter { it in bySlot }.forEach { slot ->
                         item(key = "slot_$slot") { LogGroup(slot, bySlot.getValue(slot), viewModel::delete) }
                     }
                 }
                 if (state.scans.isNotEmpty()) {
-                    item { Text(stringResource(R.string.food_recent_scans), style = MaterialTheme.typography.titleMedium) }
-                    items(state.scans, key = { "scan_${it.id}" }) { scan ->
+                    item { Text(stringResource(R.string.food_recent_scans), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 4.dp)) }
+                    items(state.scans.take(5), key = { "scan_${it.id}" }) { scan ->
                         ScanRow(scan) { scan.barcode?.let(onOpenResult) }
                     }
                 }
                 item {
                     Text(stringResource(R.string.food_disclaimer), style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(vertical = 12.dp))
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(vertical = 8.dp))
                 }
             }
             if (busy) {
@@ -324,66 +301,53 @@ fun FoodScreen(
 
 private fun fmt(n: Int) = NumberFormat.getIntegerInstance().format(n)
 
+/** The main action: a big button that opens the barcode camera. */
 @Composable
-fun CaloriesCard(
-    state: FoodUiState,
-    modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null,
-    footer: (@Composable ColumnScope.() -> Unit)? = null,
-) {
-    val target = state.target ?: return
-    val eaten = state.day.kcal
-    val progress by animateFloatAsState((eaten / target.kcal.toFloat()).coerceIn(0f, 1f), tween(800), label = "kcal")
-    val over = eaten > target.kcal
-    val accent = if (over) RaveTheme.colors.verdictSkip.content else MaterialTheme.colorScheme.primary
-    val track = MaterialTheme.colorScheme.surfaceVariant
-    SectionCard(modifier.fillMaxWidth(), onClick = onClick) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(112.dp), contentAlignment = Alignment.Center) {
-                Canvas(Modifier.size(112.dp)) {
-                    val stroke = 10.dp.toPx()
-                    val inset = Offset(stroke / 2, stroke / 2)
-                    val arc = Size(size.width - stroke, size.height - stroke)
-                    drawArc(track, 0f, 360f, false, inset, arc, style = Stroke(stroke))
-                    if (progress > 0f) drawArc(accent, -90f, 360f * progress, false, inset, arc, style = Stroke(stroke, cap = StrokeCap.Round))
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(fmt(eaten), style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
-                    Text(stringResource(R.string.food_eaten), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
+private fun BarcodeHero(onClick: () -> Unit) {
+    SectionCard(Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.primary, onClick = onClick) {
+        Row(Modifier.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(56.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.18f)), contentAlignment = Alignment.Center) {
+                Icon(Icons.Rounded.QrCodeScanner, null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(30.dp))
             }
             Spacer(Modifier.width(16.dp))
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(stringResource(R.string.food_of_target, fmt(target.kcal)), style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(
-                    if (over) stringResource(R.string.food_over, fmt(eaten - target.kcal)) else stringResource(R.string.food_left, fmt(target.kcal - eaten)),
-                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold), color = accent,
-                )
-                MacroBar(stringResource(R.string.food_protein), state.day.protein.toInt(), target.proteinG, RaveTheme.colors.tileGreen.content)
-                MacroBar(stringResource(R.string.food_carbs), state.day.carbs.toInt(), target.carbsG, RaveTheme.colors.tileBlue.content)
-                MacroBar(stringResource(R.string.food_fat), state.day.fat.toInt(), target.fatG, RaveTheme.colors.tilePink.content)
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.food_scan_barcode), style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onPrimary)
+                Text(stringResource(R.string.food_scan_hero_body), style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f))
             }
         }
-        if (state.burnedKcal > 0) {
-            Text(stringResource(R.string.food_burned, fmt(state.burnedKcal)), style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp))
-        }
-        footer?.invoke(this)
     }
 }
 
+/** Calories eaten vs target on one line, with Add food and Meal plan. */
 @Composable
-private fun MacroBar(label: String, value: Int, target: Int, color: androidx.compose.ui.graphics.Color) {
-    Column {
-        Row {
-            Text(label, style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
-            Text(stringResource(R.string.food_macro, value, target), style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
+private fun TodaySummary(state: FoodUiState, onAdd: () -> Unit, onOpenPlan: () -> Unit) {
+    val target = state.target
+    val eaten = state.day.kcal
+    val over = target != null && eaten > target.kcal
+    val accent = if (over) RaveTheme.colors.verdictSkip.content else MaterialTheme.colorScheme.primary
+    SectionCard(Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.Bottom) {
+            Text(fmt(eaten), style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold))
+            if (target != null) {
+                Text(" " + stringResource(R.string.food_of_target, fmt(target.kcal)), style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f).padding(bottom = 3.dp))
+                Text(
+                    if (over) stringResource(R.string.food_over, fmt(eaten - target.kcal)) else stringResource(R.string.food_left, fmt(target.kcal - eaten)),
+                    style = MaterialTheme.typography.labelLarge, color = accent, modifier = Modifier.padding(bottom = 3.dp),
+                )
+            }
         }
-        Box(Modifier.fillMaxWidth().padding(top = 2.dp).height(5.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant)) {
-            val f = if (target <= 0) 0f else (value / target.toFloat()).coerceIn(0f, 1f)
-            if (f > 0f) Box(Modifier.fillMaxWidth(f).height(5.dp).clip(CircleShape).background(color))
+        if (target != null) {
+            val f = (eaten / target.kcal.toFloat()).coerceIn(0f, 1f)
+            Box(Modifier.fillMaxWidth().padding(top = 8.dp).height(6.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant)) {
+                if (f > 0f) Box(Modifier.fillMaxWidth(f).height(6.dp).clip(CircleShape).background(accent))
+            }
+        }
+        Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TonalPillButton(stringResource(R.string.food_add), onAdd, Modifier.weight(1f), icon = Icons.Rounded.Add)
+            TonalPillButton(stringResource(R.string.food_meal_plan), onOpenPlan, Modifier.weight(1f), icon = Icons.Rounded.RestaurantMenu)
         }
     }
 }
@@ -391,12 +355,10 @@ private fun MacroBar(label: String, value: Int, target: Int, color: androidx.com
 @Composable
 private fun ScanTile(icon: ImageVector, label: String, modifier: Modifier, onClick: () -> Unit) {
     SectionCard(modifier, onClick = onClick) {
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(Modifier.size(44.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary), contentAlignment = Alignment.Center) {
-                Icon(icon, null, tint = MaterialTheme.colorScheme.onPrimary)
-            }
-            Spacer(Modifier.height(6.dp))
-            Text(label, style = MaterialTheme.typography.labelMedium, textAlign = TextAlign.Center, maxLines = 1)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
+            Spacer(Modifier.width(10.dp))
+            Text(label, style = MaterialTheme.typography.labelLarge, maxLines = 1)
         }
     }
 }
