@@ -5,6 +5,9 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.ui.draw.shadow
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -46,15 +49,17 @@ import com.rave.app.ui.theme.PillShape
 import com.rave.app.ui.theme.RaveTheme
 
 private val BarHeight = Dimens.NavBarHeight
-private val StartButtonSize = 44.dp
+private val StartButtonSize = 58.dp
+/** How far the Start button rises above the bar's top edge. */
+private val StartButtonRaise = 22.dp
 
-/** Space screens leave at the bottom so content isn't hidden behind the bar (system insets come on top). */
-val BottomBarClearance = BarHeight
+/** Space screens leave at the bottom so content isn't hidden behind the bar and raised button (system insets come on top). */
+val BottomBarClearance = BarHeight + StartButtonRaise
 
 /**
  * Standard bottom navigation: full width, docked to the bottom edge with a hairline on top.
- * Home and Routes on the left, Friends and Profile on the right, and an orange Start button
- * in the middle (in line with the tabs).
+ * Home and Routes on the left, Friends and Profile on the right, and a round orange Start
+ * button in the middle that pops up above the bar.
  */
 @Composable
 fun RaveBottomBar(
@@ -63,24 +68,29 @@ fun RaveBottomBar(
     onStartClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier
-            .fillMaxWidth()
-            .background(RaveTheme.colors.navBar)
-            // Background first so it also fills the area behind the (swipe-to-show) system bar.
-            .navigationBarsPadding(),
-    ) {
-        HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
-        Row(
-            Modifier.fillMaxWidth().height(BarHeight).padding(horizontal = 4.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically,
+    Box(modifier.fillMaxWidth()) {
+        Column(
+            Modifier
+                .padding(top = StartButtonRaise)
+                .fillMaxWidth()
+                .background(RaveTheme.colors.navBar)
+                // Background first so it also fills the area behind the (swipe-to-show) system bar.
+                .navigationBarsPadding(),
         ) {
-            val (left, right) = TopLevelDestination.entries.let { it.take(2) to it.drop(2) }
-            left.forEach { dest -> NavItem(dest, selected == dest, { onSelect(dest) }, Modifier.weight(1f)) }
-            Box(Modifier.weight(1f), contentAlignment = Alignment.Center) { StartButton(onStartClick) }
-            right.forEach { dest -> NavItem(dest, selected == dest, { onSelect(dest) }, Modifier.weight(1f)) }
+            HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+            Row(
+                Modifier.fillMaxWidth().height(BarHeight).padding(horizontal = 4.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                val (left, right) = TopLevelDestination.entries.let { it.take(2) to it.drop(2) }
+                left.forEach { dest -> NavItem(dest, selected == dest, { onSelect(dest) }, Modifier.weight(1f)) }
+                // Room for the raised Start button.
+                Spacer(Modifier.weight(1f))
+                right.forEach { dest -> NavItem(dest, selected == dest, { onSelect(dest) }, Modifier.weight(1f)) }
+            }
         }
+        StartButton(onStartClick, Modifier.align(Alignment.TopCenter))
     }
 }
 
@@ -137,7 +147,7 @@ private fun NavItem(
 }
 
 @Composable
-private fun StartButton(onClick: () -> Unit) {
+private fun StartButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     val scale by animateFloatAsState(
@@ -146,11 +156,14 @@ private fun StartButton(onClick: () -> Unit) {
         label = "startScale",
     )
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size(StartButtonSize)
             .scale(scale)
+            .shadow(10.dp, CircleShape, ambientColor = MaterialTheme.colorScheme.primary, spotColor = MaterialTheme.colorScheme.primary)
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.primary)
+            // Ring in the bar colour makes the button look cut into the bar.
+            .border(4.dp, RaveTheme.colors.navBar, CircleShape)
             .clickable(
                 interactionSource = interaction,
                 indication = ripple(color = MaterialTheme.colorScheme.onPrimary),
@@ -163,7 +176,7 @@ private fun StartButton(onClick: () -> Unit) {
             imageVector = Icons.Rounded.PlayArrow,
             contentDescription = stringResource(R.string.nav_start),
             tint = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier.size(26.dp),
+            modifier = Modifier.size(30.dp),
         )
     }
 }
