@@ -33,7 +33,7 @@ object DataModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, AppDatabase.NAME)
-            .addMigrations(AppDatabase.MIGRATION_1_2)
+            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3)
             .build()
 
     @Provides fun provideHabitDao(db: AppDatabase): HabitDao = db.habitDao()
@@ -44,6 +44,7 @@ object DataModule {
     @Provides fun providePrivacyZoneDao(db: AppDatabase): PrivacyZoneDao = db.privacyZoneDao()
     @Provides fun provideWorkoutDao(db: AppDatabase): WorkoutDao = db.workoutDao()
     @Provides fun provideStepsDao(db: AppDatabase): StepsDao = db.stepsDao()
+    @Provides fun provideFoodDao(db: AppDatabase): com.rave.app.data.local.dao.FoodDao = db.foodDao()
 
     @Provides
     @Singleton

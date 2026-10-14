@@ -2,4 +2,6 @@
 <paths>
     <!-- Share cards written by ShareHelper.cacheImage -->
     <cache-path name="shared" path="shared/" />
+    <!-- Food label / meal photos taken for scanning -->
+    <cache-path name="photos" path="photos/" />
 </paths>

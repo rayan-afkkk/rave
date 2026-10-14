@@ -15,6 +15,12 @@ data class UserSettings(
     val heightCm: Float = 170f,
     val dailyGoalKm: Float = 3f,
     val dailyStepGoal: Int = 8_000,
+    /** 0 = not set (assume 25 for calorie targets). */
+    val birthYear: Int = 0,
+    val sex: com.rave.app.domain.food.Sex = com.rave.app.domain.food.Sex.UNSPECIFIED,
+    val food: com.rave.app.domain.food.FoodPreferences = com.rave.app.domain.food.FoodPreferences(),
+    val ramadanMeals: Boolean = false,
+    val budgetMeals: Boolean = false,
     val autoDetectWalks: Boolean = false,
     val batterySaverGps: Boolean = false,
     val autoPause: Boolean = true,

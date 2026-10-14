@@ -67,6 +67,8 @@ fun RaveNavHost(
                 onOpenProgress = { navController.navigate(ProgressRoute) },
                 onOpenBatteryGuide = { navController.navigate(BatteryGuideRoute) },
                 onOpenWrapped = { navController.navigate(WrappedRoute(it)) },
+                onOpenFood = { navController.navigate(FoodRoute) },
+                onScanFood = { navController.navigate(FoodScanRoute) },
             )
         }
         composable<RoutesRoute> {
@@ -155,6 +157,37 @@ fun RaveNavHost(
         composable<PrivacyZonesRoute> { PrivacyZonesScreen(onBack = back) }
         composable<BatteryGuideRoute> { com.rave.app.ui.settings.BatteryGuideScreen(onBack = back) }
         composable<WrappedRoute> { com.rave.app.ui.wrapped.WrappedScreen(onBack = back) }
+
+        // ---- Food ----
+        composable<FoodRoute> {
+            com.rave.app.ui.food.FoodScreen(
+                onBack = back,
+                onScanBarcode = { navController.navigate(FoodScanRoute) },
+                onOpenResult = { navController.navigate(FoodResultRoute(it)) },
+                onOpenPlan = { navController.navigate(MealPlanRoute) },
+                onOpenSettings = { navController.navigate(FoodSettingsRoute) },
+            )
+        }
+        composable<FoodScanRoute> {
+            com.rave.app.ui.food.FoodScanScreen(
+                onBack = back,
+                onBarcode = { code ->
+                    navController.navigate(FoodResultRoute(code)) { popUpTo<FoodScanRoute> { inclusive = true } }
+                },
+            )
+        }
+        composable<FoodResultRoute> {
+            com.rave.app.ui.food.FoodResultScreen(
+                onBack = back,
+                onScanAnother = {
+                    navController.navigate(FoodScanRoute) { popUpTo<FoodResultRoute> { inclusive = true } }
+                },
+            )
+        }
+        composable<MealPlanRoute> {
+            com.rave.app.ui.food.MealPlanScreen(onBack = back, onOpenSettings = { navController.navigate(FoodSettingsRoute) })
+        }
+        composable<FoodSettingsRoute> { com.rave.app.ui.food.FoodSettingsScreen(onBack = back) }
 
         // ---- Social ----
         composable<FriendRequestsRoute> {

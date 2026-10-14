@@ -49,3 +49,10 @@ import kotlinx.serialization.Serializable
 @Serializable data object CreateCompetitionRoute
 @Serializable data class CompetitionDetailRoute(val id: String)
 @Serializable data class CompetitionResultRoute(val id: String)
+
+// Food: scanner, log, meal planner
+@Serializable data object FoodRoute
+@Serializable data object FoodScanRoute
+@Serializable data class FoodResultRoute(val barcode: String = "")
+@Serializable data object MealPlanRoute
+@Serializable data object FoodSettingsRoute

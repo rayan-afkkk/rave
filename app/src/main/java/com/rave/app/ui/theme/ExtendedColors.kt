@@ -39,6 +39,9 @@ data class ExtendedColors(
     val splashMark: Color = SplashMark,
     val splashText: Color = SplashText,
     val buddy: BuddyColors = BuddyColors(),
+    val verdictGo: TileColor = TileColor(VerdictGoSoft, VerdictGo),
+    val verdictSometimes: TileColor = TileColor(VerdictMidSoft, VerdictMid),
+    val verdictSkip: TileColor = TileColor(VerdictSkipSoft, VerdictSkip),
 ) {
     val tiles: List<TileColor> get() = listOf(tilePeach, tileGreen, tilePink, tileBlue)
 }

@@ -74,6 +74,18 @@ class SettingsRepository @Inject constructor(
             heightCm = this[Keys.HEIGHT] ?: d.heightCm,
             dailyGoalKm = this[Keys.DAILY_GOAL] ?: d.dailyGoalKm,
             dailyStepGoal = this[Keys.STEP_GOAL] ?: d.dailyStepGoal,
+            birthYear = this[Keys.BIRTH_YEAR] ?: d.birthYear,
+            sex = enumOr(this[Keys.SEX], d.sex),
+            food = com.rave.app.domain.food.FoodPreferences(
+                goal = enumOr(this[Keys.FOOD_GOAL], d.food.goal),
+                halalOnly = this[Keys.HALAL] ?: d.food.halalOnly,
+                vegetarian = this[Keys.VEG] ?: d.food.vegetarian,
+                allergies = this[Keys.ALLERGIES]
+                    ?.mapNotNull { runCatching { com.rave.app.domain.food.Allergen.valueOf(it) }.getOrNull() }?.toSet()
+                    ?: d.food.allergies,
+            ),
+            ramadanMeals = this[Keys.RAMADAN] ?: d.ramadanMeals,
+            budgetMeals = this[Keys.BUDGET] ?: d.budgetMeals,
             autoDetectWalks = this[Keys.AUTO_DETECT] ?: d.autoDetectWalks,
             batterySaverGps = this[Keys.BATTERY_SAVER] ?: d.batterySaverGps,
             autoPause = this[Keys.AUTO_PAUSE] ?: d.autoPause,
@@ -95,6 +107,14 @@ class SettingsRepository @Inject constructor(
         this[Keys.HEIGHT] = s.heightCm
         this[Keys.DAILY_GOAL] = s.dailyGoalKm
         this[Keys.STEP_GOAL] = s.dailyStepGoal
+        this[Keys.BIRTH_YEAR] = s.birthYear
+        this[Keys.SEX] = s.sex.name
+        this[Keys.FOOD_GOAL] = s.food.goal.name
+        this[Keys.HALAL] = s.food.halalOnly
+        this[Keys.VEG] = s.food.vegetarian
+        this[Keys.ALLERGIES] = s.food.allergies.map { it.name }.toSet()
+        this[Keys.RAMADAN] = s.ramadanMeals
+        this[Keys.BUDGET] = s.budgetMeals
         this[Keys.AUTO_DETECT] = s.autoDetectWalks
         this[Keys.BATTERY_SAVER] = s.batterySaverGps
         this[Keys.AUTO_PAUSE] = s.autoPause
@@ -116,6 +136,14 @@ class SettingsRepository @Inject constructor(
         val HEIGHT = floatPreferencesKey("height_cm")
         val DAILY_GOAL = floatPreferencesKey("daily_goal_km")
         val STEP_GOAL = intPreferencesKey("daily_step_goal")
+        val BIRTH_YEAR = intPreferencesKey("birth_year")
+        val SEX = stringPreferencesKey("sex")
+        val FOOD_GOAL = stringPreferencesKey("food_goal")
+        val HALAL = booleanPreferencesKey("food_halal")
+        val VEG = booleanPreferencesKey("food_veg")
+        val ALLERGIES = stringSetPreferencesKey("food_allergies")
+        val RAMADAN = booleanPreferencesKey("food_ramadan")
+        val BUDGET = booleanPreferencesKey("food_budget")
         val AUTO_DETECT = booleanPreferencesKey("auto_detect")
         val BATTERY_SAVER = booleanPreferencesKey("battery_saver")
         val AUTO_PAUSE = booleanPreferencesKey("auto_pause")

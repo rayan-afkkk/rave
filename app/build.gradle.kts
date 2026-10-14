@@ -181,6 +181,8 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.messaging)
+    // Gemini via Firebase AI Logic (food photo scan). Enable AI Logic in the Firebase console.
+    implementation(libs.firebase.ai)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services)
     implementation(libs.googleid)
@@ -192,6 +194,8 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation("com.google.guava:guava:33.3.1-android")
     implementation(libs.mlkit.barcode.scanning)
+    implementation(libs.mlkit.text.recognition)
+    implementation(libs.okhttp)
     implementation(libs.zxing.core)
 
     testImplementation(libs.junit)

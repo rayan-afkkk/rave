@@ -51,6 +51,14 @@ internal val BuddyGold = Color(0xFFF6C344)
 internal val BuddyLeaf = Color(0xFF6E9A3A)
 internal val BuddyRibbon = Color(0xFF3A6A96)
 
+// ---- Food verdicts (traffic light) ----
+internal val VerdictGo = Color(0xFF2E8B57)
+internal val VerdictGoSoft = Color(0xFFE2F2E8)
+internal val VerdictMid = Color(0xFFB7791F)
+internal val VerdictMidSoft = Color(0xFFFFF0CC)
+internal val VerdictSkip = Color(0xFFC9402F)
+internal val VerdictSkipSoft = Color(0xFFFBE2DE)
+
 // ---- Dark ----
 internal val DarkBackground = Color(0xFF17110E)
 internal val DarkSurface = Color(0xFF241A16)

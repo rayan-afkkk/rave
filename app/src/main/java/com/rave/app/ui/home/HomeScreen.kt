@@ -97,6 +97,8 @@ fun HomeScreen(
     onOpenProgress: () -> Unit,
     onOpenBatteryGuide: () -> Unit,
     onOpenWrapped: (Int) -> Unit,
+    onOpenFood: () -> Unit,
+    onScanFood: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -133,6 +135,7 @@ fun HomeScreen(
                 }
             }
             item(key = "fitness") { TodayActivityCard(onOpenBatteryGuide) }
+            item(key = "food") { FoodTodayCard(onOpenFood, onScanFood) }
             item(key = "buddy") { BuddyCard() }
             item(key = "league") { LeagueCard() }
             item(key = "week") { WeekStrip(state, viewModel::selectDate) }

@@ -231,3 +231,36 @@ data class DailyStepsEntity(
     val steps: Int,
     val updatedAt: Long,
 )
+
+/** One thing eaten (date = ISO yyyy-MM-dd). Nutrients are for the whole logged amount. */
+@Entity(tableName = "food_log")
+data class FoodLogEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val date: String,
+    val slot: String,
+    val name: String,
+    val kcal: Int,
+    val protein: Double,
+    val carbs: Double,
+    val fat: Double,
+    val sugar: Double? = null,
+    val source: String,
+    val verdict: String? = null,
+    val barcode: String? = null,
+    val createdAt: Long,
+)
+
+/** Recent scans, so the user can reopen a product. */
+@Entity(tableName = "food_scans")
+data class FoodScanEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val barcode: String? = null,
+    val name: String,
+    val brand: String = "",
+    val verdict: String,
+    val kcal: Int? = null,
+    val imageUrl: String? = null,
+    val source: String,
+    val scannedAt: Long,
+)
+
