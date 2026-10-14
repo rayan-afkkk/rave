@@ -61,6 +61,7 @@ class SyncWorker @AssistedInject constructor(
     private val settings: SettingsRepository,
     private val notifier: Notifier,
     private val time: TimeProvider,
+    private val league: com.rave.app.data.cloud.LeagueRepository,
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -71,6 +72,7 @@ class SyncWorker @AssistedInject constructor(
             uploadActivities(uid)
             uploadDays(uid)
             pushStats()
+            runCatching { league.publish() }
             competitions.refreshAllMyScores()
             watchCompetitions(uid)
             sharedStreaks.cleanUpDeclined()

@@ -51,6 +51,9 @@ interface WorkoutDao {
     @Query("SELECT * FROM workouts WHERE endTime IS NOT NULL ORDER BY startTime DESC")
     fun observeHistory(): Flow<List<WorkoutEntity>>
 
+    @Query("SELECT COUNT(*) FROM workouts WHERE endTime IS NOT NULL")
+    fun observeCount(): Flow<Int>
+
     @Query("SELECT * FROM workouts WHERE endTime IS NOT NULL")
     suspend fun finishedWorkouts(): List<WorkoutEntity>
 

@@ -72,6 +72,7 @@ import com.rave.app.ui.components.LoadingState
 import com.rave.app.ui.components.PillButton
 import com.rave.app.ui.components.PillProgress
 import com.rave.app.ui.components.ProgressRing
+import com.rave.app.ui.components.SectionCard
 import com.rave.app.ui.components.SectionHeader
 import com.rave.app.ui.components.StreakChip
 import com.rave.app.ui.components.TonalPillButton
@@ -94,6 +95,8 @@ fun HomeScreen(
     onEditHabit: (Long) -> Unit,
     onOpenTimer: (Long) -> Unit,
     onOpenProgress: () -> Unit,
+    onOpenBatteryGuide: () -> Unit,
+    onOpenWrapped: (Int) -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -112,6 +115,10 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap),
         ) {
             item(key = "header") { Header(state) }
+            item(key = "repair") { StreakRepairCard() }
+            com.rave.app.domain.wrapped.WrappedCalculator.seasonYear(java.time.LocalDate.now())?.let { year ->
+                item(key = "wrapped") { WrappedBanner(year) { onOpenWrapped(year) } }
+            }
             item(key = "progress") { ProgressCard(state, onOpenProgress) }
             item(key = "quick") {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -125,7 +132,9 @@ fun HomeScreen(
                     )
                 }
             }
-            item(key = "fitness") { TodayActivityCard() }
+            item(key = "fitness") { TodayActivityCard(onOpenBatteryGuide) }
+            item(key = "buddy") { BuddyCard() }
+            item(key = "league") { LeagueCard() }
             item(key = "week") { WeekStrip(state, viewModel::selectDate) }
             item(key = "routine_header") {
                 val title = if (state.selectedDate == state.today) stringResource(R.string.home_routine_today)
@@ -476,4 +485,20 @@ private fun habitSubtitle(item: HabitItem, unit: com.rave.app.domain.model.Dista
     }
     if (parts.isEmpty()) parts += stringResource(R.string.habit_sub_tap_to_start)
     return parts.take(2).joinToString(" · ")
+}
+
+/** December–January: invites the user to their yearly "Rave Wrapped". */
+@Composable
+private fun WrappedBanner(year: Int, onClick: () -> Unit) {
+    val colors = RaveTheme.colors
+    SectionCard(Modifier.fillMaxWidth(), color = colors.splashBackground, onClick = onClick) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            com.rave.app.ui.components.RaveLogo(color = colors.splashMark, modifier = Modifier.size(40.dp))
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.wrapped_banner_title, year), style = MaterialTheme.typography.titleMedium, color = colors.splashText)
+                Text(stringResource(R.string.wrapped_banner_body), style = MaterialTheme.typography.bodySmall, color = colors.splashText.copy(alpha = 0.75f))
+            }
+        }
+    }
 }

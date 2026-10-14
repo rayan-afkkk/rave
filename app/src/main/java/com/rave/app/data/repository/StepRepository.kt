@@ -43,6 +43,8 @@ class StepRepository @Inject constructor(
 
     suspend fun todaySteps(): Int = dao.get(time.today().toString())?.steps ?: 0
 
+    suspend fun stepsBetween(from: LocalDate, to: LocalDate): Int = dao.sumBetween(from.toString(), to.toString())
+
     @OptIn(ExperimentalCoroutinesApi::class)
     fun observeToday(): Flow<Int> = time.todayFlow.flatMapLatest { today ->
         dao.observe(today.toString()).map { it?.steps ?: 0 }

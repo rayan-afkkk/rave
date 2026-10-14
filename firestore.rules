@@ -65,6 +65,18 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // ---- Weekly step league: id = {isoWeek}_{uid} (e.g. 2026-W42_abc) ----
+    // Owners write their own total; people on the owner's friends list can read it.
+    match /weeklySteps/{id} {
+      allow get: if signedIn() && (id.split('_')[1] == request.auth.uid
+        || exists(/databases/$(database)/documents/users/$(id.split('_')[1])/friends/$(request.auth.uid)));
+      allow create, update: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && id == request.resource.data.week + '_' + request.auth.uid
+        && request.resource.data.steps is int && request.resource.data.steps >= 0 && request.resource.data.steps < 2000000;
+      allow delete: if signedIn() && id.split('_')[1] == request.auth.uid;
+    }
+
     // ---- Invite codes ----
     match /invites/{code} {
       allow read: if signedIn();

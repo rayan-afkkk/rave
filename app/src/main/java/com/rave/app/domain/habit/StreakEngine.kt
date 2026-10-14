@@ -21,6 +21,10 @@ data class StreakReplay(
     val freezesRemaining: Int,
     val freezesUsedOn: List<LocalDate>,
     val freezesEarned: Int,
+    /** Most recent day the overall streak reset because of a miss (no freeze, no repair). */
+    val lastBreak: LocalDate? = null,
+    /** Overall streak that was lost on [lastBreak]. */
+    val lostStreak: Int = 0,
 )
 
 /**
@@ -34,6 +38,10 @@ data class StreakReplay(
  *   (no streak resets, nothing increments for the missed habits).
  * - Otherwise MISSED resets that habit's streak and the overall streak.
  * - Every 7th consecutive overall day earns a freeze (max [MAX_FREEZES]).
+ * - With [monthlyFreeze], one free freeze is added on the first tracked day and on the 1st of
+ *   every month (still capped at [MAX_FREEZES]).
+ * - A day in [repairedDays] that would break the streak is covered without using a freeze
+ *   (streak repair).
  * - Skipping keeps a streak but doesn't grow it. Days with nothing due are neutral.
  */
 object StreakEngine {
@@ -47,12 +55,16 @@ object StreakEngine {
         logs: List<HabitLog>,
         through: LocalDate,
         bonusFreezes: Int = 0,
+        monthlyFreeze: Boolean = false,
+        repairedDays: Set<LocalDate> = emptySet(),
     ): StreakReplay {
         val perHabit = habits.associate { it.id to StreakState() }.toMutableMap()
         var overall = StreakState()
         var freezes = bonusFreezes.coerceIn(0, MAX_FREEZES)
         var earned = 0
         val used = mutableListOf<LocalDate>()
+        var lastBreak: LocalDate? = null
+        var lostStreak = 0
         val start = habits.minOfOrNull { it.createdDate }
         if (start == null || start.isAfter(through)) {
             return StreakReplay(perHabit, overall, freezes, used, earned)
@@ -62,6 +74,7 @@ object StreakEngine {
 
         var day: LocalDate = start
         while (!day.isAfter(through)) {
+            if (monthlyFreeze && (day == start || day.dayOfMonth == 1) && freezes < MAX_FREEZES) freezes++
             val statuses = mutableMapOf<Long, DayStatus>()
             for (habit in habits) {
                 if (!habit.isActiveOn(day)) continue
@@ -69,8 +82,9 @@ object StreakEngine {
             }
 
             val anyMissed = statuses.values.any { it == DayStatus.MISSED }
-            val frozen = anyMissed && freezes > 0
-            if (frozen) {
+            val repaired = anyMissed && day in repairedDays
+            val frozen = repaired || (anyMissed && freezes > 0)
+            if (frozen && !repaired) {
                 freezes--
                 used += day
             }
@@ -87,7 +101,13 @@ object StreakEngine {
             val anyDone = statuses.values.any { it == DayStatus.DONE }
             overall = when {
                 anyMissed && frozen -> overall
-                anyMissed -> overall.copy(current = 0)
+                anyMissed -> {
+                    if (overall.current > 0) {
+                        lastBreak = day
+                        lostStreak = overall.current
+                    }
+                    overall.copy(current = 0)
+                }
                 anyDone -> {
                     val next = overall.current + 1
                     if (next % DAYS_PER_FREEZE == 0 && freezes < MAX_FREEZES) {
@@ -100,7 +120,7 @@ object StreakEngine {
             }
             day = day.plusDays(1)
         }
-        return StreakReplay(perHabit, overall, freezes, used, earned)
+        return StreakReplay(perHabit, overall, freezes, used, earned, lastBreak, lostStreak)
     }
 
     private fun statusFor(habit: Habit, day: LocalDate, logs: Map<Pair<Long, LocalDate>, HabitLog>): DayStatus {

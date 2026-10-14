@@ -10,7 +10,11 @@ import com.rave.app.data.local.toDomain
 import com.rave.app.domain.habit.StreakEngine
 import com.rave.app.domain.habit.StreakReplay
 import com.rave.app.domain.habit.StreakState
+import com.rave.app.data.preferences.SettingsRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -27,6 +31,9 @@ data class StreakUpdate(
     val previousOverall: Int,
 )
 
+/** A recently broken overall streak that can still be repaired. */
+data class RepairOffer(val day: LocalDate, val lostStreak: Int)
+
 /**
  * Caches streaks + freeze inventory derived by [StreakEngine.replay] (through yesterday).
  * Today's progress is layered on top in the UI via [StreakEngine.displayStreak].
@@ -37,8 +44,13 @@ class StreakRepository @Inject constructor(
     private val logDao: HabitLogDao,
     private val statsDao: StatsDao,
     private val time: TimeProvider,
+    private val settings: SettingsRepository,
 ) {
     private val mutex = Mutex()
+
+    private val _repairOffer = MutableStateFlow<RepairOffer?>(null)
+    /** Set when the overall streak broke yesterday or the day before and a repair is still available this month. */
+    val repairOffer: StateFlow<RepairOffer?> = _repairOffer.asStateFlow()
 
     /** habitId → streak through yesterday. [StreakEntity.OVERALL] holds the overall streak. */
     fun observeStreaks(): Flow<Map<Long, StreakState>> = statsDao.observeStreaks().map { list ->
@@ -54,7 +66,14 @@ class StreakRepository @Inject constructor(
         val previousOverall = statsDao.getStreaks().firstOrNull { it.habitId == StreakEntity.OVERALL }?.current ?: 0
 
         val yesterday = time.today().minusDays(1)
-        val replay = StreakEngine.replay(habits, logs, yesterday, inventory.bonusGranted)
+        val repairs = repairedDays()
+        val replay = StreakEngine.replay(habits, logs, yesterday, inventory.bonusGranted, monthlyFreeze = true, repairedDays = repairs)
+        val today = time.today()
+        val brokeRecently = replay.lastBreak?.let { !it.isBefore(today.minusDays(2)) } == true
+        val usedThisMonth = repairs.any { it.year == today.year && it.month == today.month }
+        _repairOffer.value = if (brokeRecently && replay.lostStreak >= MIN_STREAK_TO_REPAIR && !usedThisMonth) {
+            RepairOffer(replay.lastBreak!!, replay.lostStreak)
+        } else null
 
         val rows = replay.perHabit.map { (id, s) ->
             StreakEntity(id, s.current, s.best, s.lastCompleted?.toEpochDay())
@@ -70,6 +89,25 @@ class StreakRepository @Inject constructor(
             ),
         )
         StreakUpdate(replay, newUses, previousOverall)
+    }
+
+    /** Covers the missed day of [offer] (one repair per calendar month) and replays streaks. */
+    suspend fun repair(offer: RepairOffer) {
+        mutex.withLock {
+            val days = repairedDays() + offer.day
+            settings.putString(KEY_REPAIRS, days.sorted().joinToString(","))
+        }
+        recompute()
+    }
+
+    fun dismissRepairOffer() { _repairOffer.value = null }
+
+    private suspend fun repairedDays(): Set<LocalDate> =
+        settings.getString(KEY_REPAIRS).orEmpty().split(',').mapNotNull { runCatching { LocalDate.parse(it.trim()) }.getOrNull() }.toSet()
+
+    private companion object {
+        const val KEY_REPAIRS = "streak_repairs"
+        const val MIN_STREAK_TO_REPAIR = 2
     }
 
     /** Grants an extra freeze (e.g. invite reward). Capped by the engine at [StreakEngine.MAX_FREEZES]. */

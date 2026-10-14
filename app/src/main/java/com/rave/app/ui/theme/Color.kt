@@ -44,6 +44,13 @@ internal val SplashBackground = Color(0xFF17110E)
 internal val SplashMark = Color(0xFFFF7A2E)
 internal val SplashText = Color(0xFFF6E9DF)
 
+// ---- Rave buddy (character drawing, same in both themes) ----
+internal val BuddyFace = Color(0xE63B2219)
+internal val BuddyCheek = Color(0xFFFFB98C)
+internal val BuddyGold = Color(0xFFF6C344)
+internal val BuddyLeaf = Color(0xFF6E9A3A)
+internal val BuddyRibbon = Color(0xFF3A6A96)
+
 // ---- Dark ----
 internal val DarkBackground = Color(0xFF17110E)
 internal val DarkSurface = Color(0xFF241A16)

@@ -65,6 +65,8 @@ fun RaveNavHost(
                 onEditHabit = { navController.navigate(AddEditHabitRoute(it)) },
                 onOpenTimer = { navController.navigate(HabitTimerRoute(it)) },
                 onOpenProgress = { navController.navigate(ProgressRoute) },
+                onOpenBatteryGuide = { navController.navigate(BatteryGuideRoute) },
+                onOpenWrapped = { navController.navigate(WrappedRoute(it)) },
             )
         }
         composable<RoutesRoute> {
@@ -90,6 +92,7 @@ fun RaveNavHost(
                 contentPadding = contentPadding,
                 onOpenSettings = { navController.navigate(SettingsRoute) },
                 onOpenProgress = { navController.navigate(ProgressRoute) },
+                onOpenWrapped = { navController.navigate(WrappedRoute(it)) },
                 onSignIn = { navController.navigate(SignInRoute) },
             )
         }
@@ -144,11 +147,14 @@ fun RaveNavHost(
             SettingsScreen(
                 onBack = back,
                 onPrivacyZones = { navController.navigate(PrivacyZonesRoute) },
+                onBatteryGuide = { navController.navigate(BatteryGuideRoute) },
                 onSignIn = { navController.navigate(SignInRoute) },
                 onAccountGone = { navController.navigate(OnboardingRoute) { popUpTo(navController.graph.id) { inclusive = true } } },
             )
         }
         composable<PrivacyZonesRoute> { PrivacyZonesScreen(onBack = back) }
+        composable<BatteryGuideRoute> { com.rave.app.ui.settings.BatteryGuideScreen(onBack = back) }
+        composable<WrappedRoute> { com.rave.app.ui.wrapped.WrappedScreen(onBack = back) }
 
         // ---- Social ----
         composable<FriendRequestsRoute> {

@@ -69,6 +69,7 @@ import com.rave.app.ui.permissions.openAppSettings
 fun SettingsScreen(
     onBack: () -> Unit,
     onPrivacyZones: () -> Unit,
+    onBatteryGuide: () -> Unit,
     onSignIn: () -> Unit,
     onAccountGone: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
@@ -156,6 +157,7 @@ fun SettingsScreen(
 
             // Tracking
             SettingsSection(stringResource(R.string.settings_tracking)) {
+                NavRow(stringResource(R.string.battery_settings_row), onClick = onBatteryGuide)
                 SwitchRow(stringResource(R.string.settings_auto_pause), stringResource(R.string.settings_auto_pause_help), s.autoPause) { on ->
                     viewModel.update { it.copy(autoPause = on) }
                 }

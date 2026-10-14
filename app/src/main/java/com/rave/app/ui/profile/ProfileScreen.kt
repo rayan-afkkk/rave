@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AcUnit
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Insights
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Settings
@@ -69,6 +70,7 @@ fun ProfileScreen(
     contentPadding: PaddingValues,
     onOpenSettings: () -> Unit,
     onOpenProgress: () -> Unit,
+    onOpenWrapped: (Int) -> Unit,
     onSignIn: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
@@ -134,6 +136,10 @@ fun ProfileScreen(
             Spacer(Modifier.height(12.dp))
             TonalPillButton(stringResource(R.string.profile_view_progress), onClick = onOpenProgress, icon = Icons.Rounded.Insights,
                 modifier = Modifier.fillMaxWidth())
+            Spacer(Modifier.height(8.dp))
+            val wrappedYear = remember { com.rave.app.domain.wrapped.WrappedCalculator.seasonYear(java.time.LocalDate.now()) ?: java.time.LocalDate.now().year }
+            TonalPillButton(stringResource(R.string.wrapped_open, wrappedYear), onClick = { onOpenWrapped(wrappedYear) },
+                icon = Icons.Rounded.AutoAwesome, modifier = Modifier.fillMaxWidth())
         }
 
         // Streak freezes

@@ -13,6 +13,15 @@ data class TileColor(val container: Color, val content: Color)
  * Read via [RaveTheme.colors].
  */
 @Immutable
+/** Fixed colours used to draw the Rave buddy character. */
+data class BuddyColors(
+    val face: Color = BuddyFace,
+    val cheek: Color = BuddyCheek,
+    val gold: Color = BuddyGold,
+    val leaf: Color = BuddyLeaf,
+    val ribbon: Color = BuddyRibbon,
+)
+
 data class ExtendedColors(
     val backgroundTop: Color,
     val backgroundBottom: Color,
@@ -29,6 +38,7 @@ data class ExtendedColors(
     val splashBackground: Color = SplashBackground,
     val splashMark: Color = SplashMark,
     val splashText: Color = SplashText,
+    val buddy: BuddyColors = BuddyColors(),
 ) {
     val tiles: List<TileColor> get() = listOf(tilePeach, tileGreen, tilePink, tileBlue)
 }

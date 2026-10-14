@@ -25,6 +25,11 @@ import androidx.compose.material.icons.rounded.LocalFireDepartment
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import com.rave.app.ui.settings.isIgnoringBatteryOptimizations
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -140,7 +145,13 @@ class TodayActivityViewModel @Inject constructor(
 }
 
 @Composable
-fun TodayActivityCard(modifier: Modifier = Modifier, viewModel: TodayActivityViewModel = hiltViewModel()) {
+fun TodayActivityCard(
+    onOpenBatteryGuide: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: TodayActivityViewModel = hiltViewModel(),
+) {
+    val context = LocalContext.current
+    val restricted = remember { !isIgnoringBatteryOptimizations(context) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { viewModel.refreshPermission() }
     LaunchedEffect(state.permitted, state.sensorAvailable) {
@@ -189,6 +200,11 @@ fun TodayActivityCard(modifier: Modifier = Modifier, viewModel: TodayActivityVie
                 if (state.week.isNotEmpty()) {
                     Spacer(Modifier.height(14.dp))
                     WeekSteps(state.week, state.goal)
+                }
+                if (restricted) {
+                    TextButton(onClick = onOpenBatteryGuide, contentPadding = PaddingValues(0.dp)) {
+                        Text(stringResource(R.string.fitness_battery_hint), style = MaterialTheme.typography.labelMedium)
+                    }
                 }
             }
         }

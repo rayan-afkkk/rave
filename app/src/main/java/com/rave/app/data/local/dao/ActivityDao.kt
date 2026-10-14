@@ -30,6 +30,9 @@ interface ActivityDao {
     @Query("SELECT * FROM activities WHERE id = :id")
     suspend fun getById(id: Long): ActivityEntity?
 
+    @Query("SELECT COALESCE(SUM(distanceM), 0) FROM activities WHERE status = 'COMPLETED'")
+    fun observeTotalDistance(): Flow<Double>
+
     @Query("SELECT * FROM activities WHERE status = 'COMPLETED' ORDER BY startTime DESC LIMIT 1")
     suspend fun latestCompleted(): ActivityEntity?
 

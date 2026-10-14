@@ -96,6 +96,43 @@ class StreakEngineTest {
     }
 
     @Test
+    fun `a break is reported with the streak that was lost`() {
+        val r = StreakEngine.replay(listOf(habit(1)), done(1, 0, 1, 2, 4), through = monday.plusDays(4))
+        assertEquals(monday.plusDays(3), r.lastBreak)
+        assertEquals(3, r.lostStreak)
+        assertEquals(1, r.overall.current)
+    }
+
+    @Test
+    fun `repairing the missed day restores the streak without using a freeze`() {
+        val logs = done(1, 0, 1, 2, 4)
+        val r = StreakEngine.replay(listOf(habit(1)), logs, through = monday.plusDays(4), repairedDays = setOf(monday.plusDays(3)))
+        assertEquals(4, r.overall.current)
+        assertEquals(4, r.perHabit.getValue(1).current)
+        assertEquals(null, r.lastBreak)
+        assertEquals(0, r.freezesUsedOn.size)
+    }
+
+    @Test
+    fun `monthly freeze covers a miss`() {
+        // Created Jan 5 (first tracked day grants one); Jan 8 missed is covered.
+        val r = StreakEngine.replay(listOf(habit(1)), done(1, 0, 1, 2, 4), through = monday.plusDays(4), monthlyFreeze = true)
+        assertEquals(4, r.overall.current)
+        assertEquals(listOf(monday.plusDays(3)), r.freezesUsedOn)
+    }
+
+    @Test
+    fun `monthly freeze is granted again on the first of the month`() {
+        val start = LocalDate.of(2026, 1, 30)
+        val h = habit(1, created = start)
+        // Jan 30 done, Jan 31 missed (uses the starting freeze), Feb 1 done, Feb 2 missed (uses the Feb freeze).
+        val logs = listOf(start, start.plusDays(2)).map { HabitLog(habitId = 1, date = it, value = 1, completed = true) }
+        val r = StreakEngine.replay(listOf(h), logs, through = start.plusDays(3), monthlyFreeze = true)
+        assertEquals(2, r.freezesUsedOn.size)
+        assertEquals(2, r.overall.current)
+    }
+
+    @Test
     fun `display streak adds today when done`() {
         assertEquals(5, StreakEngine.displayStreak(StreakState(current = 4), doneToday = true))
         assertEquals(4, StreakEngine.displayStreak(StreakState(current = 4), doneToday = false))
