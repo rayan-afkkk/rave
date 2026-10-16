@@ -33,7 +33,7 @@ import javax.inject.Singleton
 /** Rave Pro plans. Product ids must match the ones created in the Play Console. */
 enum class ProPlan(val productId: String, val type: String, val fallbackPrice: String) {
     MONTHLY("rave_pro_monthly", ProductType.SUBS, "$1.99"),
-    YEARLY("rave_pro_yearly", ProductType.SUBS, "$9.99"),
+    YEARLY("rave_pro_yearly", ProductType.SUBS, "$10.99"),
     LIFETIME("rave_pro_lifetime", ProductType.INAPP, "$25.99"),
 }
 

@@ -42,15 +42,6 @@ class MealPlannerTest {
     }
 
     @Test
-    fun `ramadan plans use suhoor and iftar with dates first`() {
-        val week = MealPlanner.week(monday, PlannerOptions(dailyKcal = 2000, ramadan = true))
-        week.forEach { d ->
-            assertEquals(listOf(MealSlot.SUHOOR, MealSlot.IFTAR, MealSlot.DINNER), d.meals.map { it.slot })
-            assertEquals("dates", d.meals[1].items.first().food.id)
-        }
-    }
-
-    @Test
     fun `plan is stable for a date`() {
         val a = MealPlanner.week(monday, PlannerOptions(dailyKcal = 2000))
         val b = MealPlanner.week(monday, PlannerOptions(dailyKcal = 2000))

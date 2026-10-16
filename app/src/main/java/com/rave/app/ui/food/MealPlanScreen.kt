@@ -83,7 +83,6 @@ class MealPlanViewModel @Inject constructor(
     private val food: FoodRepository,
     private val settings: SettingsRepository,
     private val time: TimeProvider,
-    pro: com.rave.app.data.billing.ProRepository,
 ) : ViewModel() {
     private val weekStart = time.weekStart()
     private val seedKey = "meal_seed_$weekStart"
@@ -95,11 +94,10 @@ class MealPlanViewModel @Inject constructor(
         }
     }
 
-    val ui: StateFlow<MealPlanUi> = combine(food.observeTarget(), settings.settings, seed, pro.isPro) { target, s, sd, isPro ->
+    val ui: StateFlow<MealPlanUi> = combine(food.observeTarget(), settings.settings, seed) { target, s, sd ->
         if (sd == null) return@combine MealPlanUi(target, s)
-        // Ramadan mode is a Pro feature; a setting saved earlier is ignored without Pro.
         val options = PlannerOptions(
-            dailyKcal = target.kcal, vegetarian = s.food.vegetarian, ramadan = s.ramadanMeals && isPro, goal = s.food.goal, budget = s.budgetMeals,
+            dailyKcal = target.kcal, vegetarian = s.food.vegetarian, goal = s.food.goal, budget = s.budgetMeals,
         )
         val week = MealPlanner.week(weekStart, options, sd)
         MealPlanUi(target, s, week)

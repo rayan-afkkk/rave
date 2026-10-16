@@ -468,8 +468,6 @@
     <string name="slot_lunch">Lunch</string>
     <string name="slot_dinner">Dinner</string>
     <string name="slot_snack">Snack</string>
-    <string name="slot_suhoor">Suhoor</string>
-    <string name="slot_iftar">Iftar</string>
     <string name="allergen_milk">Milk</string>
     <string name="allergen_gluten">Gluten</string>
     <string name="allergen_peanuts">Peanuts</string>
@@ -496,8 +494,6 @@
     <string name="food_halal_only">Halal only</string>
     <string name="food_halal_help">Flag pork, alcohol and doubtful ingredients like gelatin.</string>
     <string name="food_vegetarian">Vegetarian</string>
-    <string name="food_ramadan">Ramadan meal plan</string>
-    <string name="food_ramadan_help">Plan suhoor, iftar and dinner instead of breakfast, lunch and dinner.</string>
     <string name="food_budget">Budget meals</string>
     <string name="food_budget_help">Prefer daal, sabzi, eggs and other low-cost dishes.</string>
     <string name="food_allergies">Allergies</string>
@@ -939,7 +935,7 @@ Permission was denied. You can turn it on in Settings.</string>
     <string name="pro_h_comps">Start your own competitions</string>
     <string name="pro_f_ai">Unlimited AI meal photos and label reading</string>
     <string name="pro_f_scans">Unlimited barcode scans</string>
-    <string name="pro_f_meals">Full week meal plans, Ramadan mode and meal swaps</string>
+    <string name="pro_f_meals">Full week meal plans and meal swaps</string>
     <string name="pro_f_streak">3 streak freezes a month and streak repair</string>
     <string name="pro_f_stats">Monthly and yearly trends, pace charts, splits and personal records</string>
     <string name="pro_f_share">Premium share cards, route colours, no watermark</string>

@@ -10,9 +10,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
-import com.rave.app.domain.model.DistanceUnit
 import com.rave.app.domain.model.NotificationCategory
-import com.rave.app.domain.model.ProfileVisibility
 import com.rave.app.domain.model.ThemeMode
 import com.rave.app.domain.model.UserSettings
 import kotlinx.coroutines.flow.Flow
@@ -84,7 +82,6 @@ class SettingsRepository @Inject constructor(
                     ?.mapNotNull { runCatching { com.rave.app.domain.food.Allergen.valueOf(it) }.getOrNull() }?.toSet()
                     ?: d.food.allergies,
             ),
-            ramadanMeals = this[Keys.RAMADAN] ?: d.ramadanMeals,
             budgetMeals = this[Keys.BUDGET] ?: d.budgetMeals,
             autoDetectWalks = this[Keys.AUTO_DETECT] ?: d.autoDetectWalks,
             batterySaverGps = this[Keys.BATTERY_SAVER] ?: d.batterySaverGps,
@@ -113,7 +110,6 @@ class SettingsRepository @Inject constructor(
         this[Keys.HALAL] = s.food.halalOnly
         this[Keys.VEG] = s.food.vegetarian
         this[Keys.ALLERGIES] = s.food.allergies.map { it.name }.toSet()
-        this[Keys.RAMADAN] = s.ramadanMeals
         this[Keys.BUDGET] = s.budgetMeals
         this[Keys.AUTO_DETECT] = s.autoDetectWalks
         this[Keys.BATTERY_SAVER] = s.batterySaverGps
@@ -142,7 +138,6 @@ class SettingsRepository @Inject constructor(
         val HALAL = booleanPreferencesKey("food_halal")
         val VEG = booleanPreferencesKey("food_veg")
         val ALLERGIES = stringSetPreferencesKey("food_allergies")
-        val RAMADAN = booleanPreferencesKey("food_ramadan")
         val BUDGET = booleanPreferencesKey("food_budget")
         val AUTO_DETECT = booleanPreferencesKey("auto_detect")
         val BATTERY_SAVER = booleanPreferencesKey("battery_saver")

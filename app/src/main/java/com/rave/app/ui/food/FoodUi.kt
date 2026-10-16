@@ -91,8 +91,6 @@ fun slotName(s: MealSlot) = stringResource(
         MealSlot.LUNCH -> R.string.slot_lunch
         MealSlot.DINNER -> R.string.slot_dinner
         MealSlot.SNACK -> R.string.slot_snack
-        MealSlot.SUHOOR -> R.string.slot_suhoor
-        MealSlot.IFTAR -> R.string.slot_iftar
     },
 )
 

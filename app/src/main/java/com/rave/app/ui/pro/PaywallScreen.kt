@@ -244,7 +244,7 @@ private fun headline(reason: ProReason) = when (reason) {
     ProReason.COMPETITIONS -> R.string.pro_h_comps
 }
 
-private const val DEFAULT_SAVE_PERCENT = 58
+private const val DEFAULT_SAVE_PERCENT = 54
 
 private tailrec fun Context.findActivity(): Activity? = when (this) {
     is Activity -> this

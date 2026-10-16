@@ -21,7 +21,6 @@ data class DayPlan(val date: LocalDate, val meals: List<PlannedMeal>) {
 data class PlannerOptions(
     val dailyKcal: Int,
     val vegetarian: Boolean = false,
-    val ramadan: Boolean = false,
     val goal: FoodGoal = FoodGoal.MAINTAIN,
     val dislikedIds: Set<String> = emptySet(),
     val budget: Boolean = false,
@@ -35,14 +34,13 @@ data class PlannerOptions(
  */
 object MealPlanner {
     private val normalSplit = listOf(MealSlot.BREAKFAST to 0.25, MealSlot.LUNCH to 0.35, MealSlot.DINNER to 0.30, MealSlot.SNACK to 0.10)
-    private val ramadanSplit = listOf(MealSlot.SUHOOR to 0.40, MealSlot.IFTAR to 0.25, MealSlot.DINNER to 0.35)
 
     fun week(start: LocalDate, options: PlannerOptions, seed: Long = start.toEpochDay()): List<DayPlan> {
         val random = Random(seed)
         val recentMains = ArrayDeque<String>()
         var indulgentLeft = if (options.goal == FoodGoal.LOSE) 0 else 1
         return (0 until 7).map { d ->
-            val split = if (options.ramadan) ramadanSplit else normalSplit
+            val split = normalSplit
             val meals = split.map { (slot, share) ->
                 val budget = (options.dailyKcal * share).toInt()
                 val meal = buildMeal(slot, budget, options, random, recentMains, allowIndulgent = indulgentLeft > 0)
@@ -98,7 +96,7 @@ object MealPlanner {
             else -> {
                 // Breakfast / suhoor / iftar: a main item, then a drink or fruit to reach the budget.
                 val mains = pool.filter { it.role == FoodRole.MAIN && it.kcal <= budget }.ifEmpty { pool.filter { it.role == FoodRole.MAIN } }
-                val first = if (slot == MealSlot.IFTAR) pool.firstOrNull { it.id == "dates" } ?: mains.random(random) else mains.random(random)
+                val first = mains.random(random)
                 items += PlanItem(first)
                 var guard = 0
                 while (budget - total() > 80 && guard++ < 3) {

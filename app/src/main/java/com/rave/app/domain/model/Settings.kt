@@ -19,7 +19,6 @@ data class UserSettings(
     val birthYear: Int = 0,
     val sex: com.rave.app.domain.food.Sex = com.rave.app.domain.food.Sex.UNSPECIFIED,
     val food: com.rave.app.domain.food.FoodPreferences = com.rave.app.domain.food.FoodPreferences(),
-    val ramadanMeals: Boolean = false,
     val budgetMeals: Boolean = false,
     val autoDetectWalks: Boolean = false,
     val batterySaverGps: Boolean = false,
