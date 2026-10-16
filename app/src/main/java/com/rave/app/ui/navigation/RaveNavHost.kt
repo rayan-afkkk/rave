@@ -158,6 +158,8 @@ fun RaveNavHost(
         composable<BatteryGuideRoute> { com.rave.app.ui.settings.BatteryGuideScreen(onBack = back) }
         composable<WrappedRoute> { com.rave.app.ui.wrapped.WrappedScreen(onBack = back) }
 
+        composable<WeeklyReportRoute> { com.rave.app.ui.report.WeeklyReportScreen(onBack = back) }
+
         // ---- Pro ----
         composable<PaywallRoute> { com.rave.app.ui.pro.PaywallScreen(onClose = back) }
         composable<OfflineMapsRoute> { com.rave.app.ui.settings.OfflineMapsScreen(onBack = back) }

@@ -6,7 +6,7 @@ enum class ThemeMode { LIGHT, DARK, SYSTEM }
 enum class ProfileVisibility { FRIENDS, PRIVATE }
 
 /** Notification categories users can toggle individually. */
-enum class NotificationCategory { REMINDERS, FRIENDS, COMPETITIONS, AUTO_DETECT }
+enum class NotificationCategory { REMINDERS, FRIENDS, COMPETITIONS, AUTO_DETECT, STEP_NUDGES, WEEKLY_REPORT }
 
 data class UserSettings(
     val themeMode: ThemeMode = ThemeMode.LIGHT,
@@ -15,6 +15,7 @@ data class UserSettings(
     val heightCm: Float = 170f,
     val dailyGoalKm: Float = 3f,
     val dailyStepGoal: Int = 8_000,
+    val waterGoalGlasses: Int = 8,
     /** 0 = not set (assume 25 for calorie targets). */
     val birthYear: Int = 0,
     val sex: com.rave.app.domain.food.Sex = com.rave.app.domain.food.Sex.UNSPECIFIED,

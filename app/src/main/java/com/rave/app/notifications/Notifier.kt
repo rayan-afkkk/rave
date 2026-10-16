@@ -42,6 +42,8 @@ class Notifier @Inject constructor(
         const val STREAK = 1003
         const val ACTIVITY_SAVED = 1004
         const val BADGE_BASE = 2000
+        const val STEP_NUDGE = 1005
+        const val WEEKLY_REPORT = 1006
         const val REMINDER_BASE = 3000
         const val SOCIAL_BASE = 4000
         const val COMPETITION_BASE = 5000

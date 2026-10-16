@@ -113,6 +113,7 @@ fun RaveApp(viewModel: MainViewModel, navController: NavHostController = remembe
             DeepLink.Friends -> navController.navigateToTopLevel(TopLevelDestination.FRIENDS)
             DeepLink.FriendRequests -> navController.navigate(FriendRequestsRoute)
             DeepLink.SharedStreaks -> navController.navigate(SharedStreaksRoute)
+            DeepLink.WeeklyReport -> navController.navigate(com.rave.app.ui.navigation.WeeklyReportRoute)
             is DeepLink.StartActivity -> startActivity(link.type)
             DeepLink.Home -> navController.navigateToTopLevel(TopLevelDestination.HOME)
         }

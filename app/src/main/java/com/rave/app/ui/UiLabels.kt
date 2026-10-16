@@ -29,6 +29,10 @@ import com.rave.app.domain.model.PbTag
 fun unitLabel(unit: DistanceUnit): String =
     stringResource(if (unit == DistanceUnit.MILES) R.string.unit_mi else R.string.unit_km)
 
+/** [unitLabel] for code outside Compose (notifications). */
+fun unitLabelText(context: android.content.Context, unit: DistanceUnit): String =
+    context.getString(if (unit == DistanceUnit.MILES) R.string.unit_mi else R.string.unit_km)
+
 @Composable
 fun paceUnitLabel(unit: DistanceUnit): String =
     stringResource(if (unit == DistanceUnit.MILES) R.string.unit_pace_mi else R.string.unit_pace_km)

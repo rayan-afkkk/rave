@@ -20,6 +20,8 @@
     <!-- Notifications (Android 13+), reminders after reboot -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Exact habit reminders (user can grant in "Alarms & reminders"); falls back to inexact alarms. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <!-- QR scanning, contact matching (opt-in), legacy gallery saving -->
     <uses-permission android:name="android.permission.CAMERA" />
@@ -115,6 +117,16 @@
         <receiver
             android:name=".notifications.HabitActionReceiver"
             android:exported="false" />
+
+        <receiver
+            android:name=".notifications.AlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
 
         <receiver
             android:name=".tracking.autodetect.BootReceiver"

@@ -26,6 +26,7 @@ sealed interface DeepLink {
     data object Friends : DeepLink
     data object FriendRequests : DeepLink
     data object SharedStreaks : DeepLink
+    data object WeeklyReport : DeepLink
     data class StartActivity(val type: com.rave.app.domain.model.ActivityType) : DeepLink
 }
 
@@ -75,6 +76,7 @@ class DeepLinkHandler @Inject constructor(
                     if (segments.firstOrNull() == "run") com.rave.app.domain.model.ActivityType.RUN else com.rave.app.domain.model.ActivityType.WALK,
                 )
                 "profile" -> DeepLink.Profile
+                "weekly" -> DeepLink.WeeklyReport
                 "friends" -> when (segments.getOrNull(0)) {
                     "requests" -> DeepLink.FriendRequests
                     "streaks" -> DeepLink.SharedStreaks

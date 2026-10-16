@@ -171,6 +171,9 @@ fun SettingsScreen(
                 NumberRow(stringResource(R.string.settings_step_goal), s.dailyStepGoal.toFloat(), stringResource(R.string.unit_steps), decimals = 0) { v ->
                     viewModel.update { it.copy(dailyStepGoal = v.toInt().coerceIn(500, 100_000)) }
                 }
+                NumberRow(stringResource(R.string.settings_water_goal), s.waterGoalGlasses.toFloat(), stringResource(R.string.unit_glasses), decimals = 0) { v ->
+                    viewModel.update { it.copy(waterGoalGlasses = v.toInt().coerceIn(1, 20)) }
+                }
             }
 
             // Tracking
@@ -209,9 +212,12 @@ fun SettingsScreen(
                     NotificationCategory.FRIENDS to R.string.notif_cat_friends,
                     NotificationCategory.COMPETITIONS to R.string.notif_cat_competitions,
                     NotificationCategory.AUTO_DETECT to R.string.notif_cat_auto_detect,
+                    NotificationCategory.STEP_NUDGES to R.string.notif_cat_step_nudges,
+                    NotificationCategory.WEEKLY_REPORT to R.string.notif_cat_weekly,
                 ).forEach { (cat, label) ->
                     SwitchRow(stringResource(label), null, cat in s.notifications) { on -> viewModel.toggleNotification(cat, on) }
                 }
+                com.rave.app.ui.permissions.ReminderHealth(Modifier.padding(top = 8.dp))
             }
 
             // Data

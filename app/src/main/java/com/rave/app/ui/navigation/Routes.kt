@@ -60,3 +60,4 @@ import kotlinx.serialization.Serializable
 // Rave Pro
 @Serializable data class PaywallRoute(val reason: String = "GENERAL")
 @Serializable data object OfflineMapsRoute
+@Serializable data object WeeklyReportRoute

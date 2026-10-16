@@ -114,6 +114,7 @@ fun AddEditHabitScreen(
     LaunchedEffect(state.saved) { if (state.saved) onDone() }
     var showArchive by rememberSaveable { mutableStateOf(false) }
     var showTimePicker by rememberSaveable { mutableStateOf(false) }
+    val askNotifications = com.rave.app.ui.permissions.rememberNotificationRequest()
 
     RaveScreen(
         title = stringResource(if (state.isEdit) R.string.habit_edit_title else R.string.habit_new_title),
@@ -307,11 +308,13 @@ fun AddEditHabitScreen(
                         checked = form.remindersEnabled,
                         onCheckedChange = { on ->
                             viewModel.edit { it.copy(remindersEnabled = on) }
+                            if (on) askNotifications()
                             if (on && form.reminders.isEmpty()) showTimePicker = true
                         },
                     )
                 }
                 if (form.remindersEnabled) {
+                    com.rave.app.ui.permissions.ReminderHealth(Modifier.padding(vertical = 6.dp))
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         form.reminders.forEach { t ->
                             InputChip(

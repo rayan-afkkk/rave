@@ -56,6 +56,8 @@ class SettingsRepository @Inject constructor(
 
     /** Opaque per-key string storage for small caches (e.g. last seen competition ranks). */
     suspend fun getString(key: String): String? = prefs.first()[stringPreferencesKey("kv_$key")]
+
+    fun observeString(key: String): Flow<String?> = prefs.map { it[stringPreferencesKey("kv_$key")] }.distinctUntilChanged()
     suspend fun putString(key: String, value: String?) = dataStore.edit {
         val k = stringPreferencesKey("kv_$key")
         if (value == null) it.remove(k) else it[k] = value
@@ -89,9 +91,13 @@ class SettingsRepository @Inject constructor(
             voiceFeedback = this[Keys.VOICE] ?: d.voiceFeedback,
             hideStartEnd = this[Keys.HIDE_ENDS] ?: d.hideStartEnd,
             visibility = enumOr(this[Keys.VISIBILITY], d.visibility),
-            notifications = this[Keys.NOTIFICATIONS]
-                ?.mapNotNull { runCatching { NotificationCategory.valueOf(it) }.getOrNull() }?.toSet()
-                ?: d.notifications,
+            notifications = this[Keys.NOTIFICATIONS]?.let { stored ->
+                // Categories added after the user last saved settings start switched on.
+                val seen = this[Keys.NOTIFICATIONS_SEEN] ?: LEGACY_CATEGORIES
+                (stored.mapNotNull { runCatching { NotificationCategory.valueOf(it) }.getOrNull() } +
+                    NotificationCategory.entries.filter { it.name !in seen }).toSet()
+            } ?: d.notifications,
+            waterGoalGlasses = this[Keys.WATER_GOAL] ?: d.waterGoalGlasses,
             displayName = this[Keys.NAME] ?: d.displayName,
             onboardingDone = this[Keys.ONBOARDING] ?: d.onboardingDone,
         )
@@ -118,6 +124,8 @@ class SettingsRepository @Inject constructor(
         this[Keys.HIDE_ENDS] = s.hideStartEnd
         this[Keys.VISIBILITY] = s.visibility.name
         this[Keys.NOTIFICATIONS] = s.notifications.map { it.name }.toSet()
+        this[Keys.NOTIFICATIONS_SEEN] = NotificationCategory.entries.map { it.name }.toSet()
+        this[Keys.WATER_GOAL] = s.waterGoalGlasses
         this[Keys.NAME] = s.displayName
         this[Keys.ONBOARDING] = s.onboardingDone
     }
@@ -146,9 +154,14 @@ class SettingsRepository @Inject constructor(
         val HIDE_ENDS = booleanPreferencesKey("hide_start_end")
         val VISIBILITY = stringPreferencesKey("visibility")
         val NOTIFICATIONS = stringSetPreferencesKey("notifications")
+        val NOTIFICATIONS_SEEN = stringSetPreferencesKey("notifications_seen")
+        val WATER_GOAL = intPreferencesKey("water_goal")
         val NAME = stringPreferencesKey("display_name")
         val ONBOARDING = booleanPreferencesKey("onboarding_done")
         val PENDING_INVITE = stringPreferencesKey("pending_invite")
         val REFERRER_CHECKED = booleanPreferencesKey("referrer_checked")
     }
 }
+
+/** Notification categories that existed before "seen" tracking was added. */
+private val LEGACY_CATEGORIES = setOf("REMINDERS", "FRIENDS", "COMPETITIONS", "AUTO_DETECT")
