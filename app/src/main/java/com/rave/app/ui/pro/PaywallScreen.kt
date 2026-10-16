@@ -4,42 +4,39 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ShowChart
 import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.EmojiEvents
+import androidx.compose.material.icons.rounded.Insights
 import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material.icons.rounded.Palette
-import androidx.compose.material.icons.rounded.QrCodeScanner
 import androidx.compose.material.icons.rounded.RestaurantMenu
-import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -55,6 +52,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -66,10 +64,12 @@ import com.rave.app.data.billing.ProPlan
 import com.rave.app.data.billing.ProReason
 import com.rave.app.data.billing.ProRepository
 import com.rave.app.data.billing.PurchaseEvent
-import com.rave.app.ui.components.AppBackground
-import com.rave.app.ui.components.PillButton
+import com.rave.app.ui.components.BentoButton
+import com.rave.app.ui.components.BentoChip
+import com.rave.app.ui.components.BentoGap
+import com.rave.app.ui.components.BentoPillShape
+import com.rave.app.ui.components.BentoTileShape
 import com.rave.app.ui.navigation.PaywallRoute
-import com.rave.app.ui.theme.Dimens
 import com.rave.app.ui.theme.RaveTheme
 import com.rave.app.ui.theme.TileColor
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -114,105 +114,137 @@ fun PaywallScreen(onClose: () -> Unit, viewModel: PaywallViewModel = hiltViewMod
         (100 - yearly.priceMicros * 100.0 / (monthly.priceMicros * 12)).roundToInt()
     } else DEFAULT_SAVE_PERCENT
 
-    AppBackground {
-        Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-            Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp)) {
-                IconButton(onClick = onClose) { Icon(Icons.Rounded.Close, stringResource(R.string.action_close)) }
-                Spacer(Modifier.weight(1f))
-                TextButton(onClick = viewModel::restore) { Text(stringResource(R.string.pro_restore)) }
+    val ink = RaveTheme.colors.tileInk
+    Column(
+        Modifier.fillMaxSize().background(ink.container).statusBarsPadding().navigationBarsPadding()
+            .verticalScroll(rememberScrollState()).padding(start = 18.dp, end = 18.dp, top = 4.dp, bottom = 16.dp),
+    ) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onClose, modifier = Modifier.offset(x = (-11).dp)) {
+                Icon(Icons.Rounded.Close, stringResource(R.string.action_close), tint = ink.content, modifier = Modifier.size(26.dp))
             }
-            Column(
-                Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = Dimens.ScreenPadding),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Box(Modifier.size(72.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary), contentAlignment = Alignment.Center) {
-                    Icon(Icons.Rounded.WorkspacePremium, null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(40.dp))
-                }
-                Spacer(Modifier.height(14.dp))
-                Text(stringResource(headline(viewModel.reason)), style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                    textAlign = TextAlign.Center)
-                Text(stringResource(R.string.pro_subtitle), style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 6.dp))
-                Spacer(Modifier.height(18.dp))
-                Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        features().forEach { (icon, tile, text) -> Feature(icon, tile, stringResource(text)) }
+            Spacer(Modifier.weight(1f))
+            Text(
+                stringResource(R.string.pro_restore),
+                style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp, fontWeight = FontWeight.SemiBold),
+                color = RaveTheme.colors.navContent,
+                modifier = Modifier.clip(BentoPillShape).clickable(onClick = viewModel::restore).padding(vertical = 8.dp, horizontal = 4.dp),
+            )
+        }
+        Headline(Modifier.padding(top = 14.dp))
+        if (viewModel.reason != ProReason.GENERAL) {
+            Text(
+                stringResource(headline(viewModel.reason)),
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = RaveTheme.colors.highlight, modifier = Modifier.padding(top = 10.dp),
+            )
+        }
+        FeatureGrid(Modifier.padding(top = 16.dp))
+        Spacer(Modifier.height(14.dp))
+        if (isPro) {
+            Text(
+                stringResource(R.string.pro_already), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = RaveTheme.colors.highlight, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            )
+        } else {
+            val lifetime = offers.first { it.plan == ProPlan.LIFETIME }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                PlanCard(yearly, selected == ProPlan.YEARLY, stringResource(R.string.pro_plan_yearly),
+                    stringResource(R.string.bplan_per_year, yearly.price), stringResource(R.string.pro_save, savePercent), tagHighlight = true) { selected = ProPlan.YEARLY }
+                PlanCard(monthly, selected == ProPlan.MONTHLY, stringResource(R.string.pro_plan_monthly),
+                    stringResource(R.string.bplan_per_month, monthly.price), null, tagHighlight = false) { selected = ProPlan.MONTHLY }
+                PlanCard(lifetime, selected == ProPlan.LIFETIME, stringResource(R.string.pro_plan_lifetime),
+                    stringResource(R.string.pro_once, lifetime.price), stringResource(R.string.bplan_forever), tagHighlight = false) { selected = ProPlan.LIFETIME }
+            }
+            BentoButton(
+                if (offer.trialDays > 0) stringResource(R.string.bplan_start_trial) else stringResource(R.string.pro_continue),
+                container = RaveTheme.colors.highlight, content = RaveTheme.colors.onHighlight,
+                onClick = {
+                    val activity = context.findActivity()
+                    if (activity == null || !viewModel.buy(activity, offer)) Toast.makeText(context, unavailable, Toast.LENGTH_LONG).show()
+                },
+                modifier = Modifier.fillMaxWidth().padding(top = 14.dp), height = 58.dp,
+            )
+            Text(
+                stringResource(if (offer.plan == ProPlan.LIFETIME) R.string.pro_fine_print_once else R.string.bplan_fine_print),
+                style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp), color = RaveTheme.colors.navContent,
+                textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            )
+        }
+    }
+}
+
+/** "Go [Pro] / go further." with "Pro" in a lime rounded box. */
+@Composable
+private fun Headline(modifier: Modifier = Modifier) {
+    val ink = RaveTheme.colors.tileInk
+    val style = MaterialTheme.typography.displayMedium.copy(
+        fontSize = 44.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-1.5).sp, lineHeight = 46.sp,
+    )
+    Column(modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.bplan_pro_go), style = style, color = ink.content, maxLines = 1)
+            Spacer(Modifier.width(12.dp))
+            Text(
+                stringResource(R.string.bplan_pro_word), style = style, color = RaveTheme.colors.onHighlight, maxLines = 1,
+                modifier = Modifier.clip(RoundedCornerShape(14.dp)).background(RaveTheme.colors.highlight).padding(horizontal = 10.dp),
+            )
+        }
+        Text(stringResource(R.string.bplan_pro_further), style = style, color = ink.content)
+    }
+}
+
+/** 2-column grid of colour feature tiles. */
+@Composable
+private fun FeatureGrid(modifier: Modifier = Modifier) {
+    val items = features()
+    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(BentoGap)) {
+        items.chunked(2).forEach { row ->
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(BentoGap)) {
+                row.forEach { (icon, tile, text) ->
+                    Column(
+                        Modifier.weight(1f).fillMaxHeight().clip(BentoTileShape).background(tile.container).padding(12.dp),
+                    ) {
+                        Icon(icon, null, tint = tile.content, modifier = Modifier.size(26.dp))
+                        Spacer(Modifier.weight(1f))
+                        Text(
+                            stringResource(text),
+                            style = MaterialTheme.typography.titleSmall.copy(fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 17.sp),
+                            color = tile.content, modifier = Modifier.padding(top = 6.dp),
+                        )
                     }
                 }
-                Spacer(Modifier.height(16.dp))
-                if (isPro) {
-                    Text(stringResource(R.string.pro_already), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-                } else {
-                    PlanCard(yearly, selected == ProPlan.YEARLY, stringResource(R.string.pro_plan_yearly),
-                        stringResource(R.string.pro_per_year, yearly.price), stringResource(R.string.pro_save, savePercent)) { selected = ProPlan.YEARLY }
-                    Spacer(Modifier.height(8.dp))
-                    PlanCard(monthly, selected == ProPlan.MONTHLY, stringResource(R.string.pro_plan_monthly),
-                        stringResource(R.string.pro_per_month, monthly.price), null) { selected = ProPlan.MONTHLY }
-                    Spacer(Modifier.height(8.dp))
-                    val lifetime = offers.first { it.plan == ProPlan.LIFETIME }
-                    PlanCard(lifetime, selected == ProPlan.LIFETIME, stringResource(R.string.pro_plan_lifetime),
-                        stringResource(R.string.pro_once, lifetime.price), stringResource(R.string.pro_no_subscription)) { selected = ProPlan.LIFETIME }
-                }
-                Spacer(Modifier.height(16.dp))
-            }
-            if (!isPro) {
-                Column(Modifier.padding(horizontal = Dimens.ScreenPadding, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    PillButton(
-                        if (offer.trialDays > 0) stringResource(R.string.pro_start_trial, offer.trialDays) else stringResource(R.string.pro_continue),
-                        onClick = {
-                            val activity = context.findActivity()
-                            if (activity == null || !viewModel.buy(activity, offer)) Toast.makeText(context, unavailable, Toast.LENGTH_LONG).show()
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    Text(
-                        stringResource(if (offer.plan == ProPlan.LIFETIME) R.string.pro_fine_print_once else R.string.pro_fine_print),
-                        style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center, modifier = Modifier.padding(top = 6.dp),
-                    )
-                }
             }
         }
     }
 }
 
+/** One plan row: white with a lime border when selected, raised ink otherwise. */
 @Composable
-private fun Feature(icon: ImageVector, tile: TileColor, text: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.size(34.dp).clip(MaterialTheme.shapes.small).background(tile.container), contentAlignment = Alignment.Center) {
-            Icon(icon, null, tint = tile.content, modifier = Modifier.size(20.dp))
-        }
-        Spacer(Modifier.width(12.dp))
-        Text(text, style = MaterialTheme.typography.bodyMedium)
-    }
-}
-
-@Composable
-private fun PlanCard(offer: PlanOffer, selected: Boolean, title: String, price: String, tag: String?, onClick: () -> Unit) {
-    val border = if (selected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-    Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surface, border = border,
-        modifier = Modifier.fillMaxWidth().clip(MaterialTheme.shapes.large).clickable(onClick = onClick)) {
-        Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                Modifier.size(22.dp).clip(CircleShape)
-                    .background(if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant),
+private fun PlanCard(offer: PlanOffer, selected: Boolean, title: String, price: String, tag: String?, tagHighlight: Boolean, onClick: () -> Unit) {
+    val c = RaveTheme.colors
+    val bg = if (selected) c.tileInk.content else c.inkRaised
+    val fg = if (selected) c.tileInk.container else c.tileInk.content
+    Row(
+        Modifier.fillMaxWidth().clip(BentoTileShape).background(bg)
+            .then(if (selected) Modifier.border(3.dp, c.highlight, BentoTileShape) else Modifier)
+            .clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.titleMedium.copy(fontSize = 17.sp, fontWeight = FontWeight.ExtraBold), color = fg)
+            Text(
+                if (offer.trialDays > 0) stringResource(R.string.bplan_with_trial, price, offer.trialDays) else price,
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp), color = fg.copy(alpha = 0.7f),
             )
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleSmall)
-                Text(price, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                if (offer.trialDays > 0) {
-                    Text(stringResource(R.string.pro_trial_days, offer.trialDays), style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary)
-                }
-            }
-            if (tag != null) {
-                Text(
-                    tag, style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.clip(CircleShape).background(MaterialTheme.colorScheme.primary).padding(horizontal = 8.dp, vertical = 3.dp),
-                )
-            }
+        }
+        if (tag != null) {
+            Spacer(Modifier.width(8.dp))
+            BentoChip(
+                tag,
+                container = if (tagHighlight) c.highlight else fg.copy(alpha = 0.1f),
+                content = if (tagHighlight) c.onHighlight else fg,
+            )
         }
     }
 }
@@ -221,14 +253,12 @@ private fun PlanCard(offer: PlanOffer, selected: Boolean, title: String, price: 
 private fun features(): List<Triple<ImageVector, TileColor, Int>> {
     val c = RaveTheme.colors
     return listOf(
-        Triple(Icons.Rounded.AutoAwesome, c.tilePink, R.string.pro_f_ai),
-        Triple(Icons.Rounded.QrCodeScanner, c.tilePeach, R.string.pro_f_scans),
-        Triple(Icons.Rounded.RestaurantMenu, c.tileGreen, R.string.pro_f_meals),
-        Triple(Icons.Rounded.AcUnit, c.tileBlue, R.string.pro_f_streak),
-        Triple(Icons.AutoMirrored.Rounded.ShowChart, c.tilePeach, R.string.pro_f_stats),
-        Triple(Icons.Rounded.Palette, c.tilePink, R.string.pro_f_share),
-        Triple(Icons.Rounded.Map, c.tileGreen, R.string.pro_f_maps),
-        Triple(Icons.Rounded.EmojiEvents, c.tileBlue, R.string.pro_f_comps),
+        Triple(Icons.Rounded.AutoAwesome, c.tilePink, R.string.bplan_f_ai),
+        Triple(Icons.Rounded.RestaurantMenu, c.tileGreen, R.string.bplan_f_meals),
+        Triple(Icons.Rounded.AcUnit, c.tileBlue, R.string.bplan_f_streak),
+        Triple(Icons.Rounded.Insights, c.tilePeach, R.string.bplan_f_stats),
+        Triple(Icons.Rounded.Palette, c.tileOrange, R.string.bplan_f_share),
+        Triple(Icons.Rounded.Map, c.tileYellow, R.string.bplan_f_maps),
     )
 }
 

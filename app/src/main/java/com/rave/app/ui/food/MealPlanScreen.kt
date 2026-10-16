@@ -1,34 +1,31 @@
 package com.rave.app.ui.food
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.Lock
-import androidx.compose.material.icons.rounded.Tune
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,11 +33,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -53,12 +60,17 @@ import com.rave.app.domain.food.DailyTarget
 import com.rave.app.domain.food.DayPlan
 import com.rave.app.domain.food.FoodSource
 import com.rave.app.domain.food.MealPlanner
+import com.rave.app.domain.food.MealSlot
 import com.rave.app.domain.food.PlannedMeal
 import com.rave.app.domain.food.PlannerOptions
 import com.rave.app.domain.model.UserSettings
-import com.rave.app.ui.components.RaveScreen
-import com.rave.app.ui.components.SectionCard
-import com.rave.app.ui.theme.Dimens
+import com.rave.app.ui.components.AppBackground
+import com.rave.app.ui.components.BentoChip
+import com.rave.app.ui.components.BentoGap
+import com.rave.app.ui.components.BentoKicker
+import com.rave.app.ui.components.BentoTile
+import com.rave.app.ui.components.BentoTileShape
+import com.rave.app.ui.components.BentoTitle
 import com.rave.app.ui.theme.RaveTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,6 +82,7 @@ import kotlinx.coroutines.launch
 import java.time.format.TextStyle
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.math.roundToInt
 import kotlin.random.Random
 
 data class MealPlanUi(
@@ -119,6 +132,11 @@ class MealPlanViewModel @Inject constructor(
     fun todayIndex(): Int = (time.today().toEpochDay() - weekStart.toEpochDay()).toInt().coerceIn(0, 6)
 }
 
+
+/*
+ * Bento Pop weekly plan: big title, ink/sand day chips, a lime day summary tile and one
+ * colour card per meal slot (breakfast peach, lunch sky, dinner lilac, snack sand).
+ */
 @Composable
 fun MealPlanScreen(onBack: () -> Unit, onOpenSettings: () -> Unit, viewModel: MealPlanViewModel = hiltViewModel()) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
@@ -128,46 +146,44 @@ fun MealPlanScreen(onBack: () -> Unit, onOpenSettings: () -> Unit, viewModel: Me
     // Free: today's plan only. Pro: the whole week.
     if (!pro.isPro && day != today) day = today
     var logged by rememberSaveable { mutableStateOf(setOf<Int>()) }
-    RaveScreen(
-        title = stringResource(R.string.plan_title),
-        onBack = onBack,
-        actions = {
-            IconButton(onClick = { pro.gate(com.rave.app.data.billing.ProReason.MEAL_PLAN) { viewModel.regenerate() } }) { Icon(Icons.Rounded.Refresh, stringResource(R.string.plan_new)) }
-            IconButton(onClick = onOpenSettings) { Icon(Icons.Rounded.Tune, stringResource(R.string.food_settings)) }
-        },
-    ) {
+    val ink = MaterialTheme.colorScheme.onBackground
+    AppBackground {
         LazyColumn(
-            Modifier.fillMaxSize().navigationBarsPadding(),
-            contentPadding = PaddingValues(start = Dimens.ScreenPadding, end = Dimens.ScreenPadding, bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap),
+            Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding(),
+            contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 4.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(BentoGap),
         ) {
             item {
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    ui.week.forEachIndexed { i, d ->
-                        DayPill(d, selected = i == day, isToday = i == today, locked = !pro.isPro && i != today, modifier = Modifier.weight(1f)) {
-                            if (i == today) day = i else pro.gate(com.rave.app.data.billing.ProReason.MEAL_PLAN) { day = i }
+                Column {
+                    Row(Modifier.fillMaxWidth().offset(x = (-12).dp), verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.action_back), tint = ink)
+                        }
+                        Spacer(Modifier.weight(1f))
+                        IconButton(onClick = { pro.gate(com.rave.app.data.billing.ProReason.MEAL_PLAN) { viewModel.regenerate() } }, modifier = Modifier.offset(x = 19.dp).size(38.dp)) {
+                            Icon(Icons.Rounded.Refresh, stringResource(R.string.plan_new), tint = ink)
+                        }
+                        IconButton(onClick = onOpenSettings, modifier = Modifier.offset(x = 19.dp).size(38.dp)) {
+                            Icon(Icons.Rounded.Tune, stringResource(R.string.food_settings), tint = ink)
+                        }
+                    }
+                    BentoTitle(stringResource(R.string.bplan_title), Modifier.padding(top = 8.dp))
+                    Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        ui.week.forEachIndexed { i, d ->
+                            DayChip(d, selected = i == day, locked = !pro.isPro && i != today, modifier = Modifier.weight(1f)) {
+                                if (i == today) day = i else pro.gate(com.rave.app.data.billing.ProReason.MEAL_PLAN) { day = i }
+                            }
                         }
                     }
                 }
             }
             val plan = ui.week.getOrNull(day)
             if (plan != null) {
-                item {
-                    Column(Modifier.padding(horizontal = 4.dp)) {
-                        Text(stringResource(R.string.food_kcal, "%,d".format(plan.kcal)), style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold))
-                        ui.target?.let { t ->
-                            Text(stringResource(R.string.plan_target, "%,d".format(t.kcal), goalName(ui.settings.food.goal)),
-                                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                    }
-                }
-                item {
-                    SectionCard(Modifier.fillMaxWidth(), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp)) {
-                        plan.meals.forEachIndexed { i, meal ->
-                            if (i > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-                            val key = day * 10 + i
-                            MealRow(meal, done = key in logged) { viewModel.ate(meal); logged = logged + key }
-                        }
+                item { DaySummary(plan) }
+                plan.meals.forEachIndexed { i, meal ->
+                    item(key = "meal_${day}_$i") {
+                        val key = day * 10 + i
+                        MealCard(meal, done = key in logged) { viewModel.ate(meal); logged = logged + key }
                     }
                 }
             }
@@ -175,45 +191,112 @@ fun MealPlanScreen(onBack: () -> Unit, onOpenSettings: () -> Unit, viewModel: Me
     }
 }
 
+/** Rounded day chip: weekday letter + date; ink when selected, sand otherwise, lock when Pro-only. */
 @Composable
-private fun DayPill(day: DayPlan, selected: Boolean, isToday: Boolean, locked: Boolean, modifier: Modifier, onClick: () -> Unit) {
-    val bg = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-    val fg = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+private fun DayChip(day: DayPlan, selected: Boolean, locked: Boolean, modifier: Modifier, onClick: () -> Unit) {
+    val tile = if (selected) RaveTheme.colors.tileInk else RaveTheme.colors.tileSand
     Column(
-        modifier.clip(MaterialTheme.shapes.medium).background(bg).clickable(onClick = onClick).padding(vertical = 8.dp),
+        modifier.height(58.dp).clip(RoundedCornerShape(18.dp)).background(tile.container).clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
     ) {
-        Text(day.date.dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.getDefault()), style = MaterialTheme.typography.labelSmall,
-            color = if (selected) fg else MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            day.date.dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.getDefault()),
+            style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp, fontWeight = FontWeight.Normal),
+            color = tile.content.copy(alpha = 0.7f), maxLines = 1,
+        )
         if (locked) {
-            Icon(Icons.Rounded.Lock, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp).padding(top = 2.dp))
+            Icon(Icons.Rounded.Lock, null, tint = tile.content.copy(alpha = 0.7f), modifier = Modifier.padding(top = 2.dp).size(16.dp))
         } else {
-            Text(day.date.dayOfMonth.toString(), style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold), color = fg)
+            Text(
+                day.date.dayOfMonth.toString(),
+                style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp, fontWeight = FontWeight.ExtraBold),
+                color = tile.content, maxLines = 1,
+            )
         }
-        Box(Modifier.padding(top = 2.dp).size(4.dp).clip(CircleShape).background(if (isToday) (if (selected) fg else MaterialTheme.colorScheme.primary) else bg))
     }
 }
 
-/** One meal: slot, the dishes on one line, calories, and a tick to log it. */
+/** Lime tile: weekday kicker, big day calories and an ink protein chip. */
 @Composable
-private fun MealRow(meal: PlannedMeal, done: Boolean, onAte: () -> Unit) {
-    Row(Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+private fun DaySummary(plan: DayPlan) {
+    val tile = RaveTheme.colors.tileGreen
+    BentoTile(tile.container, Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                BentoKicker(plan.date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()), tile.content)
+                val unit = stringResource(R.string.bplan_kcal_unit)
+                Text(
+                    buildAnnotatedString {
+                        append("%,d".format(plan.kcal))
+                        withStyle(SpanStyle(fontSize = 16.sp, letterSpacing = (-0.5).sp)) { append(" $unit") }
+                    },
+                    color = tile.content, maxLines = 1, modifier = Modifier.padding(top = 4.dp),
+                    style = MaterialTheme.typography.displaySmall.copy(
+                        fontSize = 34.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-1.5).sp, lineHeight = 34.sp,
+                    ),
+                )
+            }
+            BentoChip(
+                stringResource(R.string.bplan_protein, plan.protein.roundToInt()),
+                container = RaveTheme.colors.tileInk.container, content = RaveTheme.colors.tileInk.content,
+            )
+        }
+    }
+}
+
+/** One meal slot as a colour card: emoji, slot kicker, dishes, calories and a log/check button. */
+@Composable
+private fun MealCard(meal: PlannedMeal, done: Boolean, onAte: () -> Unit) {
+    val c = RaveTheme.colors
+    val tile = when (meal.slot) {
+        MealSlot.BREAKFAST -> c.tilePeach
+        MealSlot.LUNCH -> c.tileBlue
+        MealSlot.DINNER -> c.tilePink
+        MealSlot.SNACK -> c.tileSand
+    }
+    val emoji = stringResource(
+        when (meal.slot) {
+            MealSlot.BREAKFAST -> R.string.bplan_emoji_breakfast
+            MealSlot.LUNCH -> R.string.bplan_emoji_lunch
+            MealSlot.DINNER -> R.string.bplan_emoji_dinner
+            MealSlot.SNACK -> R.string.bplan_emoji_snack
+        },
+    )
+    Row(
+        Modifier.fillMaxWidth().clip(BentoTileShape).background(tile.container).padding(14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(emoji, style = MaterialTheme.typography.headlineMedium.copy(fontSize = 30.sp, lineHeight = 34.sp))
+        Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
-            Text(slotName(meal.slot).uppercase(Locale.getDefault()), style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                slotName(meal.slot).uppercase(Locale.getDefault()),
+                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.2.sp),
+                color = tile.content.copy(alpha = 0.6f), maxLines = 1,
+            )
             Text(
                 meal.items.joinToString(" + ") { (if (it.servings > 1) "${it.servings} " else "") + it.food.name },
-                style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 20.sp),
+                color = tile.content, maxLines = 2, overflow = TextOverflow.Ellipsis,
             )
-            Text(stringResource(R.string.food_kcal, "%,d".format(meal.kcal)), style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary)
+            Text(
+                stringResource(R.string.food_kcal, "%,d".format(meal.kcal)),
+                style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp), color = tile.content,
+            )
         }
         Spacer(Modifier.width(8.dp))
-        val tint = if (done) RaveTheme.colors.verdictGo else RaveTheme.colors.tilePeach
-        IconButton(onClick = onAte, enabled = !done, modifier = Modifier.clip(CircleShape).background(tint.container).size(40.dp)) {
-            Icon(if (done) Icons.Rounded.Check else Icons.Rounded.Add,
+        val bg = if (done) c.tileInk.container else c.tileInk.content.copy(alpha = 0.7f)
+        val fg = if (done) c.highlight else c.tileInk.container
+        Box(
+            Modifier.size(40.dp).clip(RoundedCornerShape(14.dp)).background(bg).clickable(enabled = !done, onClick = onAte),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                if (done) Icons.Rounded.Check else Icons.Rounded.Add,
                 contentDescription = if (done) stringResource(R.string.food_logged, slotName(meal.slot)) else stringResource(R.string.plan_ate_this),
-                tint = tint.content)
+                tint = fg, modifier = Modifier.size(24.dp),
+            )
         }
     }
 }

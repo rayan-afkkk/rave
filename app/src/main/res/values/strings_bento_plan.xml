@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Bento Pop meal plan -->
+    <string name="bplan_title">This week\'s\ndesi plan 🍛</string>
+    <string name="bplan_kcal_unit">kcal</string>
+    <string name="bplan_protein">%1$dg protein</string>
+    <string name="bplan_emoji_breakfast" translatable="false">🫓</string>
+    <string name="bplan_emoji_lunch" translatable="false">🍛</string>
+    <string name="bplan_emoji_dinner" translatable="false">🍗</string>
+    <string name="bplan_emoji_snack" translatable="false">🍓</string>
+
+    <!-- Bento Pop paywall -->
+    <string name="bplan_pro_go">Go</string>
+    <string name="bplan_pro_word">Pro</string>
+    <string name="bplan_pro_further">go further.</string>
+    <string name="bplan_f_ai">Unlimited AI scans</string>
+    <string name="bplan_f_meals">Full week meal plans</string>
+    <string name="bplan_f_streak">3 freezes + repair</string>
+    <string name="bplan_f_stats">Splits, trends, PRs</string>
+    <string name="bplan_f_share">Premium share cards</string>
+    <string name="bplan_f_maps">Offline maps</string>
+    <string name="bplan_per_year">%1$s / year</string>
+    <string name="bplan_per_month">%1$s / month</string>
+    <string name="bplan_with_trial">%1$s · %2$d days free</string>
+    <string name="bplan_forever">Forever</string>
+    <string name="bplan_start_trial">Start free trial</string>
+    <string name="bplan_fine_print">Cancel anytime in Google Play</string>
+</resources>
