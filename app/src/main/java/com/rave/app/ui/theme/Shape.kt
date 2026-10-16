@@ -6,9 +6,9 @@ import androidx.compose.ui.unit.dp
 
 val RaveShapes = Shapes(
     extraSmall = RoundedCornerShape(8.dp),
-    small = RoundedCornerShape(12.dp),
-    medium = RoundedCornerShape(16.dp),   // habit cards, list items
-    large = RoundedCornerShape(20.dp),    // big cards, sheets
+    small = RoundedCornerShape(14.dp),
+    medium = RoundedCornerShape(20.dp),   // habit cards, list items
+    large = RoundedCornerShape(28.dp),    // bento tiles, big cards, sheets
     extraLarge = RoundedCornerShape(31.dp), // floating nav bar (half its height)
 )
 

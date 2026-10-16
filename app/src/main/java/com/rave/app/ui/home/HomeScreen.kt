@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,7 +21,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -46,7 +44,6 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
@@ -59,26 +56,20 @@ import com.rave.app.domain.model.ActivityType
 import com.rave.app.domain.model.HabitType
 import com.rave.app.domain.model.LogSource
 import com.rave.app.domain.model.ScheduleType
-import com.rave.app.domain.util.DayPeriod
 import com.rave.app.domain.util.Format
-import com.rave.app.domain.util.dayPeriodFor
 import com.rave.app.ui.components.AnimatedCheck
 import com.rave.app.ui.components.EmptyState
 import com.rave.app.ui.components.HabitIcons
 import com.rave.app.ui.components.IconTile
 import com.rave.app.ui.components.LoadingState
 import com.rave.app.ui.components.PillButton
-import com.rave.app.ui.components.PillProgress
-import com.rave.app.ui.components.ProgressRing
 import com.rave.app.ui.components.SectionCard
 import com.rave.app.ui.components.SectionHeader
-import com.rave.app.ui.components.StreakChip
 import com.rave.app.ui.components.tile
 import com.rave.app.ui.theme.Dimens
 import com.rave.app.ui.theme.RaveTheme
 import com.rave.app.ui.unitLabel
 import java.time.LocalDate
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
@@ -111,14 +102,20 @@ fun HomeScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap),
         ) {
-            item(key = "header") { Header(state) }
+            item(key = "header") { BentoHeader(state) }
             item(key = "repair") { StreakRepairCard() }
             com.rave.app.domain.wrapped.WrappedCalculator.seasonYear(java.time.LocalDate.now())?.let { year ->
                 item(key = "wrapped") { WrappedBanner(year) { onOpenWrapped(year) } }
             }
-            item(key = "progress") { ProgressCard(state, onOpenProgress) }
-            item(key = "fitness") { TodayActivityCard(onOpenBatteryGuide) }
-            item(key = "water") { WaterCard() }
+            item(key = "bento") {
+                BentoGrid(
+                    state = state,
+                    onToggleHabit = viewModel::toggle,
+                    onAddHabit = onAddHabit,
+                    onStartWalk = { onStartActivity(ActivityType.WALK) },
+                    onOpenBatteryGuide = onOpenBatteryGuide,
+                )
+            }
             item(key = "week") { WeekStrip(state, viewModel::selectDate) }
             item(key = "routine_header") {
                 val title = if (state.selectedDate == state.today) stringResource(R.string.home_routine_today)
@@ -175,96 +172,7 @@ fun HomeScreen(
     }
 }
 
-@Composable
-private fun Header(state: HomeUiState) {
-    val hour = LocalTime.now().hour
-    val greetingRes = when (dayPeriodFor(hour)) {
-        DayPeriod.MORNING -> R.string.greeting_morning
-        DayPeriod.AFTERNOON -> R.string.greeting_afternoon
-        DayPeriod.EVENING, DayPeriod.NIGHT -> R.string.greeting_evening
-    }
-    val name = state.name.ifBlank { stringResource(R.string.guest_name) }
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.weight(1f)) {
-            Text(
-                stringResource(greetingRes, name.substringBefore(' ')),
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onBackground,
-                maxLines = 1, overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.semantics { heading() },
-            )
-            Text(
-                state.today.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(Locale.getDefault())),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            if (state.freezes > 0) {
-                Icon(Icons.Rounded.AcUnit, contentDescription = pluralStringResource(R.plurals.freezes_count, state.freezes, state.freezes),
-                    tint = RaveTheme.colors.tileBlue.content, modifier = Modifier.size(20.dp))
-                Text(" ${state.freezes}", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground)
-                Spacer(Modifier.width(8.dp))
-            }
-            StreakChip(days = state.overallStreak)
-        }
-    }
-}
 
-@Composable
-private fun ProgressCard(state: HomeUiState, onClick: () -> Unit) {
-    val colors = RaveTheme.colors
-    val progress = if (state.totalCount == 0) 0f else state.doneCount / state.totalCount.toFloat()
-    val left = state.totalCount - state.doneCount
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .clip(MaterialTheme.shapes.large)
-            .background(colors.accentCard)
-            .clickable(onClickLabel = stringResource(R.string.home_open_progress), onClick = onClick)
-            .padding(16.dp),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            ProgressRing(
-                progress = progress,
-                size = 88.dp,
-                strokeWidth = 9.dp,
-                trackColor = colors.onAccentCard.copy(alpha = 0.15f),
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("${state.doneCount}/${state.totalCount}", style = MaterialTheme.typography.headlineSmall, color = colors.onAccentCard)
-                    Text(stringResource(R.string.home_ring_label), style = MaterialTheme.typography.labelSmall, color = colors.onAccentCard.copy(alpha = 0.75f))
-                }
-            }
-            Spacer(Modifier.width(18.dp))
-            Column(Modifier.weight(1f)) {
-                Text(
-                    when {
-                        state.totalCount == 0 -> stringResource(R.string.home_ring_none)
-                        left == 0 -> stringResource(R.string.home_ring_all_done)
-                        else -> pluralStringResource(R.plurals.home_left, left, left)
-                    },
-                    style = MaterialTheme.typography.titleMedium, color = colors.onAccentCard,
-                )
-                if (left > 0 && state.nextHabit != null) {
-                    Text(stringResource(R.string.home_next, state.nextHabit), style = MaterialTheme.typography.bodyMedium,
-                        color = colors.onAccentCard.copy(alpha = 0.8f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
-                Spacer(Modifier.height(14.dp))
-                val unit = unitLabel(state.unit)
-                val kmToday = Format.distance(state.kmToday * 1000, state.unit, 1)
-                val goal = Format.distance(state.kmGoal * 1000, state.unit, 1)
-                Text(stringResource(R.string.home_distance_vs_goal, kmToday, goal, unit), style = MaterialTheme.typography.labelMedium,
-                    color = colors.onAccentCard)
-                Spacer(Modifier.height(6.dp))
-                PillProgress(
-                    progress = if (state.kmGoal <= 0) 0f else (state.kmToday / state.kmGoal).toFloat(),
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            }
-        }
-    }
-}
 
 @Composable
 private fun WeekStrip(state: HomeUiState, onSelect: (LocalDate) -> Unit) {

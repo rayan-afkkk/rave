@@ -1010,4 +1010,19 @@ Permission was denied. You can turn it on in Settings.</string>
     <string name="weekly_vs_last">%1$s vs last week</string>
     <string name="weekly_share_text">My week on %1$s: %2$s steps 🚶</string>
     <string name="weekly_empty">Nothing tracked this week yet. Go for a walk and check back on Sunday!</string>
+    <!-- Bento home -->
+    <string name="bento_greeting">Let\'s go,\n%1$s ⚡</string>
+    <string name="bento_steps">Steps</string>
+    <string name="bento_steps_sub">of %1$s · %2$s %3$s</string>
+    <string name="bento_streak">Streak</string>
+    <string name="bento_streak_sub">days · %1$d freezes</string>
+    <string name="bento_habits">Habits · %1$d of %2$d</string>
+    <string name="bento_add">+ Add</string>
+    <string name="bento_start_walk">Start a walk</string>
+    <string name="bento_steps_left">%1$s steps to close today</string>
+    <string name="bento_goal_done">Goal smashed today 🎉</string>
+    <string name="food_open_camera">Open camera →</string>
+    <string name="food_scan_label_sub">Nutrition panel</string>
+    <string name="food_snap_meal_sub">AI counts it</string>
+    <string name="food_today">Today</string>
 </resources>

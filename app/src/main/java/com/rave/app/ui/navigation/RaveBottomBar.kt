@@ -5,9 +5,6 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.ui.draw.shadow
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -23,10 +20,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.PlayArrow
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -49,17 +45,17 @@ import com.rave.app.ui.theme.PillShape
 import com.rave.app.ui.theme.RaveTheme
 
 private val BarHeight = Dimens.NavBarHeight
-private val StartButtonSize = 58.dp
-/** How far the Start button rises above the bar's top edge. */
-private val StartButtonRaise = 22.dp
+private val StartButtonSize = 54.dp
+private val StartShape = RoundedCornerShape(18.dp)
 
-/** Space screens leave at the bottom so content isn't hidden behind the bar and raised button (system insets come on top). */
-val BottomBarClearance = BarHeight + StartButtonRaise
+/** Space screens leave at the bottom so content isn't hidden behind the bar (system insets come on top). */
+val BottomBarClearance = BarHeight + 12.dp
+
+private val BarShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
 
 /**
- * Standard bottom navigation: full width, docked to the bottom edge with a hairline on top.
- * Home and Scan on the left, Friends and Profile on the right, and a round orange Start
- * button in the middle that pops up above the bar.
+ * Bento Pop bottom bar: black, rounded on top, icons in grey with the selected one in lime,
+ * and a lime rounded-square Start button in the middle.
  */
 @Composable
 fun RaveBottomBar(
@@ -68,29 +64,24 @@ fun RaveBottomBar(
     onStartClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier.fillMaxWidth()) {
-        Column(
-            Modifier
-                .padding(top = StartButtonRaise)
-                .fillMaxWidth()
-                .background(RaveTheme.colors.navBar)
-                // Background first so it also fills the area behind the (swipe-to-show) system bar.
-                .navigationBarsPadding(),
+    Column(
+        modifier
+            .fillMaxWidth()
+            .clip(BarShape)
+            .background(RaveTheme.colors.navBar)
+            // Background first so it also fills the area behind the (swipe-to-show) system bar.
+            .navigationBarsPadding(),
+    ) {
+        Row(
+            Modifier.fillMaxWidth().height(BarHeight + 12.dp).padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
-            Row(
-                Modifier.fillMaxWidth().height(BarHeight).padding(horizontal = 4.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                val (left, right) = TopLevelDestination.entries.let { it.take(2) to it.drop(2) }
-                left.forEach { dest -> NavItem(dest, selected == dest, { onSelect(dest) }, Modifier.weight(1f)) }
-                // Room for the raised Start button.
-                Spacer(Modifier.weight(1f))
-                right.forEach { dest -> NavItem(dest, selected == dest, { onSelect(dest) }, Modifier.weight(1f)) }
-            }
+            val (left, right) = TopLevelDestination.entries.let { it.take(2) to it.drop(2) }
+            left.forEach { dest -> NavItem(dest, selected == dest, { onSelect(dest) }, Modifier.weight(1f)) }
+            Box(Modifier.weight(1f), contentAlignment = Alignment.Center) { StartButton(onStartClick) }
+            right.forEach { dest -> NavItem(dest, selected == dest, { onSelect(dest) }, Modifier.weight(1f)) }
         }
-        StartButton(onStartClick, Modifier.align(Alignment.TopCenter))
     }
 }
 
@@ -102,11 +93,11 @@ private fun NavItem(
     modifier: Modifier = Modifier,
 ) {
     val tint by animateColorAsState(
-        targetValue = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+        targetValue = if (selected) RaveTheme.colors.navActive else RaveTheme.colors.navContent,
         label = "navTint",
     )
     val indicator by animateColorAsState(
-        targetValue = if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.14f) else Color.Transparent,
+        targetValue = if (selected) RaveTheme.colors.navActive.copy(alpha = 0.14f) else Color.Transparent,
         label = "navIndicator",
     )
     Column(
@@ -159,14 +150,11 @@ private fun StartButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
         modifier = modifier
             .size(StartButtonSize)
             .scale(scale)
-            .shadow(10.dp, CircleShape, ambientColor = MaterialTheme.colorScheme.primary, spotColor = MaterialTheme.colorScheme.primary)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primary)
-            // Ring in the bar colour makes the button look cut into the bar.
-            .border(4.dp, RaveTheme.colors.navBar, CircleShape)
+            .clip(StartShape)
+            .background(RaveTheme.colors.highlight)
             .clickable(
                 interactionSource = interaction,
-                indication = ripple(color = MaterialTheme.colorScheme.onPrimary),
+                indication = ripple(color = RaveTheme.colors.onHighlight),
                 role = Role.Button,
                 onClick = onClick,
             ),
@@ -175,7 +163,7 @@ private fun StartButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
         Icon(
             imageVector = Icons.Rounded.PlayArrow,
             contentDescription = stringResource(R.string.nav_start),
-            tint = MaterialTheme.colorScheme.onPrimary,
+            tint = RaveTheme.colors.onHighlight,
             modifier = Modifier.size(30.dp),
         )
     }

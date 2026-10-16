@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Window / launcher colours only. Compose UI uses the Kotlin theme tokens. -->
-    <color name="window_background">#FFFFF6EC</color>
+    <color name="window_background">#FFFBF8F1</color>
     <color name="splash_background">#FF17110E</color>
     <color name="ic_launcher_background">#FF17110E</color>
     <color name="ic_launcher_foreground">#FFFF7A2E</color>

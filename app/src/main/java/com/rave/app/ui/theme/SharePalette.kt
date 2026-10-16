@@ -26,7 +26,7 @@ data class SharePalette(
 
 fun ShareTemplate.palette(): SharePalette = when (this) {
     ShareTemplate.WARM -> SharePalette(
-        background = Brush.linearGradient(listOf(TilePeach, LightAccent)),
+        background = Brush.linearGradient(listOf(TilePeach, BentoOrange)),
         text = LightTextPrimary, secondaryText = LightTextPrimary.copy(alpha = 0.75f),
         route = White, accent = LightTextPrimary,
     )
@@ -36,7 +36,7 @@ fun ShareTemplate.palette(): SharePalette = when (this) {
     )
     ShareTemplate.MINIMAL -> SharePalette(
         background = Brush.verticalGradient(listOf(White, White)),
-        text = LightTextPrimary, secondaryText = LightTextSecondary, route = LightAccent, accent = LightAccent,
+        text = LightTextPrimary, secondaryText = LightTextSecondary, route = BentoOrange, accent = BentoOrange,
     )
     ShareTemplate.NIGHT -> SharePalette(
         background = Brush.verticalGradient(listOf(ShareNightTop, ShareNightBottom)),

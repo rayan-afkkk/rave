@@ -42,6 +42,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.border
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -246,8 +249,8 @@ fun FoodScreen(
                 item { BarcodeHero(onScanBarcode) }
                 item {
                     Row(horizontalArrangement = Arrangement.spacedBy(Dimens.SectionGap)) {
-                        ScanTile(Icons.Rounded.DocumentScanner, stringResource(R.string.food_scan_label), Modifier.weight(1f)) { start(PendingCapture.LABEL) }
-                        ScanTile(Icons.Rounded.PhotoCamera, stringResource(R.string.food_snap_meal), Modifier.weight(1f)) { start(PendingCapture.PHOTO) }
+                        ScanTile(Icons.Rounded.DocumentScanner, stringResource(R.string.food_scan_label), stringResource(R.string.food_scan_label_sub), RaveTheme.colors.tilePink, Modifier.weight(1f)) { start(PendingCapture.LABEL) }
+                        ScanTile(Icons.Rounded.PhotoCamera, stringResource(R.string.food_snap_meal), stringResource(R.string.food_snap_meal_sub), RaveTheme.colors.tileBlue, Modifier.weight(1f)) { start(PendingCapture.PHOTO) }
                     }
                 }
                 message?.let { m ->
@@ -304,19 +307,25 @@ private fun fmt(n: Int) = NumberFormat.getIntegerInstance().format(n)
 /** The main action: a big button that opens the barcode camera. */
 @Composable
 private fun BarcodeHero(onClick: () -> Unit) {
-    SectionCard(Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.primary, onClick = onClick) {
-        Row(Modifier.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(56.dp).clip(CircleShape).background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.18f)), contentAlignment = Alignment.Center) {
-                Icon(Icons.Rounded.QrCodeScanner, null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(30.dp))
-            }
-            Spacer(Modifier.width(16.dp))
-            Column(Modifier.weight(1f)) {
-                Text(stringResource(R.string.food_scan_barcode), style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onPrimary)
-                Text(stringResource(R.string.food_scan_hero_body), style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f))
+    val ink = RaveTheme.colors.accentCard
+    val on = RaveTheme.colors.onAccentCard
+    val lime = RaveTheme.colors.highlight
+    SectionCard(Modifier.fillMaxWidth(), color = ink, onClick = onClick, contentPadding = PaddingValues(18.dp)) {
+        Text(stringResource(R.string.food_scan_barcode).uppercase(), style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold,
+            letterSpacing = 1.2.sp), color = on.copy(alpha = 0.65f))
+        Row(Modifier.padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.food_scan_hero_body), style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold),
+                color = on, modifier = Modifier.weight(1f))
+            Spacer(Modifier.width(12.dp))
+            Box(Modifier.size(84.dp).clip(RoundedCornerShape(20.dp)).border(3.dp, lime, RoundedCornerShape(20.dp)), contentAlignment = Alignment.Center) {
+                Icon(Icons.Rounded.QrCodeScanner, null, tint = lime, modifier = Modifier.size(40.dp))
             }
         }
+        Text(
+            stringResource(R.string.food_open_camera), style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+            color = RaveTheme.colors.onHighlight,
+            modifier = Modifier.padding(top = 12.dp).clip(CircleShape).background(lime).padding(horizontal = 14.dp, vertical = 7.dp),
+        )
     }
 }
 
@@ -326,13 +335,16 @@ private fun TodaySummary(state: FoodUiState, onAdd: () -> Unit, onOpenPlan: () -
     val target = state.target
     val eaten = state.day.kcal
     val over = target != null && eaten > target.kcal
-    val accent = if (over) RaveTheme.colors.verdictSkip.content else MaterialTheme.colorScheme.primary
-    SectionCard(Modifier.fillMaxWidth()) {
-        Row(verticalAlignment = Alignment.Bottom) {
-            Text(fmt(eaten), style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold))
+    val lime = RaveTheme.colors.tileGreen
+    val accent = if (over) RaveTheme.colors.verdictSkip.content else lime.content
+    SectionCard(Modifier.fillMaxWidth(), color = lime.container) {
+        Text(stringResource(R.string.food_today).uppercase(), style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold,
+            letterSpacing = 1.2.sp), color = lime.content.copy(alpha = 0.65f))
+        Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(top = 4.dp)) {
+            Text(fmt(eaten), style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold), color = lime.content)
             if (target != null) {
                 Text(" " + stringResource(R.string.food_of_target, fmt(target.kcal)), style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f).padding(bottom = 3.dp))
+                    color = lime.content, modifier = Modifier.weight(1f).padding(bottom = 4.dp))
                 Text(
                     if (over) stringResource(R.string.food_over, fmt(eaten - target.kcal)) else stringResource(R.string.food_left, fmt(target.kcal - eaten)),
                     style = MaterialTheme.typography.labelLarge, color = accent, modifier = Modifier.padding(bottom = 3.dp),
@@ -341,8 +353,8 @@ private fun TodaySummary(state: FoodUiState, onAdd: () -> Unit, onOpenPlan: () -
         }
         if (target != null) {
             val f = (eaten / target.kcal.toFloat()).coerceIn(0f, 1f)
-            Box(Modifier.fillMaxWidth().padding(top = 8.dp).height(6.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant)) {
-                if (f > 0f) Box(Modifier.fillMaxWidth(f).height(6.dp).clip(CircleShape).background(accent))
+            Box(Modifier.fillMaxWidth().padding(top = 8.dp).height(10.dp).clip(CircleShape).background(lime.content.copy(alpha = 0.15f))) {
+                if (f > 0f) Box(Modifier.fillMaxWidth(f).height(10.dp).clip(CircleShape).background(RaveTheme.colors.accentCard))
             }
         }
         Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -353,13 +365,12 @@ private fun TodaySummary(state: FoodUiState, onAdd: () -> Unit, onOpenPlan: () -
 }
 
 @Composable
-private fun ScanTile(icon: ImageVector, label: String, modifier: Modifier, onClick: () -> Unit) {
-    SectionCard(modifier, onClick = onClick) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
-            Spacer(Modifier.width(10.dp))
-            Text(label, style = MaterialTheme.typography.labelLarge, maxLines = 1)
-        }
+private fun ScanTile(icon: ImageVector, label: String, sub: String, tile: com.rave.app.ui.theme.TileColor, modifier: Modifier, onClick: () -> Unit) {
+    SectionCard(modifier, color = tile.container, onClick = onClick) {
+        Icon(icon, null, tint = tile.content, modifier = Modifier.size(28.dp))
+        Text(label, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold), color = tile.content,
+            modifier = Modifier.padding(top = 10.dp), maxLines = 1)
+        Text(sub, style = MaterialTheme.typography.bodySmall, color = tile.content.copy(alpha = 0.75f), maxLines = 1)
     }
 }
 

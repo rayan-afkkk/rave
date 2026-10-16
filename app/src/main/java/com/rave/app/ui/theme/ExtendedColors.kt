@@ -42,6 +42,14 @@ data class ExtendedColors(
     val verdictGo: TileColor = TileColor(VerdictGoSoft, VerdictGo),
     val verdictSometimes: TileColor = TileColor(VerdictMidSoft, VerdictMid),
     val verdictSkip: TileColor = TileColor(VerdictSkipSoft, VerdictSkip),
+    /** Bottom bar: always black with a lime highlight (Bento Pop). */
+    val navContent: Color = NavInactive,
+    val navActive: Color = BentoLime,
+    /** Lime "Start" button and bright highlights on black tiles. */
+    val highlight: Color = BentoLime,
+    val onHighlight: Color = BentoInk,
+    /** Big call-to-action tile ("Start a walk"). */
+    val cta: TileColor = TileColor(BentoOrange, BentoInk),
 ) {
     val tiles: List<TileColor> get() = listOf(tilePeach, tileGreen, tilePink, tileBlue)
 }
@@ -51,9 +59,9 @@ internal val LightExtendedColors = ExtendedColors(
     backgroundBottom = LightBackgroundBottom,
     accentCard = LightAccentCard,
     onAccentCard = LightOnAccentCard,
-    navBar = LightSurface,
+    navBar = BentoInk,
     navBarShadow = LightNavShadow,
-    streakFlame = LightAccent,
+    streakFlame = BentoOrange,
     tilePeach = TileColor(TilePeach, OnTilePeach),
     tileGreen = TileColor(TileGreen, OnTileGreen),
     tilePink = TileColor(TilePink, OnTilePink),
@@ -64,11 +72,11 @@ internal val LightExtendedColors = ExtendedColors(
 internal val DarkExtendedColors = ExtendedColors(
     backgroundTop = DarkBackground,
     backgroundBottom = DarkBackground,
-    accentCard = DarkSurfaceHighest,
+    accentCard = DarkSurfaceHigh,
     onAccentCard = DarkTextPrimary,
-    navBar = DarkSurface,
+    navBar = BentoInk,
     navBarShadow = DarkNavShadow,
-    streakFlame = DarkAccent,
+    streakFlame = BentoOrange,
     tilePeach = TileColor(DarkTilePeach, DarkOnTilePeach),
     tileGreen = TileColor(DarkTileGreen, DarkOnTileGreen),
     tilePink = TileColor(DarkTilePink, DarkOnTilePink),
