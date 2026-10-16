@@ -49,6 +49,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.rave.app.R
+import com.rave.app.ui.theme.ShareRouteColors
+import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import com.rave.app.ui.permissions.hasPermission
 import com.rave.app.ui.theme.CheckerDark
 import com.rave.app.ui.theme.CheckerLight
@@ -66,12 +75,20 @@ fun SharePager(
     fileName: String,
     shareText: String,
     modifier: Modifier = Modifier,
+    isPro: Boolean = false,
+    onUpgrade: () -> Unit = {},
+    /** Show the route colour picker (activity cards). */
+    routeColors: Boolean = false,
     card: @Composable BoxScope.(ShareTemplate, SharePalette) -> Unit,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val templates = ShareTemplate.entries
     val pager = rememberPagerState { templates.size }
+    var routeColor by remember { mutableStateOf<Color?>(null) }
+    val lockedPage = { !isPro && templates[pager.currentPage].premium }
+    /** Share/save only unlocked cards; premium ones open the paywall for free users. */
+    fun guarded(action: () -> Unit) { if (lockedPage()) onUpgrade() else action() }
     val layers: List<GraphicsLayer> = templates.map { rememberGraphicsLayer() }
     val saved = stringResource(R.string.share_saved)
     val failed = stringResource(R.string.share_save_failed)
@@ -92,7 +109,8 @@ fun SharePager(
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Box(Modifier.aspectRatio(9f / 16f).clip(MaterialTheme.shapes.large)) {
                     if (template == ShareTemplate.STICKER) Checkerboard()
-                    val palette = template.palette()
+                    val base = template.palette()
+                    val palette = base.copy(route = (if (isPro) routeColor else null) ?: base.route, watermark = !isPro)
                     Box(
                         Modifier
                             .fillMaxSize()
@@ -102,6 +120,17 @@ fun SharePager(
                             }
                             .then(if (palette.background != null) Modifier.background(palette.background) else Modifier),
                     ) { card(template, palette) }
+                    if (!isPro && template.premium) {
+                        Row(
+                            Modifier.align(Alignment.TopEnd).padding(10.dp).clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.primary).clickable(onClick = onUpgrade)
+                                .padding(horizontal = 10.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(Icons.Rounded.Lock, null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(14.dp))
+                            Text(" PRO", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onPrimary)
+                        }
+                    }
                 }
             }
         }
@@ -119,32 +148,48 @@ fun SharePager(
                     ShareTemplate.DARK -> R.string.template_dark
                     ShareTemplate.MINIMAL -> R.string.template_minimal
                     ShareTemplate.STICKER -> R.string.template_sticker
+                    ShareTemplate.NIGHT -> R.string.template_night
+                    ShareTemplate.SUNSET -> R.string.template_sunset
                 },
             ),
             style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 6.dp),
         )
+        if (routeColors) {
+            Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                ShareRouteColors.forEach { c ->
+                    val selected = isPro && routeColor == c
+                    Box(
+                        Modifier.size(if (selected) 30.dp else 26.dp).clip(CircleShape)
+                            .background(c ?: MaterialTheme.colorScheme.primary)
+                            .border(if (selected) 3.dp else 1.dp, if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outline, CircleShape)
+                            .clickable { if (isPro) routeColor = c else onUpgrade() },
+                    )
+                }
+                if (!isPro) Icon(Icons.Rounded.Lock, stringResource(R.string.pro_unlock), tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
+            }
+        }
         Spacer(Modifier.height(12.dp))
         Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 16.dp, vertical = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
             ShareTarget(Icons.Rounded.PhotoCamera, stringResource(R.string.share_instagram)) {
-                scope.launch {
+                guarded { scope.launch {
                     val uri = ShareHelper.cacheImage(context, capture(), fileName)
                     ShareHelper.shareToInstagramStory(context, uri, templates[pager.currentPage] == ShareTemplate.STICKER, shareText)
-                }
+                } }
             }
             ShareTarget(Icons.AutoMirrored.Rounded.Chat, stringResource(R.string.share_whatsapp)) {
-                scope.launch { ShareHelper.shareToWhatsApp(context, ShareHelper.cacheImage(context, capture(), fileName), shareText) }
+                guarded { scope.launch { ShareHelper.shareToWhatsApp(context, ShareHelper.cacheImage(context, capture(), fileName), shareText) } }
             }
-            ShareTarget(Icons.Rounded.Download, stringResource(R.string.share_save)) {
+            ShareTarget(Icons.Rounded.Download, stringResource(R.string.share_save)) { guarded {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && !context.hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     legacyStorage.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 } else scope.launch {
                     val ok = ShareHelper.saveToGallery(context, capture(), "$fileName-${System.currentTimeMillis()}")
                     Toast.makeText(context, if (ok) saved else failed, Toast.LENGTH_SHORT).show()
                 }
-            }
+            } }
             ShareTarget(Icons.Rounded.IosShare, stringResource(R.string.share_more)) {
-                scope.launch { ShareHelper.shareImage(context, ShareHelper.cacheImage(context, capture(), fileName), shareText) }
+                guarded { scope.launch { ShareHelper.shareImage(context, ShareHelper.cacheImage(context, capture(), fileName), shareText) } }
             }
         }
     }

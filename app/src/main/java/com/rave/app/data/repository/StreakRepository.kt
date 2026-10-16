@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.time.LocalDate
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.drop
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -45,8 +47,15 @@ class StreakRepository @Inject constructor(
     private val statsDao: StatsDao,
     private val time: TimeProvider,
     private val settings: SettingsRepository,
+    private val pro: com.rave.app.data.billing.ProRepository,
+    @com.rave.app.core.ApplicationScope scope: kotlinx.coroutines.CoroutineScope,
 ) {
     private val mutex = Mutex()
+
+    init {
+        // Buying or losing Pro changes the monthly freezes, so replay the streaks.
+        scope.launch { pro.isPro.drop(1).collect { recompute() } }
+    }
 
     private val _repairOffer = MutableStateFlow<RepairOffer?>(null)
     /** Set when the overall streak broke yesterday or the day before and a repair is still available this month. */
@@ -67,7 +76,7 @@ class StreakRepository @Inject constructor(
 
         val yesterday = time.today().minusDays(1)
         val repairs = repairedDays()
-        val replay = StreakEngine.replay(habits, logs, yesterday, inventory.bonusGranted, monthlyFreeze = true, repairedDays = repairs)
+        val replay = StreakEngine.replay(habits, logs, yesterday, inventory.bonusGranted, monthlyFreezes = if (pro.isPro.value) PRO_MONTHLY_FREEZES else FREE_MONTHLY_FREEZES, repairedDays = repairs)
         val today = time.today()
         val brokeRecently = replay.lastBreak?.let { !it.isBefore(today.minusDays(2)) } == true
         val usedThisMonth = repairs.any { it.year == today.year && it.month == today.month }
@@ -108,6 +117,8 @@ class StreakRepository @Inject constructor(
     private companion object {
         const val KEY_REPAIRS = "streak_repairs"
         const val MIN_STREAK_TO_REPAIR = 2
+        const val FREE_MONTHLY_FREEZES = 1
+        const val PRO_MONTHLY_FREEZES = 3
     }
 
     /** Grants an extra freeze (e.g. invite reward). Capped by the engine at [StreakEngine.MAX_FREEZES]. */

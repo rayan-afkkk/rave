@@ -104,10 +104,12 @@ class FoodResultViewModel @Inject constructor(
 
     init { load() }
 
+    fun upgrade() = food.showScanPaywall(FoodSource.BARCODE)
+
     fun load() = viewModelScope.launch {
         _ui.value = ResultUi.Loading
         val scanned = if (barcode.isBlank()) food.pendingScan.value else {
-            if (!food.canScan(FoodSource.BARCODE)) { _ui.value = ResultUi.LimitReached; return@launch }
+            if (!food.canScan(FoodSource.BARCODE)) { _ui.value = ResultUi.LimitReached; food.showScanPaywall(FoodSource.BARCODE); return@launch }
             try { off.lookup(barcode) } catch (e: FoodLookupException) { _ui.value = ResultUi.Offline; return@launch }
         }
         if (scanned == null) {
@@ -138,6 +140,7 @@ fun FoodResultScreen(onBack: () -> Unit, onScanAnother: () -> Unit, viewModel: F
             ResultUi.Loading -> LoadingState()
             ResultUi.LimitReached -> Column(Modifier.padding(Dimens.ScreenPadding)) {
                 EmptyState(Icons.Rounded.Error, stringResource(R.string.food_limit_reached), "")
+                com.rave.app.ui.components.PillButton(stringResource(R.string.pro_unlock), onClick = viewModel::upgrade, modifier = Modifier.fillMaxWidth())
             }
             ResultUi.Offline -> Column(Modifier.padding(Dimens.ScreenPadding)) {
                 EmptyState(Icons.Rounded.Error, stringResource(R.string.food_lookup_failed), "")

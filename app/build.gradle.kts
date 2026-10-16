@@ -196,6 +196,7 @@ dependencies {
     implementation(libs.mlkit.barcode.scanning)
     implementation(libs.mlkit.text.recognition)
     implementation(libs.okhttp)
+    implementation(libs.billing.ktx)
     implementation(libs.zxing.core)
 
     testImplementation(libs.junit)

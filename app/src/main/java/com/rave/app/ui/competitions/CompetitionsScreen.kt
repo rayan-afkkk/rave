@@ -90,6 +90,7 @@ fun CompetitionsScreen(
     viewModel: CompetitionsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val pro = com.rave.app.ui.pro.rememberPro()
     var tab by rememberSaveable { mutableStateOf(CompetitionTab.ACTIVE) }
     RaveScreen(title = stringResource(R.string.competitions_title), onBack = onBack) {
         androidx.compose.foundation.layout.Box(Modifier.fillMaxWidth().weight(1f)) {
@@ -133,8 +134,9 @@ fun CompetitionsScreen(
                     }
                 }
             }
+            // Anyone can join competitions; creating one is Rave Pro.
             FloatingActionButton(
-                onClick = onCreate,
+                onClick = { pro.gate(com.rave.app.data.billing.ProReason.COMPETITIONS, onCreate) },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.align(Alignment.BottomEnd).padding(20.dp),

@@ -26,7 +26,11 @@ class MainViewModel @Inject constructor(
     private val tracking: TrackingManager,
     private val deepLinks: DeepLinkHandler,
     workouts: com.rave.app.data.repository.WorkoutRepository,
+    pro: com.rave.app.data.billing.ProRepository,
 ) : ViewModel() {
+    /** Paywall requests from anywhere in the app (scan limit hit, locked feature tapped...). */
+    val paywallRequests = pro.paywallRequests
+
     /** Unfinished strength workout (drives the "Workout in progress" banner). */
     val activeWorkout: StateFlow<com.rave.app.data.local.entity.WorkoutEntity?> =
         workouts.observeActiveWorkout().stateIn(viewModelScope, SharingStarted.Eagerly, null)

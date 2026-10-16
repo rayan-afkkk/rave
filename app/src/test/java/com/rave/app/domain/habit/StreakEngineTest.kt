@@ -116,7 +116,7 @@ class StreakEngineTest {
     @Test
     fun `monthly freeze covers a miss`() {
         // Created Jan 5 (first tracked day grants one); Jan 8 missed is covered.
-        val r = StreakEngine.replay(listOf(habit(1)), done(1, 0, 1, 2, 4), through = monday.plusDays(4), monthlyFreeze = true)
+        val r = StreakEngine.replay(listOf(habit(1)), done(1, 0, 1, 2, 4), through = monday.plusDays(4), monthlyFreezes = 1)
         assertEquals(4, r.overall.current)
         assertEquals(listOf(monday.plusDays(3)), r.freezesUsedOn)
     }
@@ -127,7 +127,7 @@ class StreakEngineTest {
         val h = habit(1, created = start)
         // Jan 30 done, Jan 31 missed (uses the starting freeze), Feb 1 done, Feb 2 missed (uses the Feb freeze).
         val logs = listOf(start, start.plusDays(2)).map { HabitLog(habitId = 1, date = it, value = 1, completed = true) }
-        val r = StreakEngine.replay(listOf(h), logs, through = start.plusDays(3), monthlyFreeze = true)
+        val r = StreakEngine.replay(listOf(h), logs, through = start.plusDays(3), monthlyFreezes = 1)
         assertEquals(2, r.freezesUsedOn.size)
         assertEquals(2, r.overall.current)
     }
@@ -136,5 +136,15 @@ class StreakEngineTest {
     fun `display streak adds today when done`() {
         assertEquals(5, StreakEngine.displayStreak(StreakState(current = 4), doneToday = true))
         assertEquals(4, StreakEngine.displayStreak(StreakState(current = 4), doneToday = false))
+    }
+
+    @Test
+    fun `pro gets three monthly freezes`() {
+        // Days 1-3 missed after day 0: one free freeze covers only the first miss, three cover all.
+        val free = StreakEngine.replay(listOf(habit(1)), done(1, 0, 4), through = monday.plusDays(4), monthlyFreezes = 1)
+        val pro = StreakEngine.replay(listOf(habit(1)), done(1, 0, 4), through = monday.plusDays(4), monthlyFreezes = 3)
+        assertEquals(1, free.freezesUsedOn.size)
+        assertEquals(3, pro.freezesUsedOn.size)
+        assertEquals(2, pro.overall.current)
     }
 }

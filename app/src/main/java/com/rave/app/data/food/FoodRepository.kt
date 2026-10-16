@@ -29,14 +29,11 @@ data class DayFood(val entries: List<FoodLogEntity>) {
     val fat: Double get() = entries.sumOf { it.fat }
 }
 
-/**
- * Free vs Pro limits for food features. Everything is unlocked until the Rave Pro paywall ships;
- * then [isPro] comes from billing and the daily limits apply to free users.
- */
+/** Daily food-scan limits for free users; Rave Pro removes them. */
 object FoodGate {
-    var isPro: Boolean = true
     const val FREE_BARCODE_SCANS_PER_DAY = 5
-    const val FREE_PHOTO_SCANS_PER_DAY = 2
+    /** AI scans: meal photos and label reads together. */
+    const val FREE_AI_SCANS_PER_DAY = 2
 }
 
 @Singleton
@@ -45,6 +42,7 @@ class FoodRepository @Inject constructor(
     private val settings: SettingsRepository,
     private val steps: StepRepository,
     private val time: TimeProvider,
+    private val pro: com.rave.app.data.billing.ProRepository,
 ) {
     /** Result of the latest label/photo scan, handed to the result screen. */
     val pendingScan = MutableStateFlow<ScannedFood?>(null)
@@ -92,10 +90,20 @@ class FoodRepository @Inject constructor(
 
     /** True if a free user may scan again today with [source]. */
     suspend fun canScan(source: FoodSource): Boolean {
-        if (FoodGate.isPro) return true
-        val used = dao.countScansSince(time.startOfDayMs(time.today()), source.name)
-        return used < if (source == FoodSource.PHOTO) FoodGate.FREE_PHOTO_SCANS_PER_DAY else FoodGate.FREE_BARCODE_SCANS_PER_DAY
+        if (pro.isPro.value) return true
+        val since = time.startOfDayMs(time.today())
+        return if (source == FoodSource.BARCODE) {
+            dao.countScansSince(since, FoodSource.BARCODE.name) < FoodGate.FREE_BARCODE_SCANS_PER_DAY
+        } else {
+            val ai = dao.countScansSince(since, FoodSource.PHOTO.name) + dao.countScansSince(since, FoodSource.LABEL.name)
+            ai < FoodGate.FREE_AI_SCANS_PER_DAY
+        }
     }
+
+    /** Opens the paywall for a scan that hit the free limit. */
+    fun showScanPaywall(source: FoodSource) = pro.requestPaywall(
+        if (source == FoodSource.BARCODE) com.rave.app.data.billing.ProReason.SCANS else com.rave.app.data.billing.ProReason.AI_SCANS,
+    )
 
     fun slotNow(): MealSlot {
         val h = LocalTime.now().hour

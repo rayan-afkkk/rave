@@ -104,6 +104,7 @@ class ShareActivityViewModel @Inject constructor(
 @Composable
 fun ShareActivityScreen(onBack: () -> Unit, viewModel: ShareActivityViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val pro = com.rave.app.ui.pro.rememberPro()
     RaveScreen(title = stringResource(R.string.share_title), onBack = onBack) {
         val a = state.activity
         if (a == null) {
@@ -112,7 +113,10 @@ fun ShareActivityScreen(onBack: () -> Unit, viewModel: ShareActivityViewModel = 
         }
         val distance = Format.distance(a.distanceM, state.unit)
         val text = stringResource(R.string.share_activity_text, a.name, distance, unitLabel(state.unit), stringResource(R.string.app_name))
-        SharePager(fileName = "activity-${a.id}", shareText = text, modifier = Modifier.fillMaxSize().padding(bottom = 8.dp)) { _, palette ->
+        SharePager(
+            fileName = "activity-${a.id}", shareText = text, modifier = Modifier.fillMaxSize().padding(bottom = 8.dp),
+            isPro = pro.isPro, onUpgrade = { pro.upgrade(com.rave.app.data.billing.ProReason.SHARE) }, routeColors = true,
+        ) { _, palette ->
             ActivityCard(a, state, palette)
         }
     }
@@ -154,8 +158,10 @@ private fun BoxScope.ActivityCard(a: ActivityEntity, state: ShareActivityState, 
                 Text(stringResource(R.string.share_streak), style = style(11, androidx.compose.ui.text.font.FontWeight.Medium), color = p.secondaryText)
             }
         }
-        Spacer(Modifier.height(14.dp))
-        Text(stringResource(R.string.app_name).uppercase(), style = style(12, androidx.compose.ui.text.font.FontWeight.Bold), color = p.accent)
+        if (p.watermark) {
+            Spacer(Modifier.height(14.dp))
+            Text(stringResource(R.string.share_made_with).uppercase(), style = style(12, androidx.compose.ui.text.font.FontWeight.Bold), color = p.accent)
+        }
     }
 }
 

@@ -80,6 +80,7 @@ fun ActivitySummaryScreen(
     onRepeat: (ActivityType, Long) -> Unit,
     viewModel: ActivitySummaryViewModel = hiltViewModel(),
 ) {
+    val pro = com.rave.app.ui.pro.rememberPro()
     val state by viewModel.state.collectAsStateWithLifecycle()
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(state.closed) { if (state.closed) onClose() }
@@ -152,7 +153,11 @@ fun ActivitySummaryScreen(
                         }
                     }
 
-                    if (state.splits.isNotEmpty()) SplitsCard(state.splits, unit)
+                    if (state.splits.isNotEmpty()) {
+                        com.rave.app.ui.pro.ProLock(pro, com.rave.app.data.billing.ProReason.STATS, stringResource(R.string.summary_splits_locked)) {
+                            SplitsCard(state.splits, unit)
+                        }
+                    }
 
                     OutlinedTextField(
                         value = state.note, onValueChange = viewModel::setNote,

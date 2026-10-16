@@ -211,6 +211,9 @@
     <string name="template_dark">Dark</string>
     <string name="template_minimal">Minimal</string>
     <string name="template_sticker">Sticker (transparent)</string>
+    <string name="template_night">Night</string>
+    <string name="template_sunset">Sunset</string>
+    <string name="share_made_with">Made with Rave</string>
     <string name="routes_empty_title">No routes yet</string>
     <string name="routes_empty_message">Your walks and runs will show up here once you finish your first one.</string>
     <string name="routes_empty_filter_title">Nothing here</string>
@@ -229,6 +232,11 @@
     <string name="progress_distance">Distance (%1$s)</string>
     <string name="progress_weekly">Weekly</string>
     <string name="progress_monthly">Monthly</string>
+    <string name="progress_yearly">Yearly</string>
+    <string name="progress_records">Personal records</string>
+    <string name="progress_records_empty">Your fastest 1k, fastest 5k and longest distance show up here.</string>
+    <string name="progress_records_locked">Your personal records history</string>
+    <string name="summary_splits_locked">Splits and pace chart</string>
     <string name="progress_best_streaks">Best streaks</string>
     <string name="progress_streak_values">%1$d now · best %2$d</string>
     <string name="profile_guest">Guest</string>
@@ -241,7 +249,7 @@
     <string name="profile_total_activities">Activities</string>
     <string name="profile_view_progress">View progress</string>
     <string name="profile_badges">Badges</string>
-    <string name="profile_freezes_help">Earn 1 freeze for every %1$d-day streak (max %2$d). A freeze is used automatically when you miss a day.</string>
+    <string name="profile_freezes_help">Earn 1 freeze for every %1$d-day streak (max %2$d), plus 1 free on the 1st of each month (3 with Rave Pro). A freeze is used automatically when you miss a day.</string>
     <string name="cd_badge_earned">%1$s, earned</string>
     <string name="cd_badge_locked">%1$s, locked</string>
     <string name="badge_first_activity">First steps</string>
@@ -285,7 +293,7 @@
     <string name="settings_weight">Weight</string>
     <string name="settings_height">Height</string>
     <string name="repair_title">Your %1$d-day streak broke</string>
-    <string name="repair_body">Repair it to cover the missed day. You get one free repair each month, plus a free streak freeze on the 1st.</string>
+    <string name="repair_body">Repair it to cover the missed day. Rave Pro gives you one repair a month and 3 streak freezes on the 1st.</string>
     <string name="repair_action">Repair streak</string>
     <string name="league_title">Weekly league</string>
     <string name="league_subtitle">Most steps with your friends, Monday to Sunday</string>
@@ -916,4 +924,60 @@ Permission was denied. You can turn it on in Settings.</string>
         <item quantity="one">%1$d mile. Pace %2$d minutes %3$d.</item>
         <item quantity="other">%1$d miles. Pace %2$d minutes %3$d.</item>
     </plurals>
+
+    <!-- Rave Pro -->
+    <string name="pro_unlock">Unlock with Pro</string>
+    <string name="pro_subtitle">Support an indie app and get the full Rave.</string>
+    <string name="pro_h_general">Get Rave Pro</string>
+    <string name="pro_h_scans">You\'ve used today\'s 5 free scans</string>
+    <string name="pro_h_ai">You\'ve used today\'s 2 free AI scans</string>
+    <string name="pro_h_meals">Plan your whole week</string>
+    <string name="pro_h_streak">Save your streak</string>
+    <string name="pro_h_stats">See the full picture</string>
+    <string name="pro_h_share">Make your cards stand out</string>
+    <string name="pro_h_maps">Maps that work with no signal</string>
+    <string name="pro_h_comps">Start your own competitions</string>
+    <string name="pro_f_ai">Unlimited AI meal photos and label reading</string>
+    <string name="pro_f_scans">Unlimited barcode scans</string>
+    <string name="pro_f_meals">Full week meal plans, Ramadan mode and meal swaps</string>
+    <string name="pro_f_streak">3 streak freezes a month and streak repair</string>
+    <string name="pro_f_stats">Monthly and yearly trends, pace charts, splits and personal records</string>
+    <string name="pro_f_share">Premium share cards, route colours, no watermark</string>
+    <string name="pro_f_maps">Offline maps for walks with no signal</string>
+    <string name="pro_f_comps">Create competitions with your friends</string>
+    <string name="pro_plan_yearly">Yearly</string>
+    <string name="pro_plan_monthly">Monthly</string>
+    <string name="pro_plan_lifetime">Lifetime</string>
+    <string name="pro_per_year">%1$s a year</string>
+    <string name="pro_per_month">%1$s a month</string>
+    <string name="pro_once">%1$s once</string>
+    <string name="pro_save">Save %1$d%%</string>
+    <string name="pro_no_subscription">No subscription</string>
+    <string name="pro_trial_days">%1$d-day free trial</string>
+    <string name="pro_start_trial">Start %1$d-day free trial</string>
+    <string name="pro_continue">Continue</string>
+    <string name="pro_restore">Restore</string>
+    <string name="pro_fine_print">Renews automatically. Cancel anytime in Google Play.</string>
+    <string name="pro_fine_print_once">One payment. Pro is yours forever.</string>
+    <string name="pro_store_unavailable">Google Play isn\'t available right now. Try again in a moment.</string>
+    <string name="pro_pending">Payment pending. Pro unlocks as soon as it goes through.</string>
+    <string name="pro_failed">The purchase didn\'t go through. Please try again.</string>
+    <string name="pro_welcome">Welcome to Rave Pro!</string>
+    <string name="pro_already">You have Rave Pro. Thank you!</string>
+    <string name="pro_settings_title">Rave Pro</string>
+    <string name="pro_settings_free">Unlock everything from $1.99 a month</string>
+    <string name="pro_settings_active">Active. Thanks for supporting Rave!</string>
+    <!-- Offline maps (Pro) -->
+    <string name="offline_title">Offline maps</string>
+    <string name="offline_row">Offline maps</string>
+    <string name="offline_body">Save the map around you so streets still show on walks with no signal. GPS tracking works offline either way.</string>
+    <string name="offline_radius">Area around you</string>
+    <string name="offline_km">%1$d km</string>
+    <string name="offline_save">Save this area</string>
+    <string name="offline_saving">Saving map… %1$d / %2$d</string>
+    <string name="offline_done">Saved %1$d map pieces. This area works offline now.</string>
+    <string name="offline_no_location">Couldn\'t get your location. Turn on location and try again.</string>
+    <string name="offline_failed">Couldn\'t download the map. Check your internet and try again.</string>
+    <string name="offline_unsupported">Offline maps need a map key (Mapbox or MapTiler) in the app config.</string>
+    <string name="offline_last">Last saved %1$s</string>
 </resources>

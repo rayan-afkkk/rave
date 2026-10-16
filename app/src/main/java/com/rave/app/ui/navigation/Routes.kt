@@ -56,3 +56,7 @@ import kotlinx.serialization.Serializable
 @Serializable data class FoodResultRoute(val barcode: String = "")
 @Serializable data object MealPlanRoute
 @Serializable data object FoodSettingsRoute
+
+// Rave Pro
+@Serializable data class PaywallRoute(val reason: String = "GENERAL")
+@Serializable data object OfflineMapsRoute

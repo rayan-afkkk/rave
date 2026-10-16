@@ -11,6 +11,7 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -54,6 +55,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.rave.app.BuildConfig
 import com.rave.app.R
+import com.rave.app.ui.theme.RaveTheme
 import com.rave.app.domain.model.DistanceUnit
 import com.rave.app.domain.model.NotificationCategory
 import com.rave.app.domain.model.ProfileVisibility
@@ -70,6 +72,7 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onPrivacyZones: () -> Unit,
     onBatteryGuide: () -> Unit,
+    onOfflineMaps: () -> Unit,
     onSignIn: () -> Unit,
     onAccountGone: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
@@ -77,6 +80,7 @@ fun SettingsScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val s = state.settings
     val context = LocalContext.current
+    val pro = com.rave.app.ui.pro.rememberPro()
     var dialog by rememberSaveable { mutableStateOf<String?>(null) }
 
     val exportedOk = stringResource(R.string.settings_export_done)
@@ -120,6 +124,20 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap),
         ) {
             // Account
+            com.rave.app.ui.components.SectionCard(
+                Modifier.fillMaxWidth(), color = RaveTheme.colors.tilePeach.container,
+                onClick = { pro.upgrade(com.rave.app.data.billing.ProReason.GENERAL) },
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    com.rave.app.ui.pro.ProBadge()
+                    Spacer(Modifier.width(10.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(stringResource(R.string.pro_settings_title), style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(if (pro.isPro) R.string.pro_settings_active else R.string.pro_settings_free),
+                            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
             SettingsSection(stringResource(R.string.settings_account)) {
                 if (state.user != null) {
                     ValueRow(stringResource(R.string.settings_signed_in_as), state.user?.email ?: state.user?.name.orEmpty())
@@ -158,6 +176,7 @@ fun SettingsScreen(
             // Tracking
             SettingsSection(stringResource(R.string.settings_tracking)) {
                 NavRow(stringResource(R.string.battery_settings_row), onClick = onBatteryGuide)
+                NavRow(stringResource(R.string.offline_row), onClick = onOfflineMaps)
                 SwitchRow(stringResource(R.string.settings_auto_pause), stringResource(R.string.settings_auto_pause_help), s.autoPause) { on ->
                     viewModel.update { it.copy(autoPause = on) }
                 }

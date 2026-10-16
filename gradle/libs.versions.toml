@@ -28,6 +28,7 @@ camerax = "1.4.2"
 mlkitBarcode = "17.3.0"
 mlkitText = "16.0.1"
 okhttp = "4.12.0"
+billing = "7.1.1"
 zxing = "3.5.3"
 installReferrer = "2.2"
 junit = "4.13.2"
@@ -100,6 +101,7 @@ androidx-camera-view = { group = "androidx.camera", name = "camera-view", versio
 mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "mlkitBarcode" }
 mlkit-text-recognition = { group = "com.google.mlkit", name = "text-recognition", version.ref = "mlkitText" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+billing-ktx = { group = "com.android.billingclient", name = "billing-ktx", version.ref = "billing" }
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
 installreferrer = { group = "com.android.installreferrer", name = "installreferrer", version.ref = "installReferrer" }
 

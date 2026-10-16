@@ -149,6 +149,7 @@ fun RaveNavHost(
                 onBack = back,
                 onPrivacyZones = { navController.navigate(PrivacyZonesRoute) },
                 onBatteryGuide = { navController.navigate(BatteryGuideRoute) },
+                onOfflineMaps = { navController.navigate(OfflineMapsRoute) },
                 onSignIn = { navController.navigate(SignInRoute) },
                 onAccountGone = { navController.navigate(OnboardingRoute) { popUpTo(navController.graph.id) { inclusive = true } } },
             )
@@ -156,6 +157,10 @@ fun RaveNavHost(
         composable<PrivacyZonesRoute> { PrivacyZonesScreen(onBack = back) }
         composable<BatteryGuideRoute> { com.rave.app.ui.settings.BatteryGuideScreen(onBack = back) }
         composable<WrappedRoute> { com.rave.app.ui.wrapped.WrappedScreen(onBack = back) }
+
+        // ---- Pro ----
+        composable<PaywallRoute> { com.rave.app.ui.pro.PaywallScreen(onClose = back) }
+        composable<OfflineMapsRoute> { com.rave.app.ui.settings.OfflineMapsScreen(onBack = back) }
 
         // ---- Food ----
         composable<FoodRoute> {

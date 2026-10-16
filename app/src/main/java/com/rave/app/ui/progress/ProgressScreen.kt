@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +50,7 @@ import java.util.Locale
 @Composable
 fun ProgressScreen(onBack: () -> Unit, viewModel: ProgressViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val pro = com.rave.app.ui.pro.rememberPro()
     RaveScreen(title = stringResource(R.string.progress_title), onBack = onBack) {
         if (state.loading) {
             LoadingState()
@@ -108,7 +110,11 @@ fun ProgressScreen(onBack: () -> Unit, viewModel: ProgressViewModel = hiltViewMo
                         modifier = Modifier.weight(1f))
                     PillChip(state.chartMode == ChartMode.WEEKLY, stringResource(R.string.progress_weekly), { viewModel.setMode(ChartMode.WEEKLY) })
                     Spacer(Modifier.width(6.dp))
-                    PillChip(state.chartMode == ChartMode.MONTHLY, stringResource(R.string.progress_monthly), { viewModel.setMode(ChartMode.MONTHLY) })
+                    PillChip(state.chartMode == ChartMode.MONTHLY, stringResource(R.string.progress_monthly),
+                        { pro.gate(com.rave.app.data.billing.ProReason.STATS) { viewModel.setMode(ChartMode.MONTHLY) } })
+                    Spacer(Modifier.width(6.dp))
+                    PillChip(state.chartMode == ChartMode.YEARLY, stringResource(R.string.progress_yearly),
+                        { pro.gate(com.rave.app.data.billing.ProReason.STATS) { viewModel.setMode(ChartMode.YEARLY) } })
                 }
                 Spacer(Modifier.height(12.dp))
                 BarChart(
@@ -121,6 +127,11 @@ fun ProgressScreen(onBack: () -> Unit, viewModel: ProgressViewModel = hiltViewMo
                         Modifier.weight(1f), unit = unitLabel(state.unit))
                     StatItem(state.stats.totalActivities.toString(), stringResource(R.string.profile_total_activities), Modifier.weight(1f))
                 }
+            }
+
+            // Personal records (Pro)
+            com.rave.app.ui.pro.ProLock(pro, com.rave.app.data.billing.ProReason.STATS, stringResource(R.string.progress_records_locked)) {
+                RecordsCard(state)
             }
 
             // Best streaks
@@ -144,3 +155,32 @@ fun ProgressScreen(onBack: () -> Unit, viewModel: ProgressViewModel = hiltViewMo
     }
 }
 
+@Composable
+private fun RecordsCard(state: ProgressState) {
+    SectionCard(Modifier.fillMaxWidth()) {
+        Text(stringResource(R.string.progress_records), style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(8.dp))
+        if (state.records.isEmpty()) {
+            Text(stringResource(R.string.progress_records_empty), style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        val fmt = java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy", Locale.getDefault())
+        state.records.forEach { r ->
+            Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Rounded.EmojiEvents, null, tint = RaveTheme.colors.tilePeach.content, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(com.rave.app.ui.pbTagRes(r.tag)), style = MaterialTheme.typography.bodyMedium)
+                    Text("${r.name.ifBlank { "—" }} · ${r.date.format(fmt)}", style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                val value = if (r.tag == com.rave.app.domain.model.PbTag.LONGEST_DISTANCE) {
+                    "${com.rave.app.domain.util.Format.distance(r.distanceM, state.unit)} ${com.rave.app.ui.unitLabel(state.unit)}"
+                } else {
+                    "${com.rave.app.domain.util.Format.pace(r.paceSPerKm, state.unit)} ${com.rave.app.ui.paceUnitLabel(state.unit)}"
+                }
+                Text(value, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            }
+        }
+    }
+}

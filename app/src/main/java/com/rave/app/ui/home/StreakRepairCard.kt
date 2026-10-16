@@ -45,6 +45,7 @@ class StreakRepairViewModel @Inject constructor(private val streaks: StreakRepos
 @Composable
 fun StreakRepairCard(modifier: Modifier = Modifier, viewModel: StreakRepairViewModel = hiltViewModel()) {
     val offer by viewModel.offer.collectAsStateWithLifecycle()
+    val pro = com.rave.app.ui.pro.rememberPro()
     AnimatedVisibility(visible = offer != null, modifier = modifier) {
         val o = offer ?: return@AnimatedVisibility
         SectionCard(Modifier.fillMaxWidth(), color = RaveTheme.colors.tilePeach.container) {
@@ -60,7 +61,8 @@ fun StreakRepairCard(modifier: Modifier = Modifier, viewModel: StreakRepairViewM
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
                 TextButton(onClick = viewModel::dismiss) { Text(stringResource(R.string.action_not_now)) }
-                PillButton(stringResource(R.string.repair_action), onClick = { viewModel.repair(o) })
+                PillButton(stringResource(R.string.repair_action), onClick = { pro.gate(com.rave.app.data.billing.ProReason.STREAK) { viewModel.repair(o) } },
+                    icon = if (pro.isPro) null else androidx.compose.material.icons.Icons.Rounded.WorkspacePremium)
             }
         }
     }

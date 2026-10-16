@@ -97,6 +97,7 @@ class CompetitionResultViewModel @Inject constructor(
 @Composable
 fun CompetitionResultScreen(onBack: () -> Unit, viewModel: CompetitionResultViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val pro = com.rave.app.ui.pro.rememberPro()
     LaunchedEffect(state.ranked) { viewModel.recordWinIfMine(state) }
     RaveScreen(title = stringResource(R.string.comp_results), onBack = onBack) {
         val c = state.competition
@@ -119,7 +120,10 @@ fun CompetitionResultScreen(onBack: () -> Unit, viewModel: CompetitionResultView
                     color = MaterialTheme.colorScheme.primary, modifier = Modifier.fillMaxWidth())
             }
             Spacer(Modifier.height(8.dp))
-            SharePager(fileName = "competition-${c.id}", shareText = text, modifier = Modifier.weight(1f)) { _, palette ->
+            SharePager(
+                fileName = "competition-${c.id}", shareText = text, modifier = Modifier.weight(1f),
+                isPro = pro.isPro, onUpgrade = { pro.upgrade(com.rave.app.data.billing.ProReason.SHARE) },
+            ) { _, palette ->
                 ResultCard(c, state, palette)
             }
         }
@@ -144,7 +148,7 @@ private fun BoxScope.ResultCard(c: Competition, state: ResultState, p: SharePale
         Spacer(Modifier.height(18.dp))
         c.stake?.let { Text(stringResource(R.string.competition_stake, it), style = style(13, FontWeight.SemiBold), color = p.secondaryText) }
         Spacer(Modifier.height(10.dp))
-        Text(stringResource(R.string.app_name).uppercase(), style = style(12, FontWeight.Bold), color = p.accent)
+        if (p.watermark) Text(stringResource(R.string.share_made_with).uppercase(), style = style(12, FontWeight.Bold), color = p.accent)
     }
 }
 

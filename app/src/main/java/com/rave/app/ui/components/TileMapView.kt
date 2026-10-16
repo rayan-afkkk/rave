@@ -51,6 +51,7 @@ import com.rave.app.R
 import okhttp3.OkHttpClient
 import com.rave.app.domain.model.LatLngPoint
 import com.rave.app.ui.theme.RaveTheme
+import kotlinx.coroutines.async
 import kotlin.math.PI
 import kotlin.math.atan
 import kotlin.math.cos
@@ -330,7 +331,7 @@ fun TileMapView(
 }
 
 /** Tile source in priority order: Mapbox -> MapTiler -> TomTom -> OpenStreetMap (no key needed). */
-private enum class TileProvider(val attribution: String) {
+internal enum class TileProvider(val attribution: String) {
     MAPBOX("© Mapbox © OpenStreetMap"),
     MAPTILER("© MapTiler © OpenStreetMap contributors"),
     TOMTOM("© TomTom"),
@@ -368,7 +369,7 @@ private enum class TileProvider(val attribution: String) {
  * - keeps up to 250 MB of tiles on disk and reuses them without re-checking, so areas you have
  *   already seen still show when you are offline.
  */
-private object TileImageLoader {
+internal object TileImageLoader {
     @Volatile private var instance: ImageLoader? = null
 
     fun get(context: Context): ImageLoader = instance ?: synchronized(this) {
@@ -409,4 +410,63 @@ private fun latToWorldY(lat: Double, scale: Double): Double {
 private fun worldYToLat(worldY: Double, scale: Double): Double {
     val n = PI - 2.0 * PI * (worldY / scale)
     return 180.0 / PI * atan(sinh(n))
+}
+
+/**
+ * Saves map tiles around a point into the same disk cache [TileMapView] reads from, so the map
+ * still shows streets on walks with no signal (Rave Pro). Not offered for the OpenStreetMap
+ * fallback, whose usage policy forbids bulk downloads.
+ */
+object OfflineTiles {
+    private const val MIN_ZOOM = 12
+    private const val MAX_ZOOM = 16
+    private const val MAX_TILES = 1_500
+    private const val PARALLEL = 6
+
+    val supported: Boolean get() = TileProvider.resolve() != TileProvider.OSM
+
+    /** Tiles covering [radiusKm] around the point, most detailed zooms dropped first if it gets too big. */
+    fun tiles(lat: Double, lng: Double, radiusKm: Double): List<Triple<Int, Int, Int>> {
+        val dLat = radiusKm / 111.32
+        val dLng = radiusKm / (111.32 * cos(lat * PI / 180.0)).coerceAtLeast(0.01)
+        var maxZoom = MAX_ZOOM
+        while (true) {
+            val out = mutableListOf<Triple<Int, Int, Int>>()
+            for (z in MIN_ZOOM..maxZoom) {
+                val n = 2.0.pow(z)
+                val x0 = floor(lngToWorldX(lng - dLng, n)).toInt(); val x1 = floor(lngToWorldX(lng + dLng, n)).toInt()
+                val y0 = floor(latToWorldY(lat + dLat, n)).toInt(); val y1 = floor(latToWorldY(lat - dLat, n)).toInt()
+                for (x in x0..x1) for (y in y0..y1) out += Triple(z, x, y)
+            }
+            if (out.size <= MAX_TILES || maxZoom == MIN_ZOOM) return out
+            maxZoom--
+        }
+    }
+
+    /** Downloads the tiles; returns how many were saved. [onProgress] gets (done, total). */
+    suspend fun download(
+        context: Context, lat: Double, lng: Double, radiusKm: Double, dark: Boolean,
+        onProgress: (Int, Int) -> Unit,
+    ): Int = kotlinx.coroutines.coroutineScope {
+        val provider = TileProvider.resolve()
+        val loader = TileImageLoader.get(context)
+        val list = tiles(lat, lng, radiusKm)
+        val gate = kotlinx.coroutines.sync.Semaphore(PARALLEL)
+        val done = java.util.concurrent.atomic.AtomicInteger(0)
+        val saved = java.util.concurrent.atomic.AtomicInteger(0)
+        list.map { (z, x, y) ->
+            async {
+                gate.acquire()
+                try {
+                    val request = coil.request.ImageRequest.Builder(context).data(provider.url(z, x, y, dark))
+                        .memoryCachePolicy(coil.request.CachePolicy.DISABLED).build()
+                    if (loader.execute(request) is coil.request.SuccessResult) saved.incrementAndGet()
+                } finally {
+                    gate.release()
+                    onProgress(done.incrementAndGet(), list.size)
+                }
+            }
+        }.forEach { it.await() }
+        saved.get()
+    }
 }

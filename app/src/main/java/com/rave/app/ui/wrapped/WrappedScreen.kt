@@ -272,7 +272,8 @@ private fun BoxScope.ShareFinale(s: WrappedSummary) {
             modifier = Modifier.align(Alignment.CenterHorizontally))
         Text(persona, color = colors.splashMark, style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold),
             modifier = Modifier.align(Alignment.CenterHorizontally))
-        SharePager(fileName = "rave-wrapped-${s.year}", shareText = text, modifier = Modifier.weight(1f).padding(top = 8.dp)) { _, palette ->
+        // Wrapped is free marketing: every template is open to everyone.
+        SharePager(fileName = "rave-wrapped-${s.year}", shareText = text, modifier = Modifier.weight(1f).padding(top = 8.dp), isPro = true) { _, palette ->
             WrappedCard(s, persona, palette)
         }
     }

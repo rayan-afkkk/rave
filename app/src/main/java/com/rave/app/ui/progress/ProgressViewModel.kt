@@ -29,11 +29,14 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
+import com.rave.app.data.local.pbTagSet
 import javax.inject.Inject
 
-enum class ChartMode { WEEKLY, MONTHLY }
+enum class ChartMode { WEEKLY, MONTHLY, YEARLY }
 
 data class WeekRow(val label: String, val color: HabitColor?, val type: ActivityType?, val values: List<Float>)
+/** A personal best set on an activity (fastest 1k/5k, longest distance). */
+data class RecordRow(val tag: com.rave.app.domain.model.PbTag, val activityId: Long, val name: String, val date: LocalDate, val distanceM: Double, val paceSPerKm: Double?)
 data class StreakRow(val name: String, val color: HabitColor, val current: Int, val best: Int)
 
 data class ProgressState(
@@ -47,6 +50,7 @@ data class ProgressState(
     val chartValues: List<Double> = emptyList(),
     val chartLabels: List<String> = emptyList(),
     val streaks: List<StreakRow> = emptyList(),
+    val records: List<RecordRow> = emptyList(),
     val stats: ProfileStats = ProfileStats(),
     val unit: DistanceUnit = DistanceUnit.KM,
 )
@@ -64,7 +68,7 @@ class ProgressViewModel @Inject constructor(
     private val mode = MutableStateFlow(ChartMode.WEEKLY)
 
     private val data = time.todayFlow.flatMapLatest { today ->
-        val from = today.minusDays(190)
+        val from = today.minusYears(YEARS_SHOWN.toLong())
         combine(
             habits.observeHabits(),
             habits.observeLogsBetween(from, today),
@@ -136,10 +140,15 @@ class ProgressViewModel @Inject constructor(
                     .sumOf { it.distanceM } / unit.meters
                 km to "${start.dayOfMonth}/${start.monthValue}"
             }.unzip()
-            ChartMode.MONTHLY -> (5 downTo 0).map { back ->
+            ChartMode.MONTHLY -> (11 downTo 0).map { back ->
                 val ym = month.minusMonths(back.toLong())
                 val km = d.activities.filter { YearMonth.from(time.dateOf(it.startTime)) == ym }.sumOf { it.distanceM } / unit.meters
-                km to ym.month.getDisplayName(TextStyle.SHORT, locale)
+                km to ym.month.getDisplayName(TextStyle.NARROW, locale)
+            }.unzip()
+            ChartMode.YEARLY -> (YEARS_SHOWN - 1 downTo 0).map { back ->
+                val year = d.today.year - back
+                val km = d.activities.filter { time.dateOf(it.startTime).year == year }.sumOf { it.distanceM } / unit.meters
+                km to year.toString()
             }.unzip()
         }
 
@@ -159,6 +168,12 @@ class ProgressViewModel @Inject constructor(
             }.sortedByDescending { it.best },
             stats = stats,
             unit = unit,
+            records = d.activities.sortedByDescending { it.startTime }.flatMap { a ->
+                a.pbTagSet.map { RecordRow(it, a.id, a.name, time.dateOf(a.startTime), a.distanceM, a.avgPaceSPerKm) }
+            }.take(MAX_RECORDS),
         )
     }
 }
+
+private const val YEARS_SHOWN = 4
+private const val MAX_RECORDS = 12

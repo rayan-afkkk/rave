@@ -38,8 +38,8 @@ data class StreakReplay(
  *   (no streak resets, nothing increments for the missed habits).
  * - Otherwise MISSED resets that habit's streak and the overall streak.
  * - Every 7th consecutive overall day earns a freeze (max [MAX_FREEZES]).
- * - With [monthlyFreeze], one free freeze is added on the first tracked day and on the 1st of
- *   every month (still capped at [MAX_FREEZES]).
+ * - [monthlyFreezes] free freezes are added on the first tracked day and on the 1st of every
+ *   month (1 free, 3 with Rave Pro; still capped at [MAX_FREEZES]).
  * - A day in [repairedDays] that would break the streak is covered without using a freeze
  *   (streak repair).
  * - Skipping keeps a streak but doesn't grow it. Days with nothing due are neutral.
@@ -55,7 +55,7 @@ object StreakEngine {
         logs: List<HabitLog>,
         through: LocalDate,
         bonusFreezes: Int = 0,
-        monthlyFreeze: Boolean = false,
+        monthlyFreezes: Int = 0,
         repairedDays: Set<LocalDate> = emptySet(),
     ): StreakReplay {
         val perHabit = habits.associate { it.id to StreakState() }.toMutableMap()
@@ -74,7 +74,7 @@ object StreakEngine {
 
         var day: LocalDate = start
         while (!day.isAfter(through)) {
-            if (monthlyFreeze && (day == start || day.dayOfMonth == 1) && freezes < MAX_FREEZES) freezes++
+            if (monthlyFreezes > 0 && (day == start || day.dayOfMonth == 1)) freezes = minOf(MAX_FREEZES, freezes + monthlyFreezes)
             val statuses = mutableMapOf<Long, DayStatus>()
             for (habit in habits) {
                 if (!habit.isActiveOn(day)) continue

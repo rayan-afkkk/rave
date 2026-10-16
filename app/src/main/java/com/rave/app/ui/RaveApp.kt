@@ -118,6 +118,11 @@ fun RaveApp(viewModel: MainViewModel, navController: NavHostController = remembe
         }
     }
     // An invite captured before sign-up (install referrer / link) resumes once onboarding is done.
+    LaunchedEffect(Unit) {
+        viewModel.paywallRequests.collect { reason ->
+            navController.navigate(com.rave.app.ui.navigation.PaywallRoute(reason.name)) { launchSingleTop = true }
+        }
+    }
     LaunchedEffect(pendingInvite, onboardingDone) {
         val code = pendingInvite ?: return@LaunchedEffect
         if (onboardingDone && deepLink == null && !onOnboarding) navController.navigate(InviteLandingRoute(code)) { launchSingleTop = true }

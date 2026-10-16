@@ -157,7 +157,7 @@ class FoodViewModel @Inject constructor(
 
     private fun runScan(source: FoodSource, onReady: () -> Unit, block: suspend () -> com.rave.app.domain.food.ScannedFood?) {
         viewModelScope.launch {
-            if (!food.canScan(source)) { _message.value = R.string.food_limit_reached; return@launch }
+            if (!food.canScan(source)) { _message.value = R.string.food_limit_reached; food.showScanPaywall(source); return@launch }
             _busy.value = true
             val result = runCatching { block() }.getOrElse { _message.value = R.string.food_label_failed; null }
             _busy.value = false

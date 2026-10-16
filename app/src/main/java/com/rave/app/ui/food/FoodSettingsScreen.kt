@@ -62,6 +62,7 @@ class FoodSettingsViewModel @Inject constructor(private val settings: SettingsRe
 fun FoodSettingsScreen(onBack: () -> Unit, viewModel: FoodSettingsViewModel = hiltViewModel()) {
     val s by viewModel.state.collectAsStateWithLifecycle()
     val target by viewModel.target.collectAsStateWithLifecycle()
+    val pro = com.rave.app.ui.pro.rememberPro()
     val st = s ?: return
     RaveScreen(title = stringResource(R.string.food_settings_title), onBack = onBack) {
         Column(
@@ -108,8 +109,8 @@ fun FoodSettingsScreen(onBack: () -> Unit, viewModel: FoodSettingsViewModel = hi
                 ToggleRow(stringResource(R.string.food_vegetarian), null, st.food.vegetarian) { on ->
                     viewModel.update { it.copy(food = it.food.copy(vegetarian = on)) }
                 }
-                ToggleRow(stringResource(R.string.food_ramadan), stringResource(R.string.food_ramadan_help), st.ramadanMeals) { on ->
-                    viewModel.update { it.copy(ramadanMeals = on) }
+                ToggleRow(stringResource(R.string.food_ramadan), stringResource(R.string.food_ramadan_help), st.ramadanMeals && pro.isPro) { on ->
+                    pro.gate(com.rave.app.data.billing.ProReason.MEAL_PLAN) { viewModel.update { it.copy(ramadanMeals = on) } }
                 }
                 ToggleRow(stringResource(R.string.food_budget), stringResource(R.string.food_budget_help), st.budgetMeals) { on ->
                     viewModel.update { it.copy(budgetMeals = on) }

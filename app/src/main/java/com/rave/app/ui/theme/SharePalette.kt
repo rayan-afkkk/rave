@@ -4,8 +4,11 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
-/** Share-card templates. Cards look the same in light and dark app themes. */
-enum class ShareTemplate { WARM, DARK, MINIMAL, STICKER }
+/** Share-card templates. Cards look the same in light and dark app themes. [premium] ones need Rave Pro. */
+enum class ShareTemplate(val premium: Boolean) { WARM(false), STICKER(false), DARK(true), MINIMAL(true), NIGHT(true), SUNSET(true) }
+
+/** Route colours Pro users can pick on share cards (null = the template's own colour). */
+val ShareRouteColors: List<Color?> = listOf(null, White, RouteBlue, RouteGreen, RoutePink, RouteGold)
 
 @Immutable
 data class SharePalette(
@@ -17,6 +20,8 @@ data class SharePalette(
     /** Sticker template draws text with a soft shadow so it reads on any photo. */
     val shadow: Boolean = false,
     val shadowColor: Color = Color.Transparent,
+    /** Free users' cards say "Made with Rave"; Pro cards don't. */
+    val watermark: Boolean = true,
 )
 
 fun ShareTemplate.palette(): SharePalette = when (this) {
@@ -32,6 +37,14 @@ fun ShareTemplate.palette(): SharePalette = when (this) {
     ShareTemplate.MINIMAL -> SharePalette(
         background = Brush.verticalGradient(listOf(White, White)),
         text = LightTextPrimary, secondaryText = LightTextSecondary, route = LightAccent, accent = LightAccent,
+    )
+    ShareTemplate.NIGHT -> SharePalette(
+        background = Brush.verticalGradient(listOf(ShareNightTop, ShareNightBottom)),
+        text = ShareNightText, secondaryText = ShareNightMuted, route = ShareNeon, accent = ShareNeon,
+    )
+    ShareTemplate.SUNSET -> SharePalette(
+        background = Brush.linearGradient(listOf(ShareSunsetA, ShareSunsetB, ShareSunsetC)),
+        text = White, secondaryText = White.copy(alpha = 0.82f), route = White, accent = White,
     )
     ShareTemplate.STICKER -> SharePalette(
         background = null,
