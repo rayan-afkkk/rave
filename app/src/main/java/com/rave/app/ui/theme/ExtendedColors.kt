@@ -50,6 +50,18 @@ data class ExtendedColors(
     val onHighlight: Color = BentoInk,
     /** Big call-to-action tile ("Start a walk"). */
     val cta: TileColor = TileColor(BentoOrange, BentoInk),
+    /** Bento tiles beyond the four habit tiles. */
+    val tileYellow: TileColor = TileColor(TileYellow, OnTileYellow),
+    val tileOrange: TileColor = TileColor(BentoOrange, BentoInk),
+    val tileInk: TileColor = TileColor(BentoInk, White),
+    val tileSand: TileColor = TileColor(BentoSand, BentoInk),
+    /** Raised surface on an ink tile (Pause button, unselected plan rows). */
+    val inkRaised: Color = BentoInkSoft,
+    /** Bold verdict hero colours (Scan result, recent scans). */
+    val verdictHeroGo: TileColor = TileColor(BentoLime, BentoInk),
+    val verdictHeroSometimes: TileColor = TileColor(TileYellow, BentoInk),
+    val verdictHeroSkip: TileColor = TileColor(TileCoral, BentoInk),
+    val verdictChipSkip: TileColor = TileColor(TileCoralSoft, BentoInk),
 ) {
     val tiles: List<TileColor> get() = listOf(tilePeach, tileGreen, tilePink, tileBlue)
 }

@@ -44,6 +44,12 @@ internal val BentoLime = Color(0xFFD7F36B)
 internal val BentoOrange = Color(0xFFFF7A2E)
 internal val BentoInk = Color(0xFF111111)
 internal val NavInactive = Color(0xFF8A8A8A)
+internal val TileYellow = Color(0xFFFFE08A)
+internal val OnTileYellow = Color(0xFF5A4300)
+internal val TileCoral = Color(0xFFFF6B5A)
+internal val TileCoralSoft = Color(0xFFFFB4A8)
+internal val BentoSand = Color(0xFFECE6D8)
+internal val BentoInkSoft = Color(0xFF2A2A2A)
 
 // ---- Splash (same in light and dark: the brand launch screen is always black) ----
 internal val SplashBackground = Color(0xFF17110E)
