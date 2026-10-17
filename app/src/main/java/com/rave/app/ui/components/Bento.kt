@@ -1,5 +1,15 @@
 package com.rave.app.ui.components
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.composed
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -54,8 +64,8 @@ fun BentoTile(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
-        modifier.clip(BentoTileShape).background(color)
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+        modifier.then(if (onClick != null) Modifier.pressable(BentoTileShape, onClick = onClick, pressedScale = 0.97f) else Modifier)
+            .clip(BentoTileShape).background(color)
             .padding(padding),
         content = content,
     )
@@ -110,8 +120,8 @@ fun BentoChip(
     onClick: (() -> Unit)? = null,
 ) {
     Row(
-        modifier.clip(BentoPillShape).background(container)
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+        modifier.then(if (onClick != null) Modifier.pressable(BentoPillShape, onClick = onClick) else Modifier)
+            .clip(BentoPillShape).background(container)
             .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -137,8 +147,9 @@ fun BentoButton(
     height: Dp = 50.dp,
 ) {
     Row(
-        modifier.height(height).clip(BentoPillShape).background(if (enabled) container else container.copy(alpha = 0.4f))
-            .clickable(enabled = enabled, onClick = onClick).padding(horizontal = 18.dp),
+        modifier.height(height).pressable(BentoPillShape, enabled = enabled, onClick = onClick)
+            .clip(BentoPillShape).background(if (enabled) container else container.copy(alpha = 0.4f))
+            .padding(horizontal = 18.dp),
         horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
     ) {
         if (leading != null) {
@@ -165,7 +176,7 @@ fun BentoIconButton(
     size: Dp = 42.dp,
 ) {
     Box(
-        modifier.size(size).clip(BentoSquareShape).background(container).clickable(onClick = onClick),
+        modifier.size(size).pressable(BentoSquareShape, onClick = onClick, pressedScale = 0.9f).clip(BentoSquareShape).background(container),
         contentAlignment = Alignment.Center,
     ) { Icon(icon, contentDescription, tint = content, modifier = Modifier.size(24.dp)) }
 }
@@ -219,4 +230,27 @@ fun BentoOutlinedCard(modifier: Modifier = Modifier, content: @Composable Column
             .border(2.dp, MaterialTheme.colorScheme.onBackground, BentoTileShape).padding(14.dp),
         content = content,
     )
+}
+
+/**
+ * Click with a springy press: the element shrinks slightly while held and bounces back.
+ * The scale is applied in the draw layer, so pressing never triggers a relayout. The ripple is
+ * clipped to [shape].
+ */
+fun Modifier.pressable(
+    shape: androidx.compose.ui.graphics.Shape,
+    enabled: Boolean = true,
+    pressedScale: Float = 0.95f,
+    onClick: () -> Unit,
+): Modifier = composed {
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        if (pressed) pressedScale else 1f,
+        spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+        label = "press",
+    )
+    this
+        .graphicsLayer { scaleX = scale; scaleY = scale; this.shape = shape; clip = true }
+        .clickable(interactionSource = interaction, indication = LocalIndication.current, enabled = enabled, onClick = onClick)
 }

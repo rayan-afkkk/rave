@@ -2,6 +2,7 @@ package com.rave.app.ui.home
 
 import android.Manifest
 import com.rave.app.ui.components.SmoothCornerShape
+import com.rave.app.ui.components.pressable
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -81,7 +82,8 @@ private fun Big(text: String, color: Color, size: TextUnit = 32.sp) {
 @Composable
 private fun Tile(color: Color, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null, content: @Composable () -> Unit) {
     Box(
-        modifier.clip(TileShape).background(color).then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier).padding(TilePad),
+        modifier.then(if (onClick != null) Modifier.pressable(TileShape, pressedScale = 0.97f, onClick = onClick) else Modifier)
+            .clip(TileShape).background(color).padding(TilePad),
     ) { content() }
 }
 

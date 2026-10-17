@@ -1,6 +1,8 @@
 package com.rave.app.ui.onboarding
 
 import android.Manifest
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.text.BasicTextField
@@ -174,7 +176,7 @@ fun OnboardingScreen(
                 )
                 else -> {
                     val s = story.getValue(page)
-                    StoryLayout(offset, index, s.tile(), s.title, s.body) {
+                    StoryLayout(offset, index, active, s.tile(), s.title, s.body) {
                         when (page) {
                             Page.WELCOME -> WelcomeArt(active, Modifier.fillMaxSize())
                             Page.HABITS -> HabitsArt(active, Modifier.fillMaxSize())
@@ -223,7 +225,17 @@ fun OnboardingScreen(
 
 /** Big colour tile with the illustration, then a step label, bold headline and body. */
 @Composable
-private fun StoryLayout(offset: Float, index: Int, tile: TileColor, title: Int, body: Int, art: @Composable () -> Unit) {
+private fun StoryLayout(offset: Float, index: Int, active: Boolean, tile: TileColor, title: Int, body: Int, art: @Composable () -> Unit) {
+    // Text rises in (kicker, headline, body one after another) each time the page is reached.
+    val rise = remember { Animatable(0f) }
+    LaunchedEffect(active) {
+        if (active) { rise.snapTo(0f); rise.animateTo(1f, tween(650, easing = FastOutSlowInEasing)) }
+    }
+    fun Modifier.rise(order: Int) = graphicsLayer {
+        val t = ((rise.value - order * 0.15f) / 0.7f).coerceIn(0f, 1f)
+        alpha = t
+        translationY = (1f - t) * 28.dp.toPx()
+    }
     Column(Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
         Box(
             Modifier.weight(1f).fillMaxWidth()
@@ -242,13 +254,13 @@ private fun StoryLayout(offset: Float, index: Int, tile: TileColor, title: Int, 
                 alpha = 1f - abs(offset).coerceAtMost(1f)
             },
         ) {
-            BentoKicker("${index + 1} / ${STORY_PAGES.last + 1}", MaterialTheme.colorScheme.onBackground)
+            BentoKicker("${index + 1} / ${STORY_PAGES.last + 1}", MaterialTheme.colorScheme.onBackground, Modifier.rise(0))
             Spacer(Modifier.height(6.dp))
             BentoBig(stringResource(title), MaterialTheme.colorScheme.onBackground, size = 30.sp, maxLines = 2,
-                modifier = Modifier.semantics { heading() })
+                modifier = Modifier.rise(1).semantics { heading() })
             Spacer(Modifier.height(8.dp))
             Text(stringResource(body), style = MaterialTheme.typography.bodyLarge.copy(fontSize = 15.sp, lineHeight = 21.sp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.rise(2))
         }
     }
 }

@@ -888,6 +888,9 @@ Permission was denied. You can turn it on in Settings.</string>
     <string name="onb_welcome_body">Your habits, walks, runs and workouts — all in one warm little place.</string>
     <string name="onb_workout_title">Log every set</string>
     <string name="onb_workout_body">Track exercises, sets and reps with a rest timer. Beat your last session and set new PRs.</string>
+    <string name="onb_chip_streak">🔥 12-day streak</string>
+    <string name="onb_chip_walk">🚶 3.4 km walk</string>
+    <string name="onb_chip_habits">✓ 4/4 habits</string>
     <string name="onb_cta_start">Let\'s go</string>
     <string name="onb_signin_title">One last thing</string>
     <string name="onb_signin_body">Sign in with Google to bring your friends along and keep your progress safe.</string>

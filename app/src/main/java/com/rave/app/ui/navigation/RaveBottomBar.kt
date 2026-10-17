@@ -1,10 +1,13 @@
 package com.rave.app.ui.navigation
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.ui.draw.shadow
 import androidx.compose.foundation.shape.CircleShape
@@ -112,6 +115,14 @@ private fun NavItem(
         targetValue = if (selected) RaveTheme.colors.navActive.copy(alpha = 0.14f) else Color.Transparent,
         label = "navIndicator",
     )
+    // The icon pops a little when its tab becomes selected.
+    val bounce = remember { Animatable(1f) }
+    LaunchedEffect(selected) {
+        if (selected) {
+            bounce.snapTo(0.7f)
+            bounce.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMediumLow))
+        }
+    }
     Column(
         modifier = modifier
             .fillMaxHeight()
@@ -135,7 +146,7 @@ private fun NavItem(
                 // The label below already describes the item for TalkBack.
                 contentDescription = null,
                 tint = tint,
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(22.dp).graphicsLayer { scaleX = bounce.value; scaleY = bounce.value },
             )
         }
         Text(

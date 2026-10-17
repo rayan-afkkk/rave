@@ -41,6 +41,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -55,6 +56,7 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.rave.app.R
 import com.rave.app.ui.components.RaveLogo
 import com.rave.app.ui.theme.RaveTheme
 import com.rave.app.ui.theme.TileColor
@@ -120,10 +122,29 @@ fun WelcomeArt(active: Boolean, modifier: Modifier = Modifier) {
         RaveLogo(
             color = accent,
             progress = intro.segment(0.15f, 1f),
-            modifier = Modifier.size(104.dp).graphicsLayer {
+            modifier = Modifier.size(120.dp).graphicsLayer {
                 scaleX = flicker; scaleY = flicker
             },
         )
+        // Little stat chips pop in around the logo.
+        val chips = listOf(
+            Triple(R.string.onb_chip_streak, Alignment.TopStart, 0.45f),
+            Triple(R.string.onb_chip_walk, Alignment.CenterEnd, 0.6f),
+            Triple(R.string.onb_chip_habits, Alignment.BottomStart, 0.75f),
+        )
+        chips.forEach { (text, align, at) ->
+            val pop = intro.segment(at, at + 0.2f)
+            Text(
+                stringResource(text),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.align(align).padding(18.dp)
+                    .graphicsLayer { alpha = pop; scaleX = 0.6f + 0.4f * pop; scaleY = 0.6f + 0.4f * pop }
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(50))
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(horizontal = 14.dp, vertical = 8.dp),
+            )
+        }
     }
 }
 
