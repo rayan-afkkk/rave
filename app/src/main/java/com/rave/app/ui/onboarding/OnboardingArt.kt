@@ -128,8 +128,8 @@ fun WelcomeArt(active: Boolean, modifier: Modifier = Modifier) {
         )
         // Little stat chips pop in around the logo.
         val chips = listOf(
-            Triple(R.string.onb_chip_streak, Alignment.TopStart, 0.45f),
-            Triple(R.string.onb_chip_walk, Alignment.CenterEnd, 0.6f),
+            Triple(R.string.onb_chip_streak, Alignment.TopEnd, 0.45f),
+            Triple(R.string.onb_chip_walk, Alignment.BottomEnd, 0.6f),
             Triple(R.string.onb_chip_habits, Alignment.BottomStart, 0.75f),
         )
         chips.forEach { (text, align, at) ->
