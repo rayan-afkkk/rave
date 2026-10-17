@@ -25,10 +25,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.DocumentScanner
-import androidx.compose.material.icons.rounded.PhotoCamera
 import androidx.compose.material.icons.rounded.QrCodeScanner
 import androidx.compose.material.icons.rounded.RestaurantMenu
 import androidx.compose.material3.CircularProgressIndicator
@@ -60,8 +60,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material.icons.rounded.Remove
 import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.ui.draw.drawBehind
@@ -169,14 +167,6 @@ class FoodViewModel @Inject constructor(
         result
     }
 
-    /** Meal photo → Gemini → result screen. */
-    fun analyzePhoto(uri: Uri, onReady: () -> Unit) = runScan(FoodSource.PHOTO, onReady) {
-        if (!ai.isAvailable) { _message.value = R.string.food_photo_unavailable; return@runScan null }
-        val bitmap = withContext(Dispatchers.IO) { loadScaled(uri, 1024) } ?: return@runScan null
-        runCatching { ai.analyze(bitmap) }.getOrElse { _message.value = R.string.food_photo_unavailable; return@runScan null }
-            ?: run { _message.value = R.string.food_photo_failed; null }
-    }
-
     private fun runScan(source: FoodSource, onReady: () -> Unit, block: suspend () -> com.rave.app.domain.food.ScannedFood?) {
         viewModelScope.launch {
             if (!food.canScan(source)) { _message.value = R.string.food_limit_reached; food.showScanPaywall(source); return@launch }
@@ -210,7 +200,7 @@ class FoodViewModel @Inject constructor(
     }
 }
 
-private enum class PendingCapture { LABEL, PHOTO }
+private enum class PendingCapture { LABEL }
 
 private val ScanGutter = 18.dp
 private const val RECENT_CHIPS = 3
@@ -239,7 +229,6 @@ fun FoodScreen(
         val uri = photoUri
         if (ok && uri != null) when (pending) {
             PendingCapture.LABEL -> viewModel.readLabel(uri, labelName) { onOpenResult("") }
-            PendingCapture.PHOTO -> viewModel.analyzePhoto(uri) { onOpenResult("") }
             null -> Unit
         }
     }
@@ -274,12 +263,8 @@ fun FoodScreen(
             }
             item(key = "barcode") { BarcodeHero(onScanBarcode) }
             item(key = "capture") {
-                Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(BentoGap)) {
-                    ScanTile(Icons.Rounded.DocumentScanner, stringResource(R.string.bscan_read_label), stringResource(R.string.food_scan_label_sub),
-                        c.tilePink, Modifier.weight(1f).fillMaxHeight()) { start(PendingCapture.LABEL) }
-                    ScanTile(Icons.Rounded.PhotoCamera, stringResource(R.string.food_snap_meal), stringResource(R.string.food_snap_meal_sub),
-                        c.tileBlue, Modifier.weight(1f).fillMaxHeight()) { start(PendingCapture.PHOTO) }
-                }
+                ScanTile(Icons.Rounded.DocumentScanner, stringResource(R.string.bscan_read_label), stringResource(R.string.food_scan_label_sub),
+                    c.tilePink, Modifier.fillMaxWidth()) { start(PendingCapture.LABEL) }
             }
             message?.let { m ->
                 item(key = "message") { MessageTile(stringResource(m), viewModel::dismissMessage) }
@@ -368,15 +353,20 @@ private fun BarcodeHero(onClick: () -> Unit) {
     }
 }
 
-/** Read label (lilac) / Snap meal (sky): icon, title, subtitle. */
+/** Read label (lilac): icon, title, subtitle and an arrow. */
 @Composable
 private fun ScanTile(icon: ImageVector, label: String, sub: String, tile: TileColor, modifier: Modifier, onClick: () -> Unit) {
     BentoTile(tile.container, modifier, onClick = onClick) {
-        Icon(icon, null, tint = tile.content, modifier = Modifier.size(30.dp))
-        Text(label, style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp, fontWeight = FontWeight.ExtraBold), color = tile.content,
-            modifier = Modifier.padding(top = 10.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Text(sub, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp), color = tile.content.copy(alpha = 0.65f),
-            maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, null, tint = tile.content, modifier = Modifier.size(32.dp))
+            Column(Modifier.weight(1f).padding(horizontal = 14.dp)) {
+                Text(label, style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp, fontWeight = FontWeight.ExtraBold), color = tile.content,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(sub, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp), color = tile.content.copy(alpha = 0.65f),
+                    maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            Icon(Icons.AutoMirrored.Rounded.ArrowForward, null, tint = tile.content, modifier = Modifier.size(22.dp))
+        }
     }
 }
 
