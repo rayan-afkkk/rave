@@ -1,6 +1,7 @@
 package com.rave.app.screens
 
 import android.graphics.Bitmap
+import android.os.Looper
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onRoot
@@ -47,6 +48,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
+import org.robolectric.Shadows.shadowOf
 import java.io.File
 import java.time.LocalDate
 import java.time.LocalTime
@@ -126,21 +128,31 @@ class AppScreenshots {
     }
 
     private fun shoot(name: String, route: Any?, settleMs: Long = 2500) {
+        // Some screens run endless animations (pulses, the buddy), so the compose clock is driven
+        // by hand: with auto-advance off, waiting for idle doesn't wait for those to finish.
+        compose.mainClock.autoAdvance = false
         lateinit var nav: NavHostController
         compose.setContent {
             nav = rememberNavController()
             val vm: MainViewModel = hiltViewModel()
             RaveTheme(darkTheme = false) { RaveApp(vm, nav) }
         }
-        compose.waitForIdle()
+        settle(500)
         if (route != null) compose.runOnUiThread { nav.navigate(route) }
-        compose.mainClock.advanceTimeBy(settleMs)
-        compose.waitForIdle()
+        settle(settleMs)
         Thread.sleep(1500) // let IO (Room / network) finish
-        compose.mainClock.advanceTimeBy(1000)
-        compose.waitForIdle()
+        settle(1500)
         val bmp: Bitmap = compose.onRoot().captureToImage().asAndroidBitmap()
         File(outDir, "$name.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
+    }
+
+    private fun settle(ms: Long) {
+        var left = ms
+        while (left > 0) {
+            compose.mainClock.advanceTimeBy(100)
+            shadowOf(Looper.getMainLooper()).idle()
+            left -= 100
+        }
     }
 
     @Test fun s01_home() = shoot("01_home", null)
