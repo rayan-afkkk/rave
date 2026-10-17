@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
@@ -144,6 +147,17 @@ fun RaveApp(viewModel: MainViewModel, navController: NavHostController = remembe
             onStartActivity = startActivity,
             onStartWorkout = startWorkout,
         )
+
+        // Tab screens scroll under the transparent status bar; this strip keeps the clock and
+        // icons readable by fading the content out beneath them.
+        if (selectedTab != null) {
+            val bg = MaterialTheme.colorScheme.background
+            Box(
+                Modifier.align(Alignment.TopCenter).fillMaxWidth()
+                    .windowInsetsTopHeight(WindowInsets.statusBars)
+                    .background(bg),
+            )
+        }
 
         AnimatedVisibility(
             visible = selectedTab != null,

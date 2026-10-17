@@ -469,7 +469,8 @@ private fun RecentChip(scan: FoodScanEntity, modifier: Modifier, onClick: () -> 
     ) {
         Text(scan.name, style = MaterialTheme.typography.labelLarge.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold), color = t.content,
             maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Text(verdictShort(v), style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp), color = t.content, maxLines = 1)
+        val sub = scan.kcal?.let { "${verdictShort(v)} · ${stringResource(R.string.food_kcal, fmt(it))}" } ?: verdictShort(v)
+        Text(sub, style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp), color = t.content, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
