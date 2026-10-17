@@ -300,7 +300,7 @@ private fun VerdictHero(food: ScannedFood, a: FoodAssessment) {
                     modifier = Modifier.padding(top = 4.dp))
             }
             Spacer(Modifier.width(12.dp))
-            Box(Modifier.size(72.dp).clip(SmoothCornerShape(28.dp)).background(ink.container), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(72.dp).clip(SmoothCornerShape(22.dp)).background(ink.container), contentAlignment = Alignment.Center) {
                 Icon(verdictIcon(a.verdict), verdictTitle(a.verdict), tint = t.container, modifier = Modifier.size(40.dp))
             }
         }

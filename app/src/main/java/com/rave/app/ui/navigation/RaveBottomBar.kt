@@ -47,7 +47,7 @@ import com.rave.app.ui.theme.RaveTheme
 
 private val BarHeight = Dimens.NavBarHeight
 private val StartButtonSize = 54.dp
-private val StartShape = SmoothCornerShape(22.dp)
+private val StartShape = SmoothCornerShape(16.dp)
 
 /** Space screens leave at the bottom so content isn't hidden behind the bar (system insets come on top). */
 val BottomBarClearance = BarHeight + 12.dp

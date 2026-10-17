@@ -39,9 +39,9 @@ import java.util.Locale
  * uppercase kickers, chunky numbers, pill chips and pill buttons.
  */
 
-val BentoTileShape = SmoothCornerShape(32.dp)
+val BentoTileShape = SmoothCornerShape(26.dp)
 val BentoPillShape = RoundedCornerShape(50)
-val BentoSquareShape = SmoothCornerShape(20.dp)
+val BentoSquareShape = SmoothCornerShape(16.dp)
 val BentoGap = 10.dp
 
 /** A rounded colour tile. [onClick] makes the whole tile tappable. */

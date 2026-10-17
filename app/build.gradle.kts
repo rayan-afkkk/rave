@@ -89,6 +89,15 @@ android {
         debug {
             if (sharedDebugKeystore.exists()) signingConfig = signingConfigs.getByName("debugConfig")
         }
+        // Same optimised code as release (R8 + baseline profiles) but signed with the debug key,
+        // so it installs straight from Android Studio. Compose debug builds are several times
+        // slower than this: pick the "staging" build variant to judge smoothness.
+        create("staging") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName(if (sharedDebugKeystore.exists()) "debugConfig" else "debug")
+            matchingFallbacks += listOf("release")
+            isDebuggable = false
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -131,6 +140,8 @@ room {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
+    // Installs the Compose/AndroidX baseline profiles on release installs: much less jank on first runs.
+    implementation("androidx.profileinstaller:profileinstaller:1.4.1")
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)

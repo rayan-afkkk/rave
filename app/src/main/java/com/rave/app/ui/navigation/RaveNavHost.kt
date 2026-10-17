@@ -1,5 +1,6 @@
 package com.rave.app.ui.navigation
 
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.PaddingValues
@@ -53,8 +54,11 @@ fun RaveNavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier,
-        enterTransition = { fadeIn() },
-        exitTransition = { fadeOut() },
+        // Short, snappy cross-fade between screens.
+        enterTransition = { fadeIn(tween(180)) },
+        exitTransition = { fadeOut(tween(120)) },
+        popEnterTransition = { fadeIn(tween(180)) },
+        popExitTransition = { fadeOut(tween(120)) },
     ) {
         // ---- Tabs ----
         composable<HomeRoute> {

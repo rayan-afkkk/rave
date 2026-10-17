@@ -81,7 +81,7 @@ import java.util.Locale
  * a badge grid, Progress / Wrapped buttons, then streak freezes.
  */
 
-private val BadgeShape = SmoothCornerShape(26.dp)
+private val BadgeShape = SmoothCornerShape(20.dp)
 
 @Composable
 fun ProfileScreen(
@@ -183,7 +183,7 @@ fun ProfileScreen(
         BentoTile(c.tileYellow.container, Modifier.fillMaxWidth()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
-                    Modifier.size(48.dp).clip(SmoothCornerShape(20.dp)).background(c.tileInk.container),
+                    Modifier.size(48.dp).clip(SmoothCornerShape(14.dp)).background(c.tileInk.container),
                     contentAlignment = Alignment.Center,
                 ) { Icon(Icons.Rounded.AcUnit, null, tint = c.tileYellow.container, modifier = Modifier.size(26.dp)) }
                 Spacer(Modifier.width(14.dp))

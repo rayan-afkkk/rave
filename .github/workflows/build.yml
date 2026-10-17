@@ -22,7 +22,7 @@ jobs:
       - name: Compile debug app
         run: |
           chmod +x gradlew
-          ./gradlew :app:assembleDebug --stacktrace --console=plain
+          ./gradlew :app:assembleDebug :app:assembleStaging --stacktrace --console=plain
       - name: Unit tests + screenshots
         run: ./gradlew :app:testDebugUnitTest --console=plain --continue
       - name: Commit screenshots to docs/screenshots
