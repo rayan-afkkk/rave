@@ -219,4 +219,4 @@ object RaveTheme {
 
 
 /** Global UI scale applied on top of the device density (1 = Android default sizes). */
-private const val UI_SCALE = 0.92f
+private const val UI_SCALE = 0.97f

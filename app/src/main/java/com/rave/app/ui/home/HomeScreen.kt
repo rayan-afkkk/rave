@@ -165,7 +165,7 @@ fun HomeScreen(
             shape = CircleShape,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 20.dp, bottom = contentPadding.calculateBottomPadding()),
+                .padding(end = 20.dp, bottom = contentPadding.calculateBottomPadding() + 16.dp),
         ) {
             Icon(Icons.Rounded.Add, contentDescription = stringResource(R.string.home_add_habit))
         }

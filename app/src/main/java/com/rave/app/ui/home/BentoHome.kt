@@ -63,7 +63,7 @@ import java.util.Locale
 
 private val TileShape = SmoothCornerShape(26.dp)
 private val TilePad = 16.dp
-private const val STEPS_TILE_HEIGHT = 204
+private const val STEPS_TILE_HEIGHT = 220
 
 private fun fmt(n: Int) = NumberFormat.getIntegerInstance().format(n)
 
