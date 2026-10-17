@@ -1,6 +1,7 @@
 package com.rave.app.ui.friends
 
 import android.widget.Toast
+import com.rave.app.ui.components.SmoothCornerShape
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +21,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.EmojiEvents
@@ -179,7 +179,7 @@ fun FriendsScreen(
                     item(key = "invite") {
                         SquadMember(stringResource(R.string.action_invite), Modifier.clickable(onClick = onInvite)) {
                             Box(
-                                Modifier.size(56.dp).clip(RoundedCornerShape(16.dp)).background(c.tileSand.container),
+                                Modifier.size(56.dp).clip(SmoothCornerShape(16.dp)).background(c.tileSand.container),
                                 contentAlignment = Alignment.Center,
                             ) { Icon(Icons.Rounded.Add, contentDescription = null, tint = c.tileSand.content, modifier = Modifier.size(24.dp)) }
                         }

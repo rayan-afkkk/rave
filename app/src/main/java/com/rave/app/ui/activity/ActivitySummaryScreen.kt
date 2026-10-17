@@ -1,6 +1,7 @@
 package com.rave.app.ui.activity
 
 import androidx.activity.compose.BackHandler
+import com.rave.app.ui.components.SmoothCornerShape
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,7 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AutoAwesome
@@ -232,14 +232,14 @@ fun ActivitySummaryScreen(
                             OutlinedTextField(
                                 value = state.name, onValueChange = viewModel::setName,
                                 label = { Text(stringResource(R.string.summary_name)) }, singleLine = true,
-                                shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth(),
+                                shape = SmoothCornerShape(18.dp), modifier = Modifier.fillMaxWidth(),
                                 colors = sandFieldColors(),
                             )
                             Spacer(Modifier.height(10.dp))
                             OutlinedTextField(
                                 value = state.note, onValueChange = viewModel::setNote,
                                 label = { Text(stringResource(R.string.summary_note)) }, minLines = 2,
-                                shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth(),
+                                shape = SmoothCornerShape(18.dp), modifier = Modifier.fillMaxWidth(),
                                 colors = sandFieldColors(),
                             )
                         }

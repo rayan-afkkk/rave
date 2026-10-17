@@ -1,6 +1,7 @@
 package com.rave.app.ui.home
 
 import android.Manifest
+import com.rave.app.ui.components.SmoothCornerShape
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -60,7 +61,7 @@ import java.util.Locale
  * Steps (black, with the week's bars) · Streak (lime) · Water (sky) · Habits (lilac) · Start a walk (orange).
  */
 
-private val TileShape = RoundedCornerShape(24.dp)
+private val TileShape = SmoothCornerShape(24.dp)
 private val TilePad = 16.dp
 private const val STEPS_TILE_HEIGHT = 204
 
@@ -95,7 +96,7 @@ fun BentoHeader(state: HomeUiState, modifier: Modifier = Modifier) {
             color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.weight(1f),
         )
         Box(
-            Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(RaveTheme.colors.tilePeach.container),
+            Modifier.size(48.dp).clip(SmoothCornerShape(16.dp)).background(RaveTheme.colors.tilePeach.container),
             contentAlignment = Alignment.Center,
         ) {
             Text(name.take(1).uppercase(Locale.getDefault()), style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold),

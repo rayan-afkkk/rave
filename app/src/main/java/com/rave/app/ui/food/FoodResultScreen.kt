@@ -1,6 +1,7 @@
 package com.rave.app.ui.food
 
 import android.content.Intent
+import com.rave.app.ui.components.SmoothCornerShape
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -51,7 +52,6 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Check
@@ -300,7 +300,7 @@ private fun VerdictHero(food: ScannedFood, a: FoodAssessment) {
                     modifier = Modifier.padding(top = 4.dp))
             }
             Spacer(Modifier.width(12.dp))
-            Box(Modifier.size(72.dp).clip(RoundedCornerShape(24.dp)).background(ink.container), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(72.dp).clip(SmoothCornerShape(24.dp)).background(ink.container), contentAlignment = Alignment.Center) {
                 Icon(verdictIcon(a.verdict), verdictTitle(a.verdict), tint = t.container, modifier = Modifier.size(40.dp))
             }
         }

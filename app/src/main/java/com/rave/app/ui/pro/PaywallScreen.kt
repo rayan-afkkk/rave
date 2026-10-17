@@ -1,6 +1,7 @@
 package com.rave.app.ui.pro
 
 import android.app.Activity
+import com.rave.app.ui.components.SmoothCornerShape
 import android.content.Context
 import android.content.ContextWrapper
 import android.widget.Toast
@@ -23,7 +24,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AcUnit
@@ -187,7 +187,7 @@ private fun Headline(modifier: Modifier = Modifier) {
             Spacer(Modifier.width(12.dp))
             Text(
                 stringResource(R.string.bplan_pro_word), style = style, color = RaveTheme.colors.onHighlight, maxLines = 1,
-                modifier = Modifier.clip(RoundedCornerShape(14.dp)).background(RaveTheme.colors.highlight).padding(horizontal = 10.dp),
+                modifier = Modifier.clip(SmoothCornerShape(14.dp)).background(RaveTheme.colors.highlight).padding(horizontal = 10.dp),
             )
         }
         Text(stringResource(R.string.bplan_pro_further), style = style, color = ink.content)

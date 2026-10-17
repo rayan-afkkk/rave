@@ -1,6 +1,7 @@
 package com.rave.app.ui.profile
 
 import androidx.compose.foundation.background
+import com.rave.app.ui.components.SmoothCornerShape
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -80,7 +81,7 @@ import java.util.Locale
  * a badge grid, Progress / Wrapped buttons, then streak freezes.
  */
 
-private val BadgeShape = RoundedCornerShape(22.dp)
+private val BadgeShape = SmoothCornerShape(22.dp)
 
 @Composable
 fun ProfileScreen(
@@ -182,7 +183,7 @@ fun ProfileScreen(
         BentoTile(c.tileYellow.container, Modifier.fillMaxWidth()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
-                    Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(c.tileInk.container),
+                    Modifier.size(48.dp).clip(SmoothCornerShape(16.dp)).background(c.tileInk.container),
                     contentAlignment = Alignment.Center,
                 ) { Icon(Icons.Rounded.AcUnit, null, tint = c.tileYellow.container, modifier = Modifier.size(26.dp)) }
                 Spacer(Modifier.width(14.dp))

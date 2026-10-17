@@ -1,6 +1,7 @@
 package com.rave.app.ui.navigation
 
 import androidx.compose.animation.animateColorAsState
+import com.rave.app.ui.components.SmoothCornerShape
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -46,7 +47,7 @@ import com.rave.app.ui.theme.RaveTheme
 
 private val BarHeight = Dimens.NavBarHeight
 private val StartButtonSize = 54.dp
-private val StartShape = RoundedCornerShape(18.dp)
+private val StartShape = SmoothCornerShape(18.dp)
 
 /** Space screens leave at the bottom so content isn't hidden behind the bar (system insets come on top). */
 val BottomBarClearance = BarHeight + 12.dp

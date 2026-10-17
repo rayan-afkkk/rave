@@ -1,6 +1,7 @@
 package com.rave.app.ui.tracking
 
 import androidx.activity.compose.BackHandler
+import com.rave.app.ui.components.SmoothCornerShape
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Flag
@@ -278,7 +278,7 @@ private fun TrackingMap(state: TrackingState, follow: Boolean, onUserMovedMap: (
 
 private fun List<LatLngPoint>.toLatLng(): List<LatLng> = map { LatLng(it.lat, it.lng) }
 
-private val SheetShape = RoundedCornerShape(34.dp)
+private val SheetShape = SmoothCornerShape(34.dp)
 
 @Composable
 private fun LiveChip(text: String) {
