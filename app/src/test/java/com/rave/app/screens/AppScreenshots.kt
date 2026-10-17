@@ -25,6 +25,10 @@ import com.rave.app.domain.model.Habit
 import com.rave.app.domain.model.HabitColor
 import com.rave.app.domain.model.HabitType
 import com.rave.app.ui.RaveApp
+import com.rave.app.ui.onboarding.OnboardingScreen
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeLeft
 import com.rave.app.ui.navigation.ActivitySummaryRoute
 import com.rave.app.ui.navigation.AddEditHabitRoute
 import com.rave.app.ui.navigation.CompetitionsRoute
@@ -171,4 +175,26 @@ class AppScreenshots {
     @Test fun s11_paywall() = shoot("11_paywall", PaywallRoute())
     @Test fun s12_home_bento() = shoot("12_home_bento", null, style = AppStyle.BENTO)
     @Test fun s13_scan_bento() = shoot("13_scan_bento", FoodRoute, style = AppStyle.BENTO)
+
+    /** Onboarding: render the real screen and swipe through its pages. */
+    @Test fun s14_onboarding() {
+        compose.mainClock.autoAdvance = false
+        compose.setContent { RaveTheme(darkTheme = false) { OnboardingScreen(onFinished = {}) } }
+        settle(3000)
+        listOf("14_onboarding_1", "15_onboarding_2", "16_onboarding_3", "17_onboarding_4", "18_onboarding_5", "19_onboarding_setup", "20_onboarding_signin")
+            .forEachIndexed { i, name ->
+                if (i > 0) {
+                    compose.onRoot().performTouchInput { swipeLeft() }
+                    settle(3500)
+                }
+                save(name)
+            }
+    }
+
+    private fun save(name: String) {
+        val view = compose.activity.window.decorView
+        val bmp = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+        view.draw(Canvas(bmp))
+        File(outDir, "$name.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
+    }
 }
