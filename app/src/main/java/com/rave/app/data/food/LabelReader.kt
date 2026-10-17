@@ -37,7 +37,8 @@ class LabelReader @Inject constructor(@ApplicationContext private val context: C
             name = name,
             per100g = if (parsed.per100) parsed.nutrients else null,
             perServing = if (parsed.per100) null else parsed.nutrients,
-            ingredients = result.text.substringAfter("ingredients", "", ignoreCase = true).take(600),
+            ingredients = result.text.indexOf("ingredients", ignoreCase = true)
+                .let { i -> if (i < 0) "" else result.text.substring(i + "ingredients".length) }.take(600),
             source = FoodSource.LABEL,
         )
     }

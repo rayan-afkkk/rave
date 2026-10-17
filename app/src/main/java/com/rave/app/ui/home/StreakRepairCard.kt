@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Build
+import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -62,7 +63,7 @@ fun StreakRepairCard(modifier: Modifier = Modifier, viewModel: StreakRepairViewM
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
                 TextButton(onClick = viewModel::dismiss) { Text(stringResource(R.string.action_not_now)) }
                 PillButton(stringResource(R.string.repair_action), onClick = { pro.gate(com.rave.app.data.billing.ProReason.STREAK) { viewModel.repair(o) } },
-                    icon = if (pro.isPro) null else androidx.compose.material.icons.Icons.Rounded.WorkspacePremium)
+                    icon = if (pro.isPro) null else Icons.Rounded.WorkspacePremium)
             }
         }
     }
