@@ -1,11 +1,9 @@
 package com.rave.app.screens
 
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.os.Looper
-import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.captureToImage
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -142,7 +140,11 @@ class AppScreenshots {
         settle(settleMs)
         Thread.sleep(1500) // let IO (Room / network) finish
         settle(1500)
-        val bmp: Bitmap = compose.onRoot().captureToImage().asAndroidBitmap()
+        // Draw the window directly: captureToImage() waits for an idle UI, which screens with
+        // endless animations never reach.
+        val view = compose.activity.window.decorView
+        val bmp = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+        view.draw(Canvas(bmp))
         File(outDir, "$name.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }
 
