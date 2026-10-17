@@ -155,7 +155,7 @@ fun SettingsScreen(
                 Text(stringResource(R.string.settings_app_style), style = MaterialTheme.typography.labelLarge)
                 Spacer(Modifier.height(6.dp))
                 Segmented(
-                    listOf(AppStyle.BENTO to R.string.style_bento, AppStyle.CLASSIC to R.string.style_classic),
+                    listOf(AppStyle.CLASSIC to R.string.style_classic, AppStyle.BENTO to R.string.style_bento),
                     s.appStyle,
                 ) { style -> viewModel.update { it.copy(appStyle = style) } }
                 Spacer(Modifier.height(10.dp))

@@ -126,7 +126,7 @@ class AppScreenshots {
         food.log("Greek yogurt", 130, 11.0, 9.0, 4.0, 6.0, FoodSource.MANUAL, MealSlot.SNACK)
     }
 
-    private fun shoot(name: String, route: Any?, settleMs: Long = 2500, style: AppStyle = AppStyle.BENTO) {
+    private fun shoot(name: String, route: Any?, settleMs: Long = 2500, style: AppStyle = AppStyle.CLASSIC) {
         // Some screens run endless animations (pulses, the buddy), so the compose clock is driven
         // by hand: with auto-advance off, waiting for idle doesn't wait for those to finish.
         compose.mainClock.autoAdvance = false
@@ -169,6 +169,6 @@ class AppScreenshots {
     @Test fun s09_habit() = shoot("09_new_habit", AddEditHabitRoute())
     @Test fun s10_mealplan() = shoot("10_meal_plan", MealPlanRoute)
     @Test fun s11_paywall() = shoot("11_paywall", PaywallRoute())
-    @Test fun s12_home_classic() = shoot("12_home_classic", null, style = AppStyle.CLASSIC)
-    @Test fun s13_scan_classic() = shoot("13_scan_classic", FoodRoute, style = AppStyle.CLASSIC)
+    @Test fun s12_home_bento() = shoot("12_home_bento", null, style = AppStyle.BENTO)
+    @Test fun s13_scan_bento() = shoot("13_scan_bento", FoodRoute, style = AppStyle.BENTO)
 }

@@ -168,7 +168,7 @@ internal val ClassicDarkColors = darkColorScheme(
 @Composable
 fun RaveTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    style: AppStyle = AppStyle.BENTO,
+    style: AppStyle = AppStyle.CLASSIC,
     content: @Composable () -> Unit,
 ) {
     val classic = style == AppStyle.CLASSIC

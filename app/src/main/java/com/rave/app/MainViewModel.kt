@@ -39,7 +39,7 @@ class MainViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, ThemeMode.LIGHT)
 
     val appStyle: StateFlow<com.rave.app.domain.model.AppStyle> = settings.appStyle
-        .stateIn(viewModelScope, SharingStarted.Eagerly, com.rave.app.domain.model.AppStyle.BENTO)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, com.rave.app.domain.model.AppStyle.CLASSIC)
 
     /** Null until settings are read (avoids flashing onboarding for returning users). */
     private val _needsOnboarding = MutableStateFlow<Boolean?>(null)
