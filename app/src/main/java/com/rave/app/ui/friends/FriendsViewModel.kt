@@ -15,6 +15,7 @@ import com.rave.app.data.cloud.SharedStreak
 import com.rave.app.data.cloud.SharedStreakRepository
 import com.rave.app.data.cloud.UserProfile
 import com.rave.app.data.preferences.SettingsRepository
+import com.rave.app.domain.competition.CompetitionStatus
 import com.rave.app.domain.model.DistanceUnit
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -22,7 +23,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -45,6 +48,8 @@ data class FriendsUiState(
     val unit: DistanceUnit = DistanceUnit.KM,
     /** Friends already nudged today (uid set). */
     val nudged: Set<String> = emptySet(),
+    /** Competitions I'm in that are running right now. */
+    val liveCompetitions: Int = 0,
 )
 
 @HiltViewModel
@@ -62,12 +67,16 @@ class FriendsViewModel @Inject constructor(
     private val _messages = Channel<NudgeResult>(Channel.BUFFERED)
     val messages: Flow<NudgeResult> = _messages.receiveAsFlow()
 
+    private val liveCompetitions = competitions.observeMine()
+        .map { list -> list.count { it.statusAt(time.nowMs()) == CompetitionStatus.ACTIVE } }
+        .catch { emit(0) }
+
     private val social = combine(friends.observeFriends(), friends.observeRequests(), shared.observeActive(), shared.observeInvitations(),
         competitions.observeInvitations()) { f, r, s, si, ci -> Social(f, r.incoming.size, s, si.size + ci.size) }
 
     val state: StateFlow<FriendsUiState> = combine(
-        auth.currentUser, profiles.observeMyProfile(), social, feed.observeFeed(), combine(settings.settings, nudged) { a, b -> a to b },
-    ) { user, me, soc, feedItems, (prefs, nudgedSet) ->
+        auth.currentUser, profiles.observeMyProfile(), social, feed.observeFeed(), combine(settings.settings, nudged, liveCompetitions) { a, b, c -> Triple(a, b, c) },
+    ) { user, me, soc, feedItems, (prefs, nudgedSet, live) ->
         val weekStart = time.weekStart().toEpochDay()
         val board = (soc.friends.map { LeaderboardEntry(it.uid, it.name, it.weekKm, false) } +
             listOfNotNull(me?.let { LeaderboardEntry(it.uid, it.name, it.weekKmFor(weekStart), true) }))
@@ -85,6 +94,7 @@ class FriendsViewModel @Inject constructor(
             feed = feedItems,
             unit = prefs.unit,
             nudged = nudgedSet,
+            liveCompetitions = live,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), FriendsUiState(cloudAvailable = auth.isAvailable))
 

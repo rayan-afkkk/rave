@@ -1,8 +1,6 @@
 package com.rave.app.ui.competitions
 
 import androidx.compose.foundation.layout.Arrangement
-import com.rave.app.ui.theme.Dimens
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,8 +14,6 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,14 +32,18 @@ import com.rave.app.core.TimeProvider
 import com.rave.app.data.cloud.CompetitionRepository
 import com.rave.app.domain.competition.Competition
 import com.rave.app.domain.competition.CompetitionStatus
+import com.rave.app.ui.components.BentoBig
+import com.rave.app.ui.components.BentoChip
+import com.rave.app.ui.components.BentoKicker
+import com.rave.app.ui.components.BentoSquareShape
+import com.rave.app.ui.components.BentoTile
 import com.rave.app.ui.components.EmptyState
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.unit.sp
 import com.rave.app.ui.components.PillChip
 import com.rave.app.ui.components.RaveScreen
-import com.rave.app.ui.components.SectionCard
 import com.rave.app.ui.friends.InvitationCard
-import com.rave.app.ui.theme.PillShape
 import com.rave.app.ui.theme.RaveTheme
-import androidx.compose.material3.Surface
 import androidx.compose.foundation.layout.padding
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -94,7 +94,7 @@ fun CompetitionsScreen(
     var tab by rememberSaveable { mutableStateOf(CompetitionTab.ACTIVE) }
     RaveScreen(title = stringResource(R.string.competitions_title), onBack = onBack) {
         androidx.compose.foundation.layout.Box(Modifier.fillMaxWidth().weight(1f)) {
-            LazyColumn(contentPadding = PaddingValues(start = Dimens.ScreenPadding, end = Dimens.ScreenPadding, top = 4.dp, bottom = 96.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            LazyColumn(contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 4.dp, bottom = 96.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 item {
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         item { PillChip(tab == CompetitionTab.ACTIVE, stringResource(R.string.comp_tab_active), { tab = CompetitionTab.ACTIVE }) }
@@ -137,42 +137,44 @@ fun CompetitionsScreen(
             // Anyone can join competitions; creating one is Rave Pro.
             FloatingActionButton(
                 onClick = { pro.gate(com.rave.app.data.billing.ProReason.COMPETITIONS, onCreate) },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
+                containerColor = RaveTheme.colors.tileInk.container,
+                contentColor = RaveTheme.colors.highlight,
+                shape = BentoSquareShape,
                 modifier = Modifier.align(Alignment.BottomEnd).padding(20.dp),
             ) { Icon(Icons.Rounded.Add, contentDescription = stringResource(R.string.comp_create)) }
         }
     }
 }
 
+/** Bento tile per competition: orange while live/upcoming, sand once finished. */
 @Composable
 private fun CompetitionCard(c: Competition, now: Long, onClick: () -> Unit) {
-    SectionCard(onClick = onClick) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text(c.name, style = MaterialTheme.typography.titleMedium)
-                Text(
-                    "${stringResource(competitionTypeRes(c.type))} · ${stringResource(competitionModeRes(c.mode))} · " +
-                        stringResource(R.string.comp_people, c.members.size),
-                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Text(
-                when (c.statusAt(now)) {
+    val colors = RaveTheme.colors
+    val status = c.statusAt(now)
+    val tile = if (status == CompetitionStatus.ENDED) colors.tileSand else colors.tileOrange
+    val ink = tile.content
+    BentoTile(tile.container, Modifier.fillMaxWidth(), onClick = onClick) {
+        BentoKicker("${stringResource(competitionTypeRes(c.type))} · ${stringResource(competitionModeRes(c.mode))}", ink)
+        Spacer(Modifier.height(4.dp))
+        BentoBig(c.name, ink, size = 24.sp, maxLines = 2)
+        Spacer(Modifier.height(10.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BentoChip(
+                pluralStringResource(R.plurals.bfriends_players, c.members.size, c.members.size),
+                container = colors.tileInk.container, content = colors.tileInk.content,
+            )
+            BentoChip(
+                when (status) {
                     CompetitionStatus.UPCOMING -> stringResource(R.string.comp_starts_in, formatRemaining(c.startAtMs - now))
-                    CompetitionStatus.ACTIVE -> stringResource(R.string.comp_time_left, formatRemaining(c.endAtMs - now))
+                    CompetitionStatus.ACTIVE -> stringResource(R.string.bfriends_ends_in, formatRemaining(c.endAtMs - now))
                     CompetitionStatus.ENDED -> stringResource(R.string.comp_ended)
                 },
-                style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary,
+                container = ink.copy(alpha = 0.14f), content = ink,
             )
         }
         c.stake?.let {
             Spacer(Modifier.height(8.dp))
-            Surface(shape = PillShape, color = RaveTheme.colors.tilePeach.container) {
-                Text(stringResource(R.string.competition_stake, it), style = MaterialTheme.typography.labelMedium,
-                    color = RaveTheme.colors.tilePeach.content, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
-            }
+            BentoChip(stringResource(R.string.competition_stake, it), container = colors.highlight, content = colors.onHighlight)
         }
     }
 }
-

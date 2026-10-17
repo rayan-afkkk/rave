@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bento Pop Friends tab and competition screens. -->
+<resources>
+    <string name="bfriends_title">Squad</string>
+    <string name="bfriends_feed">Feed</string>
+    <plurals name="bfriends_days_left">
+        <item quantity="one">%1$d day left</item>
+        <item quantity="other">%1$d days left</item>
+    </plurals>
+    <string name="bfriends_last_day">Last day</string>
+    <string name="bfriends_live">%1$d live</string>
+    <string name="bfriends_streak_with">with %1$s · %2$dd</string>
+    <string name="bfriends_feed_ran">%1$s ran %2$s</string>
+    <string name="bfriends_feed_walked">%1$s walked %2$s</string>
+    <string name="bfriends_hype">🔥 Hype</string>
+    <string name="bfriends_hype_count">🔥 %1$d</string>
+    <string name="bfriends_comp_kicker">Competition · %1$s</string>
+    <plurals name="bfriends_players">
+        <item quantity="one">%1$d player</item>
+        <item quantity="other">%1$d players</item>
+    </plurals>
+    <string name="bfriends_ends_in">Ends in %1$s</string>
+    <string name="bfriends_nudge_squad">Nudge the squad</string>
+    <string name="bfriends_nudged_squad">Squad nudged today</string>
+</resources>
