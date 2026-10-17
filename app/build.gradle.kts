@@ -183,6 +183,8 @@ dependencies {
     // Location & maps
     implementation(libs.play.services.location)
     implementation(libs.play.services.maps)
+    // Recording API: Google Play services counts steps in the background, even when Rave is closed.
+    implementation(libs.play.services.fitness)
     implementation(libs.maps.compose)
     implementation(libs.coil.compose)
 

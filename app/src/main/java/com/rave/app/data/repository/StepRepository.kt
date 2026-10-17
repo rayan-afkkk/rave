@@ -41,6 +41,27 @@ class StepRepository @Inject constructor(
         widget.refreshSteps()
     }
 
+    /**
+     * Writes daily totals from the Recording API. Past days take the recorded value; today
+     * never goes backwards (live counting may be a few steps ahead of Play services).
+     */
+    suspend fun applyRecorded(days: Map<LocalDate, Int>) = mutex.withLock {
+        val today = time.today()
+        var changed = false
+        for ((date, steps) in days) {
+            val key = date.toString()
+            val current = dao.get(key)?.steps ?: 0
+            val value = if (date == today) maxOf(current, steps) else steps
+            if (value != current) {
+                dao.upsert(DailyStepsEntity(key, value, time.nowMs()))
+                changed = true
+            }
+        }
+        // Live counting restarts from here, so steps already recorded aren't added twice.
+        settings.putString(KEY_LAST_COUNTER, null)
+        if (changed) widget.refreshSteps()
+    }
+
     suspend fun todaySteps(): Int = dao.get(time.today().toString())?.steps ?: 0
 
     suspend fun stepsBetween(from: LocalDate, to: LocalDate): Int = dao.sumBetween(from.toString(), to.toString())

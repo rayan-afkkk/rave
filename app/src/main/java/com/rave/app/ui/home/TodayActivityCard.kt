@@ -101,6 +101,7 @@ data class TodayActivityState(
 @HiltViewModel
 class TodayActivityViewModel @Inject constructor(
     private val sensor: StepSensor,
+    private val stepSync: com.rave.app.tracking.steps.StepSync,
     private val steps: StepRepository,
     activities: ActivityRepository,
     workouts: WorkoutRepository,
@@ -123,7 +124,7 @@ class TodayActivityViewModel @Inject constructor(
         steps.observeToday(), steps.observeLastDays(7), settings.settings, trackedToday, permitted,
     ) { today, week, prefs, tracked, ok ->
         TodayActivityState(
-            sensorAvailable = sensor.isAvailable,
+            sensorAvailable = sensor.isAvailable || stepSync.usesRecording || !ok,
             permitted = ok,
             steps = today,
             goal = prefs.dailyStepGoal,
@@ -137,8 +138,12 @@ class TodayActivityViewModel @Inject constructor(
 
     fun refreshPermission() { permitted.value = sensor.hasPermission() }
 
-    /** Live counting while the card is on screen. */
+    /**
+     * While the card is on screen: catch up from Play services' background count, then add
+     * live steps from the hardware counter so the number moves as you walk.
+     */
     suspend fun countLive() {
+        stepSync.sync()
         if (!sensor.canCount) return
         sensor.counter().collect { steps.record(it) }
     }

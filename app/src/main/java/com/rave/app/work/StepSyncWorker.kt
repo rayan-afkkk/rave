@@ -7,23 +7,21 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.rave.app.data.repository.StepRepository
-import com.rave.app.tracking.steps.StepSensor
+import com.rave.app.tracking.steps.StepSync
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.util.concurrent.TimeUnit
 
-/** Reads the step counter every 15 minutes so daily steps add up while the app is closed. */
+/** Syncs daily steps every 15 minutes so they stay right while the app is closed (see StepSync). */
 @HiltWorker
 class StepSyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val sensor: StepSensor,
-    private val steps: StepRepository,
+    private val stepSync: StepSync,
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        sensor.readOnce()?.let { steps.record(it) }
+        stepSync.sync()
         return Result.success()
     }
 
