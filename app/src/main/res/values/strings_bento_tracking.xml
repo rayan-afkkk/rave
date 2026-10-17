@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Bento Pop live tracking + activity summary -->
+    <string name="btrack_live_chip">● LIVE · %1$s</string>
+    <string name="btrack_paused_chip">● %1$s · %2$s</string>
+    <!-- Pace as 9'26" (minutes, seconds). -->
+    <string name="btrack_pace">%1$d\'%2$02d\"</string>
+    <string name="btrack_new_pr">🏆 New PR</string>
+    <string name="btrack_do_again">Do again</string>
+    <string name="btrack_subtitle">%1$s · %2$s</string>
+    <string name="btrack_title_morning_walk">Morning walk</string>
+    <string name="btrack_title_afternoon_walk">Afternoon walk</string>
+    <string name="btrack_title_evening_walk">Evening walk</string>
+    <string name="btrack_title_night_walk">Night walk</string>
+    <string name="btrack_title_morning_run">Morning run</string>
+    <string name="btrack_title_afternoon_run">Afternoon run</string>
+    <string name="btrack_title_evening_run">Evening run</string>
+    <string name="btrack_title_night_run">Night run</string>
+</resources>

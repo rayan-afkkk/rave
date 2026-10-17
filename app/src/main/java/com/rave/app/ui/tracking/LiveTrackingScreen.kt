@@ -1,18 +1,10 @@
 package com.rave.app.ui.tracking
 
 import androidx.activity.compose.BackHandler
-import com.rave.app.ui.theme.Dimens
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,64 +14,41 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Flag
-import androidx.compose.material.icons.rounded.GpsFixed
-import androidx.compose.material.icons.rounded.GpsNotFixed
-import androidx.compose.material.icons.rounded.GpsOff
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.LockOpen
 import androidx.compose.material.icons.rounded.MyLocation
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SmallFloatingActionButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.JointType
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.RoundCap
-import com.google.maps.android.compose.CameraMoveStartedReason
-import com.google.maps.android.compose.Circle
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Polyline
-import com.google.maps.android.compose.rememberCameraPositionState
-import com.rave.app.BuildConfig
 import com.rave.app.R
 import com.rave.app.domain.model.LatLngPoint
 import com.rave.app.domain.util.Format
@@ -87,13 +56,11 @@ import com.rave.app.tracking.GpsQuality
 import com.rave.app.tracking.TrackingState
 import com.rave.app.tracking.TrackingStatus
 import com.rave.app.ui.activityTypeRes
+import com.rave.app.ui.components.BentoChip
+import com.rave.app.ui.components.BentoIconButton
 import com.rave.app.ui.components.ConfirmDialog
 import com.rave.app.ui.components.PillProgress
-import com.rave.app.ui.components.RouteCanvas
-import com.rave.app.ui.components.StatItem
-import com.rave.app.ui.paceUnitLabel
 import com.rave.app.ui.permissions.LocationPermissionGate
-import com.rave.app.ui.theme.PillShape
 import com.rave.app.ui.theme.RaveTheme
 import com.rave.app.ui.unitLabel
 
@@ -129,7 +96,6 @@ fun LiveTrackingScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun LiveTrackingContent(viewModel: LiveTrackingViewModel, onBack: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -138,31 +104,26 @@ private fun LiveTrackingContent(viewModel: LiveTrackingViewModel, onBack: () -> 
     var follow by rememberSaveable { mutableStateOf(true) }
     var confirmFinish by rememberSaveable { mutableStateOf(false) }
     BackHandler(enabled = locked) { /* swallow back while locked */ }
+    val c = RaveTheme.colors
+    val ink = c.tileInk
 
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         TrackingMap(state, follow, onUserMovedMap = { follow = false })
 
-        // Top bar
+        // Top controls floating on the map
         Row(
             Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            RoundIconButton(onClick = onBack, enabled = !locked) {
-                Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.action_back))
-            }
-            Spacer(Modifier.width(10.dp))
-            Surface(shape = PillShape, color = MaterialTheme.colorScheme.surface) {
-                Row(Modifier.padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(activityTypeRes(state.type.takeIf { state.isTracking } ?: viewModel.requestedType)),
-                        style = MaterialTheme.typography.titleSmall)
-                    Spacer(Modifier.width(10.dp))
-                    GpsChip(state.gps)
-                }
-            }
+            BentoIconButton(
+                Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.action_back),
+                onClick = { if (!locked) onBack() }, container = ink.container, content = ink.content,
+            )
             Spacer(Modifier.weight(1f))
-            RoundIconButton(onClick = { locked = true }, enabled = !locked) {
-                Icon(Icons.Rounded.Lock, contentDescription = stringResource(R.string.tracking_lock))
-            }
+            BentoIconButton(
+                Icons.Rounded.Lock, stringResource(R.string.tracking_lock),
+                onClick = { locked = true }, container = ink.container, content = ink.content,
+            )
         }
 
         // Re-centre
@@ -171,90 +132,93 @@ private fun LiveTrackingContent(viewModel: LiveTrackingViewModel, onBack: () -> 
             enter = fadeIn(), exit = fadeOut(),
             modifier = Modifier.align(Alignment.CenterEnd).padding(end = 16.dp),
         ) {
-            SmallFloatingActionButton(onClick = { follow = true }, containerColor = MaterialTheme.colorScheme.surface) {
-                Icon(Icons.Rounded.MyLocation, contentDescription = stringResource(R.string.tracking_recenter))
-            }
+            BentoIconButton(
+                Icons.Rounded.MyLocation, stringResource(R.string.tracking_recenter),
+                onClick = { follow = true }, container = ink.container, content = ink.content,
+            )
         }
 
-        // Stats sheet
-        Surface(
-            shape = MaterialTheme.shapes.large.copy(bottomStart = androidx.compose.foundation.shape.CornerSize(0.dp),
-                bottomEnd = androidx.compose.foundation.shape.CornerSize(0.dp)),
-            color = MaterialTheme.colorScheme.surface,
-            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
+        // Floating black stats card
+        Column(
+            Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(start = 12.dp, end = 12.dp, bottom = 14.dp)
+                .clip(SheetShape)
+                .background(ink.container)
+                .padding(20.dp),
         ) {
-            Column(Modifier.navigationBarsPadding().padding(20.dp)) {
-                val unit = settings.unit
-                Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.semantics(mergeDescendants = true) { liveRegion = LiveRegionMode.Polite }) {
-                    Text(Format.distance(state.distanceM, unit), style = MaterialTheme.typography.displayLarge, color = MaterialTheme.colorScheme.onSurface)
-                    Spacer(Modifier.width(6.dp))
-                    Text(unitLabel(unit), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 10.dp))
-                    Spacer(Modifier.weight(1f))
-                    if (state.status == TrackingStatus.PAUSED || state.status == TrackingStatus.AUTO_PAUSED) {
-                        Text(
-                            stringResource(if (state.status == TrackingStatus.PAUSED) R.string.tracking_paused else R.string.tracking_auto_paused),
-                            style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(bottom = 12.dp),
-                        )
-                    }
-                }
-                state.goalM?.let { goal ->
-                    val left = goal - state.distanceM
-                    PillProgress(progress = if (goal <= 0) 1f else (state.distanceM / goal).toFloat())
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        if (left <= 0) stringResource(R.string.tracking_goal_reached)
-                        else stringResource(R.string.tracking_to_go, Format.distance(left, unit), unitLabel(unit)) +
-                            (state.goalHabitName?.let { " · $it" } ?: ""),
-                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+            val unit = settings.unit
+            val typeLabel = stringResource(activityTypeRes(state.type.takeIf { state.isTracking } ?: viewModel.requestedType))
+            val paused = state.status == TrackingStatus.PAUSED || state.status == TrackingStatus.AUTO_PAUSED
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                if (paused) {
+                    val pausedLabel = stringResource(if (state.status == TrackingStatus.PAUSED) R.string.tracking_paused else R.string.tracking_auto_paused)
+                    BentoChip(
+                        stringResource(R.string.btrack_paused_chip, pausedLabel, typeLabel),
+                        container = c.inkRaised, content = ink.content,
+                        modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
                     )
-                    Spacer(Modifier.height(12.dp))
+                } else {
+                    LiveChip(stringResource(R.string.btrack_live_chip, typeLabel))
                 }
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    StatItem(Format.duration(state.elapsedMs / 1000), stringResource(R.string.stat_time))
-                    StatItem(Format.pace(state.paceSPerKm, unit), stringResource(R.string.stat_pace), unit = paceUnitLabel(unit))
-                    StatItem(state.calories.toString(), stringResource(R.string.stat_calories), unit = stringResource(R.string.unit_kcal))
-                }
-                Spacer(Modifier.height(16.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    val active = state.status == TrackingStatus.ACTIVE
-                    Surface(
-                        onClick = viewModel::togglePause,
-                        enabled = state.isTracking && !locked,
-                        shape = PillShape,
-                        color = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary,
-                        modifier = Modifier.weight(1f).heightIn(min = 56.dp),
-                    ) {
-                        Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                            Icon(if (active) Icons.Rounded.Pause else Icons.Rounded.PlayArrow, null)
-                            Spacer(Modifier.width(8.dp))
-                            Text(stringResource(if (active) R.string.action_pause else R.string.action_resume), style = MaterialTheme.typography.labelLarge)
-                        }
-                    }
-                    val finishLabel = stringResource(R.string.tracking_finish_hint)
-                    Box(
-                        Modifier
-                            .weight(1f)
-                            .heightIn(min = 56.dp)
-                            .clip(PillShape)
-                            .background(MaterialTheme.colorScheme.primary)
-                            .combinedClickable(
-                                enabled = state.isTracking && !locked,
-                                onClickLabel = finishLabel,
-                                onClick = { confirmFinish = true },
-                                onLongClick = { viewModel.finish() },
-                            ),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Rounded.Flag, null, tint = MaterialTheme.colorScheme.onPrimary)
-                            Spacer(Modifier.width(8.dp))
-                            Text(stringResource(R.string.action_finish), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onPrimary)
-                        }
-                    }
-                }
+                Spacer(Modifier.weight(1f))
+                GpsLabel(state.gps)
+            }
+            Row(
+                verticalAlignment = Alignment.Bottom,
+                modifier = Modifier.padding(top = 10.dp).semantics(mergeDescendants = true) { liveRegion = LiveRegionMode.Polite },
+            ) {
+                Text(
+                    Format.distance(state.distanceM, unit), color = ink.content, maxLines = 1,
+                    style = MaterialTheme.typography.displayLarge.copy(
+                        fontSize = 78.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-3).sp, lineHeight = 74.sp,
+                    ),
+                )
+                Text(
+                    unitLabel(unit), color = c.navContent,
+                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                    modifier = Modifier.padding(start = 6.dp, bottom = 8.dp),
+                )
+            }
+            state.goalM?.let { goal ->
+                val left = goal - state.distanceM
+                Spacer(Modifier.height(12.dp))
+                PillProgress(progress = if (goal <= 0) 1f else (state.distanceM / goal).toFloat(), color = c.highlight)
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    if (left <= 0) stringResource(R.string.tracking_goal_reached)
+                    else stringResource(R.string.tracking_to_go, Format.distance(left, unit), unitLabel(unit)) +
+                        (state.goalHabitName?.let { " · $it" } ?: ""),
+                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 13.sp), color = c.navContent,
+                )
+            }
+            Row(Modifier.fillMaxWidth().padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                BentoMiniStat(Format.duration(state.elapsedMs / 1000), stringResource(R.string.stat_time), c.tilePink, Modifier.weight(1f))
+                BentoMiniStat(bentoPace(state.paceSPerKm, unit), stringResource(R.string.stat_pace), c.tileBlue, Modifier.weight(1f))
+                BentoMiniStat(state.calories.toString(), stringResource(R.string.unit_kcal), c.tilePeach, Modifier.weight(1f))
+            }
+            Row(Modifier.fillMaxWidth().padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                val active = state.status == TrackingStatus.ACTIVE
+                BentoPillAction(
+                    stringResource(if (active) R.string.action_pause else R.string.action_resume),
+                    container = c.inkRaised, content = ink.content,
+                    onClick = viewModel::togglePause,
+                    enabled = state.isTracking && !locked,
+                    leading = if (active) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                    modifier = Modifier.weight(1f),
+                )
+                BentoPillAction(
+                    stringResource(R.string.action_finish),
+                    container = c.cta.container, content = c.cta.content,
+                    onClick = { confirmFinish = true },
+                    onLongClick = { viewModel.finish() },
+                    onClickLabel = stringResource(R.string.tracking_finish_hint),
+                    enabled = state.isTracking && !locked,
+                    trailing = Icons.Rounded.Flag,
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
 
@@ -269,13 +233,7 @@ private fun LiveTrackingContent(viewModel: LiveTrackingViewModel, onBack: () -> 
                     .semantics { contentDescription = unlockHint },
                 contentAlignment = Alignment.Center,
             ) {
-                Surface(shape = PillShape, color = MaterialTheme.colorScheme.surface) {
-                    Row(Modifier.padding(horizontal = Dimens.ScreenPadding, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Rounded.LockOpen, null, tint = MaterialTheme.colorScheme.primary)
-                        Spacer(Modifier.width(8.dp))
-                        Text(unlockHint, style = MaterialTheme.typography.labelLarge)
-                    }
-                }
+                BentoChip(unlockHint, container = ink.container, content = ink.content, icon = Icons.Rounded.LockOpen)
             }
         }
     }
@@ -293,7 +251,8 @@ private fun LiveTrackingContent(viewModel: LiveTrackingViewModel, onBack: () -> 
 
 @Composable
 private fun TrackingMap(state: TrackingState, follow: Boolean, onUserMovedMap: () -> Unit) {
-    val routeColor = MaterialTheme.colorScheme.primary
+    // Route in ink; the current-position marker follows the route colour (TileMapView has no separate dot colour).
+    val routeColor = RaveTheme.colors.tileInk.container
     val current = state.current
     val currentPt = current?.let { LatLngPoint(it.lat, it.lng) }
     val startPt = state.start
@@ -319,23 +278,21 @@ private fun TrackingMap(state: TrackingState, follow: Boolean, onUserMovedMap: (
 
 private fun List<LatLngPoint>.toLatLng(): List<LatLng> = map { LatLng(it.lat, it.lng) }
 
+private val SheetShape = RoundedCornerShape(34.dp)
+
 @Composable
-private fun GpsChip(gps: GpsQuality) {
-    val (icon, label, color) = when (gps) {
-        GpsQuality.STRONG -> Triple(Icons.Rounded.GpsFixed, R.string.gps_strong, MaterialTheme.colorScheme.tertiary)
-        GpsQuality.WEAK -> Triple(Icons.Rounded.GpsNotFixed, R.string.gps_weak, MaterialTheme.colorScheme.primary)
-        GpsQuality.SEARCHING -> Triple(Icons.Rounded.GpsOff, R.string.gps_searching, MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(icon, null, tint = color, modifier = Modifier.size(16.dp))
-        Spacer(Modifier.width(4.dp))
-        Text(stringResource(label), style = MaterialTheme.typography.labelMedium, color = color)
-    }
+private fun LiveChip(text: String) {
+    val c = RaveTheme.colors
+    BentoChip(text, container = c.highlight, content = c.onHighlight)
 }
 
 @Composable
-private fun RoundIconButton(onClick: () -> Unit, enabled: Boolean = true, content: @Composable () -> Unit) {
-    Surface(shape = CircleShape, color = MaterialTheme.colorScheme.surface, modifier = Modifier.size(48.dp)) {
-        IconButton(onClick = onClick, enabled = enabled) { content() }
+private fun GpsLabel(gps: GpsQuality) {
+    val c = RaveTheme.colors
+    val (label, color) = when (gps) {
+        GpsQuality.STRONG -> R.string.gps_strong to c.navContent
+        GpsQuality.WEAK -> R.string.gps_weak to c.tileOrange.container
+        GpsQuality.SEARCHING -> R.string.gps_searching to c.navContent
     }
+    Text(stringResource(label), style = MaterialTheme.typography.bodySmall.copy(fontSize = 13.sp), color = color, maxLines = 1)
 }

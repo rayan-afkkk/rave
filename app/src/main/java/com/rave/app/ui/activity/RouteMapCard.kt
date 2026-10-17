@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -14,27 +13,28 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.rave.app.domain.model.LatLngPoint
+import com.rave.app.ui.components.BentoTileShape
 import com.rave.app.ui.components.RouteCanvas
 import com.rave.app.ui.components.TileMapView
+import com.rave.app.ui.theme.RaveTheme
 import kotlin.math.ln
 import kotlin.math.max
 
-/** Static map fitted to the route bounds using MapTiler & OpenStreetMap tiles. */
+/** Bento sand map card fitted to the route bounds (MapTiler & OpenStreetMap tiles), route in orange. */
 @Composable
-fun RouteMapCard(segments: List<List<LatLngPoint>>, modifier: Modifier = Modifier, height: Dp = 220.dp) {
-    val shape = MaterialTheme.shapes.large
+fun RouteMapCard(segments: List<List<LatLngPoint>>, modifier: Modifier = Modifier, height: Dp = 170.dp) {
     val all = remember(segments) { segments.flatten() }
-    val routeColor = MaterialTheme.colorScheme.primary
+    val routeColor = RaveTheme.colors.tileOrange.container
 
-    Box(modifier = modifier.fillMaxWidth().height(height).clip(shape).background(MaterialTheme.colorScheme.surfaceVariant)) {
+    Box(modifier = modifier.fillMaxWidth().height(height).clip(BentoTileShape).background(RaveTheme.colors.tileSand.container)) {
         if (all.size < 2) {
             RouteCanvas(
                 segments = segments,
                 color = routeColor,
                 modifier = Modifier.fillMaxSize().padding(24.dp),
-                strokeWidth = 5.dp,
+                strokeWidth = 7.dp,
                 showEndpoints = true,
-                endpointColor = MaterialTheme.colorScheme.tertiary
+                endpointColor = RaveTheme.colors.tileInk.container
             )
             return@Box
         }
