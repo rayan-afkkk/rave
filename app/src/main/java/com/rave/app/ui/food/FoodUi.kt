@@ -25,6 +25,66 @@ fun verdictColors(v: Verdict): TileColor = when (v) {
     Verdict.SKIP -> RaveTheme.colors.verdictSkip
 }
 
+/** Bold Bento Pop hero colour for a verdict (Go = lime, Sometimes = yellow, Skip = coral). */
+@Composable
+fun verdictHeroColors(v: Verdict): TileColor = when (v) {
+    Verdict.GO -> RaveTheme.colors.verdictHeroGo
+    Verdict.SOMETIMES -> RaveTheme.colors.verdictHeroSometimes
+    Verdict.SKIP -> RaveTheme.colors.verdictHeroSkip
+}
+
+/** Small recent-scan chip colour (Go = lime, Sometimes = yellow, Skip = soft coral). */
+@Composable
+fun verdictChipColors(v: Verdict): TileColor = when (v) {
+    Verdict.GO -> RaveTheme.colors.verdictHeroGo
+    Verdict.SOMETIMES -> RaveTheme.colors.verdictHeroSometimes
+    Verdict.SKIP -> RaveTheme.colors.verdictChipSkip
+}
+
+/** Short verdict word for chips ("Go for it", "Sometimes", "Skip it"). */
+@Composable
+fun verdictShort(v: Verdict) = stringResource(
+    when (v) {
+        Verdict.GO -> R.string.bscan_verdict_go_short
+        Verdict.SOMETIMES -> R.string.bscan_verdict_sometimes_short
+        Verdict.SKIP -> R.string.bscan_verdict_skip_short
+    },
+)
+
+/** Huge verdict headline ("Skip it."). */
+@Composable
+fun verdictHeadline(v: Verdict) = stringResource(
+    when (v) {
+        Verdict.GO -> R.string.bscan_verdict_go_title
+        Verdict.SOMETIMES -> R.string.bscan_verdict_sometimes_title
+        Verdict.SKIP -> R.string.bscan_verdict_skip_title
+    },
+)
+
+/** One-line verdict subline ("Better as a rare treat"). */
+@Composable
+fun verdictSub(v: Verdict) = stringResource(
+    when (v) {
+        Verdict.GO -> R.string.bscan_verdict_go_sub
+        Verdict.SOMETIMES -> R.string.bscan_verdict_sometimes_sub
+        Verdict.SKIP -> R.string.bscan_verdict_skip_sub
+    },
+)
+
+@Composable
+fun swapEmoji(s: Swap) = stringResource(
+    when (s) {
+        Swap.ROASTED_CHANA -> R.string.bscan_swap_roasted_chana_emoji
+        Swap.LEMON_WATER -> R.string.bscan_swap_lemon_water_emoji
+        Swap.NUTS_OR_FRUIT -> R.string.bscan_swap_nuts_fruit_emoji
+        Swap.DATES -> R.string.bscan_swap_dates_emoji
+        Swap.CHANA_CHAAT -> R.string.bscan_swap_chana_chaat_emoji
+        Swap.FRUIT_CHAAT -> R.string.bscan_swap_fruit_chaat_emoji
+        Swap.PLAIN_YOGURT -> R.string.bscan_swap_plain_yogurt_emoji
+        Swap.AIR_POPCORN -> R.string.bscan_swap_popcorn_emoji
+    },
+)
+
 fun verdictIcon(v: Verdict): ImageVector = when (v) {
     Verdict.GO -> Icons.Rounded.CheckCircle
     Verdict.SOMETIMES -> Icons.Rounded.Info

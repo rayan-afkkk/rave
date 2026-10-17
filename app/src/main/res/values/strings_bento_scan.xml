@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Bento Pop: Scan tab -->
+    <string name="bscan_title">Scan it.\nKnow it.</string>
+    <string name="bscan_barcode">Barcode</string>
+    <string name="bscan_hero_title">Point at any\nsnack or drink</string>
+    <string name="bscan_read_label">Read label</string>
+    <string name="bscan_log_food">+ Log food</string>
+    <string name="bscan_of_target"> / %1$s kcal</string>
+    <string name="bscan_kcal_suffix"> kcal</string>
+    <string name="bscan_recent">Recent</string>
+    <string name="bscan_see_all">See all</string>
+    <string name="bscan_show_less">Show less</string>
+    <string name="bscan_verdict_go_short">Go for it</string>
+    <string name="bscan_verdict_sometimes_short">Sometimes</string>
+    <string name="bscan_verdict_skip_short">Skip it</string>
+    <string name="bscan_meal_plan_kicker">Meal plan</string>
+
+    <!-- Bento Pop: "Should I eat it?" result -->
+    <string name="bscan_verdict_go_title">Go for it.</string>
+    <string name="bscan_verdict_sometimes_title">Sometimes.</string>
+    <string name="bscan_verdict_skip_title">Skip it.</string>
+    <string name="bscan_verdict_go_sub">A good pick for your goal</string>
+    <string name="bscan_verdict_sometimes_sub">Fine now and then</string>
+    <string name="bscan_verdict_skip_sub">Better as a rare treat</string>
+    <string name="bscan_daily_sugar">%1$d%% daily sugar</string>
+    <string name="bscan_daily_salt">%1$d%% daily salt</string>
+    <string name="bscan_nova">NOVA %1$d</string>
+    <string name="bscan_nutri">Nutri %1$s</string>
+    <string name="bscan_grams">%1$sg</string>
+    <string name="bscan_halal_check">Halal check</string>
+    <string name="bscan_halal_clear">✓ No haram ingredients found</string>
+    <string name="bscan_halal_certified">✓ Halal certified</string>
+    <string name="bscan_halal_doubtful">Check: %1$s</string>
+    <string name="bscan_halal_not">✗ Not halal: %1$s</string>
+    <string name="bscan_contains">Contains %1$s</string>
+    <string name="bscan_log_it">Log it</string>
+    <string name="bscan_share_text">%1$s: %2$s (checked with %3$s)</string>
+    <string name="bscan_swap_roasted_chana_emoji" translatable="false">🫘</string>
+    <string name="bscan_swap_lemon_water_emoji" translatable="false">🍋</string>
+    <string name="bscan_swap_nuts_fruit_emoji" translatable="false">🥜</string>
+    <string name="bscan_swap_dates_emoji" translatable="false">🌴</string>
+    <string name="bscan_swap_chana_chaat_emoji" translatable="false">🥣</string>
+    <string name="bscan_swap_fruit_chaat_emoji" translatable="false">🍎</string>
+    <string name="bscan_swap_plain_yogurt_emoji" translatable="false">🥛</string>
+    <string name="bscan_swap_popcorn_emoji" translatable="false">🍿</string>
+</resources>

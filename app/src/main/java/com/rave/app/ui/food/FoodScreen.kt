@@ -31,7 +31,6 @@ import androidx.compose.material.icons.rounded.DocumentScanner
 import androidx.compose.material.icons.rounded.PhotoCamera
 import androidx.compose.material.icons.rounded.QrCodeScanner
 import androidx.compose.material.icons.rounded.RestaurantMenu
-import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -40,11 +39,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.border
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -64,6 +60,33 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.material.icons.rounded.Remove
+import androidx.compose.material.icons.rounded.Tune
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.style.TextOverflow
+import com.rave.app.ui.components.BentoBig
+import com.rave.app.ui.components.BentoButton
+import com.rave.app.ui.components.BentoChip
+import com.rave.app.ui.components.BentoGap
+import com.rave.app.ui.components.BentoIconButton
+import com.rave.app.ui.components.BentoKicker
+import com.rave.app.ui.components.BentoPillShape
+import com.rave.app.ui.components.BentoSquareShape
+import com.rave.app.ui.components.BentoTile
+import com.rave.app.ui.components.BentoTileShape
+import com.rave.app.ui.components.BentoTitle
+import com.rave.app.ui.components.BentoToggleChip
+import com.rave.app.ui.theme.TileColor
 import com.rave.app.R
 import com.rave.app.data.food.DayFood
 import com.rave.app.data.food.FoodAi
@@ -80,11 +103,7 @@ import com.rave.app.domain.food.DesiFoods
 import com.rave.app.domain.food.FoodSource
 import com.rave.app.domain.food.MealSlot
 import com.rave.app.domain.food.Verdict
-import com.rave.app.ui.components.SectionCard
-import com.rave.app.ui.components.TonalPillButton
-import com.rave.app.ui.components.RaveScreen
 import com.rave.app.ui.permissions.hasPermission
-import com.rave.app.ui.theme.Dimens
 import com.rave.app.ui.theme.RaveTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -193,6 +212,9 @@ class FoodViewModel @Inject constructor(
 
 private enum class PendingCapture { LABEL, PHOTO }
 
+private val ScanGutter = 18.dp
+private const val RECENT_CHIPS = 3
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FoodScreen(
@@ -211,6 +233,7 @@ fun FoodScreen(
     var pending by remember { mutableStateOf<PendingCapture?>(null) }
     var photoUri by remember { mutableStateOf<Uri?>(null) }
     var showAdd by rememberSaveable { mutableStateOf(false) }
+    var showAllScans by rememberSaveable { mutableStateOf(false) }
 
     val takePicture = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
         val uri = photoUri
@@ -232,60 +255,67 @@ fun FoodScreen(
         if (context.hasPermission(Manifest.permission.CAMERA)) capture(kind) else cameraPermission.launch(Manifest.permission.CAMERA)
     }
 
-    RaveScreen(
-        title = stringResource(R.string.nav_scan),
-        onBack = null,
-        actions = { IconButton(onClick = onOpenSettings) { Icon(Icons.Rounded.Settings, stringResource(R.string.food_settings)) } },
-    ) {
-        Box(Modifier.fillMaxSize()) {
-            LazyColumn(
-                Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(
-                    start = Dimens.ScreenPadding, end = Dimens.ScreenPadding,
-                    bottom = contentPadding.calculateBottomPadding() + 16.dp,
-                ),
-                verticalArrangement = Arrangement.spacedBy(Dimens.SectionGap),
-            ) {
-                item { BarcodeHero(onScanBarcode) }
-                item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(Dimens.SectionGap)) {
-                        ScanTile(Icons.Rounded.DocumentScanner, stringResource(R.string.food_scan_label), stringResource(R.string.food_scan_label_sub), RaveTheme.colors.tilePink, Modifier.weight(1f)) { start(PendingCapture.LABEL) }
-                        ScanTile(Icons.Rounded.PhotoCamera, stringResource(R.string.food_snap_meal), stringResource(R.string.food_snap_meal_sub), RaveTheme.colors.tileBlue, Modifier.weight(1f)) { start(PendingCapture.PHOTO) }
-                    }
-                }
-                message?.let { m ->
-                    item {
-                        SectionCard(Modifier.fillMaxWidth(), color = RaveTheme.colors.verdictSometimes.container, onClick = viewModel::dismissMessage) {
-                            Text(stringResource(m), style = MaterialTheme.typography.bodyMedium, color = RaveTheme.colors.verdictSometimes.content)
-                        }
-                    }
-                }
-                item { TodaySummary(state, onAdd = { showAdd = true }, onOpenPlan = onOpenPlan) }
-                if (state.day.entries.isNotEmpty()) {
-                    val bySlot = state.day.entries.groupBy { runCatching { MealSlot.valueOf(it.slot) }.getOrDefault(MealSlot.SNACK) }
-                    MealSlot.entries.filter { it in bySlot }.forEach { slot ->
-                        item(key = "slot_$slot") { LogGroup(slot, bySlot.getValue(slot), viewModel::delete) }
-                    }
-                }
-                if (state.scans.isNotEmpty()) {
-                    item { Text(stringResource(R.string.food_recent_scans), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 4.dp)) }
-                    items(state.scans.take(5), key = { "scan_${it.id}" }) { scan ->
-                        ScanRow(scan) { scan.barcode?.let(onOpenResult) }
-                    }
-                }
-                item {
-                    Text(stringResource(R.string.food_disclaimer), style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(vertical = 8.dp))
+    val c = RaveTheme.colors
+    Box(Modifier.fillMaxSize()) {
+        LazyColumn(
+            Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(
+                top = contentPadding.calculateTopPadding() + 12.dp,
+                start = ScanGutter, end = ScanGutter,
+                bottom = contentPadding.calculateBottomPadding() + 16.dp,
+            ),
+            verticalArrangement = Arrangement.spacedBy(BentoGap),
+        ) {
+            item(key = "header") {
+                Row(Modifier.fillMaxWidth().padding(bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    BentoTitle(stringResource(R.string.bscan_title), Modifier.weight(1f))
+                    BentoIconButton(Icons.Rounded.Tune, stringResource(R.string.food_settings), onOpenSettings, size = 48.dp)
                 }
             }
-            if (busy) {
-                Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.35f)), contentAlignment = Alignment.Center) {
-                    SectionCard {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp)
-                            Spacer(Modifier.width(12.dp))
-                            Text(stringResource(R.string.food_reading))
-                        }
+            item(key = "barcode") { BarcodeHero(onScanBarcode) }
+            item(key = "capture") {
+                Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(BentoGap)) {
+                    ScanTile(Icons.Rounded.DocumentScanner, stringResource(R.string.bscan_read_label), stringResource(R.string.food_scan_label_sub),
+                        c.tilePink, Modifier.weight(1f).fillMaxHeight()) { start(PendingCapture.LABEL) }
+                    ScanTile(Icons.Rounded.PhotoCamera, stringResource(R.string.food_snap_meal), stringResource(R.string.food_snap_meal_sub),
+                        c.tileBlue, Modifier.weight(1f).fillMaxHeight()) { start(PendingCapture.PHOTO) }
+                }
+            }
+            message?.let { m ->
+                item(key = "message") { MessageTile(stringResource(m), viewModel::dismissMessage) }
+            }
+            item(key = "today") { TodayTile(state, onAdd = { showAdd = true }) }
+            if (state.scans.isNotEmpty()) {
+                item(key = "recent") {
+                    RecentScans(
+                        scans = state.scans,
+                        showAll = showAllScans,
+                        onToggleAll = { showAllScans = !showAllScans },
+                        onOpen = { scan -> scan.barcode?.let(onOpenResult) },
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
+            }
+            if (state.day.entries.isNotEmpty()) {
+                val bySlot = state.day.entries.groupBy { runCatching { MealSlot.valueOf(it.slot) }.getOrDefault(MealSlot.SNACK) }
+                MealSlot.entries.filter { it in bySlot }.forEach { slot ->
+                    item(key = "slot_$slot") { LogGroup(slot, bySlot.getValue(slot), viewModel::delete) }
+                }
+            }
+            item(key = "plan") { MealPlanTile(onOpenPlan) }
+            item(key = "disclaimer") {
+                Text(stringResource(R.string.food_disclaimer), style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(vertical = 8.dp))
+            }
+        }
+        if (busy) {
+            Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.35f)), contentAlignment = Alignment.Center) {
+                BentoTile(c.tileInk.container) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        CircularProgressIndicator(Modifier.size(22.dp), color = c.highlight, strokeWidth = 2.dp)
+                        Spacer(Modifier.width(12.dp))
+                        Text(stringResource(R.string.food_reading), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                            color = c.tileInk.content)
                     }
                 }
             }
@@ -304,117 +334,188 @@ fun FoodScreen(
 
 private fun fmt(n: Int) = NumberFormat.getIntegerInstance().format(n)
 
-/** The main action: a big button that opens the barcode camera. */
+/** Black BARCODE hero: headline, lime dashed frame with a barcode icon, lime "Open camera →" chip. */
 @Composable
 private fun BarcodeHero(onClick: () -> Unit) {
-    val ink = RaveTheme.colors.accentCard
-    val on = RaveTheme.colors.onAccentCard
+    val ink = RaveTheme.colors.tileInk
     val lime = RaveTheme.colors.highlight
-    SectionCard(Modifier.fillMaxWidth(), color = ink, onClick = onClick, contentPadding = PaddingValues(18.dp)) {
-        Text(stringResource(R.string.food_scan_barcode).uppercase(), style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold,
-            letterSpacing = 1.2.sp), color = on.copy(alpha = 0.65f))
-        Row(Modifier.padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.food_scan_hero_body), style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold),
-                color = on, modifier = Modifier.weight(1f))
-            Spacer(Modifier.width(12.dp))
-            Box(Modifier.size(84.dp).clip(RoundedCornerShape(20.dp)).border(3.dp, lime, RoundedCornerShape(20.dp)), contentAlignment = Alignment.Center) {
-                Icon(Icons.Rounded.QrCodeScanner, null, tint = lime, modifier = Modifier.size(40.dp))
-            }
+    Box(Modifier.fillMaxWidth().height(250.dp).clip(BentoTileShape).background(ink.container).clickable(onClick = onClick)) {
+        Column(Modifier.padding(16.dp)) {
+            BentoKicker(stringResource(R.string.bscan_barcode), ink.content)
+            Text(
+                stringResource(R.string.bscan_hero_title), color = ink.content, modifier = Modifier.padding(top = 6.dp),
+                style = MaterialTheme.typography.headlineSmall.copy(fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 28.6.sp, letterSpacing = (-0.5).sp),
+            )
         }
-        Text(
-            stringResource(R.string.food_open_camera), style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-            color = RaveTheme.colors.onHighlight,
-            modifier = Modifier.padding(top = 12.dp).clip(CircleShape).background(lime).padding(horizontal = 14.dp, vertical = 7.dp),
+        Box(
+            Modifier.align(Alignment.BottomEnd).padding(end = 18.dp, bottom = 18.dp).size(width = 150.dp, height = 110.dp)
+                .drawBehind {
+                    val stroke = 3.dp.toPx()
+                    drawRoundRect(
+                        color = lime,
+                        topLeft = Offset(stroke / 2, stroke / 2),
+                        size = Size(size.width - stroke, size.height - stroke),
+                        cornerRadius = CornerRadius(18.dp.toPx() - stroke / 2),
+                        style = Stroke(width = stroke, pathEffect = PathEffect.dashPathEffect(floatArrayOf(9.dp.toPx(), 6.dp.toPx()), 0f)),
+                    )
+                },
+            contentAlignment = Alignment.Center,
+        ) { Icon(Icons.Rounded.QrCodeScanner, null, tint = lime, modifier = Modifier.size(54.dp)) }
+        BentoChip(
+            stringResource(R.string.food_open_camera), container = lime, content = RaveTheme.colors.onHighlight,
+            modifier = Modifier.align(Alignment.BottomStart).padding(start = 16.dp, bottom = 18.dp), onClick = onClick,
         )
     }
 }
 
-/** Calories eaten vs target on one line, with Add food and Meal plan. */
+/** Read label (lilac) / Snap meal (sky): icon, title, subtitle. */
 @Composable
-private fun TodaySummary(state: FoodUiState, onAdd: () -> Unit, onOpenPlan: () -> Unit) {
+private fun ScanTile(icon: ImageVector, label: String, sub: String, tile: TileColor, modifier: Modifier, onClick: () -> Unit) {
+    BentoTile(tile.container, modifier, onClick = onClick) {
+        Icon(icon, null, tint = tile.content, modifier = Modifier.size(30.dp))
+        Text(label, style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp, fontWeight = FontWeight.ExtraBold), color = tile.content,
+            modifier = Modifier.padding(top = 10.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(sub, style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp), color = tile.content.copy(alpha = 0.65f),
+            maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+/** Error / free-scan-limit note; tap to dismiss. */
+@Composable
+private fun MessageTile(text: String, onDismiss: () -> Unit) {
+    val t = RaveTheme.colors.verdictHeroSometimes
+    BentoTile(t.container, Modifier.fillMaxWidth(), onClick = onDismiss) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold), color = t.content, modifier = Modifier.weight(1f))
+            Spacer(Modifier.width(8.dp))
+            Icon(Icons.Rounded.Close, stringResource(R.string.action_dismiss), tint = t.content, modifier = Modifier.size(20.dp))
+        }
+    }
+}
+
+/** Lime TODAY tile: "1,240 / 2,050 kcal", black "+ Log food" chip and a black progress bar. */
+@Composable
+private fun TodayTile(state: FoodUiState, onAdd: () -> Unit) {
+    val lime = RaveTheme.colors.highlight
+    val ink = RaveTheme.colors.onHighlight
     val target = state.target
     val eaten = state.day.kcal
-    val over = target != null && eaten > target.kcal
-    val lime = RaveTheme.colors.tileGreen
-    val accent = if (over) RaveTheme.colors.verdictSkip.content else lime.content
-    SectionCard(Modifier.fillMaxWidth(), color = lime.container) {
-        Text(stringResource(R.string.food_today).uppercase(), style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold,
-            letterSpacing = 1.2.sp), color = lime.content.copy(alpha = 0.65f))
-        Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(top = 4.dp)) {
-            Text(fmt(eaten), style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold), color = lime.content)
-            if (target != null) {
-                Text(" " + stringResource(R.string.food_of_target, fmt(target.kcal)), style = MaterialTheme.typography.bodyMedium,
-                    color = lime.content, modifier = Modifier.weight(1f).padding(bottom = 4.dp))
+    val suffix = if (target != null) stringResource(R.string.bscan_of_target, fmt(target.kcal)) else stringResource(R.string.bscan_kcal_suffix)
+    BentoTile(lime, Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                BentoKicker(stringResource(R.string.food_today), ink)
                 Text(
-                    if (over) stringResource(R.string.food_over, fmt(eaten - target.kcal)) else stringResource(R.string.food_left, fmt(target.kcal - eaten)),
-                    style = MaterialTheme.typography.labelLarge, color = accent, modifier = Modifier.padding(bottom = 3.dp),
+                    buildAnnotatedString {
+                        append(fmt(eaten))
+                        withStyle(SpanStyle(fontSize = 16.sp, letterSpacing = (-0.5).sp)) { append(suffix) }
+                    },
+                    color = ink, maxLines = 1, modifier = Modifier.padding(top = 6.dp),
+                    style = MaterialTheme.typography.displaySmall.copy(fontSize = 34.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-1.5).sp, lineHeight = 34.sp),
+                )
+            }
+            BentoChip(
+                stringResource(R.string.bscan_log_food), container = RaveTheme.colors.tileInk.container, content = RaveTheme.colors.tileInk.content,
+                onClick = onAdd,
+            )
+        }
+        val f = if (target != null && target.kcal > 0) (eaten / target.kcal.toFloat()).coerceIn(0f, 1f) else 0f
+        Box(Modifier.fillMaxWidth().padding(top = 12.dp).height(10.dp).clip(CircleShape).background(ink.copy(alpha = 0.12f))) {
+            if (f > 0f) Box(Modifier.fillMaxWidth(f).height(10.dp).clip(CircleShape).background(ink))
+        }
+    }
+}
+
+/** "Recent  ·  See all" and a row of small verdict-coloured chips (name + verdict word). */
+@Composable
+private fun RecentScans(
+    scans: List<FoodScanEntity>,
+    showAll: Boolean,
+    onToggleAll: () -> Unit,
+    onOpen: (FoodScanEntity) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier.fillMaxWidth()) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.bscan_recent), style = MaterialTheme.typography.titleMedium.copy(fontSize = 16.sp, fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.weight(1f))
+            if (scans.size > RECENT_CHIPS) {
+                Text(
+                    stringResource(if (showAll) R.string.bscan_show_less else R.string.bscan_see_all),
+                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp, fontWeight = FontWeight.SemiBold),
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.65f),
+                    modifier = Modifier.clip(BentoPillShape).clickable(onClick = onToggleAll).padding(horizontal = 4.dp, vertical = 2.dp),
                 )
             }
         }
-        if (target != null) {
-            val f = (eaten / target.kcal.toFloat()).coerceIn(0f, 1f)
-            Box(Modifier.fillMaxWidth().padding(top = 8.dp).height(10.dp).clip(CircleShape).background(lime.content.copy(alpha = 0.15f))) {
-                if (f > 0f) Box(Modifier.fillMaxWidth(f).height(10.dp).clip(CircleShape).background(RaveTheme.colors.accentCard))
+        val shown = if (showAll) scans else scans.take(RECENT_CHIPS)
+        shown.chunked(RECENT_CHIPS).forEach { row ->
+            Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                row.forEach { scan -> RecentChip(scan, Modifier.weight(1f)) { onOpen(scan) } }
+                repeat(RECENT_CHIPS - row.size) { Spacer(Modifier.weight(1f)) }
             }
         }
-        Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TonalPillButton(stringResource(R.string.food_add), onAdd, Modifier.weight(1f), icon = Icons.Rounded.Add)
-            TonalPillButton(stringResource(R.string.food_meal_plan), onOpenPlan, Modifier.weight(1f), icon = Icons.Rounded.RestaurantMenu)
-        }
     }
 }
 
 @Composable
-private fun ScanTile(icon: ImageVector, label: String, sub: String, tile: com.rave.app.ui.theme.TileColor, modifier: Modifier, onClick: () -> Unit) {
-    SectionCard(modifier, color = tile.container, onClick = onClick) {
-        Icon(icon, null, tint = tile.content, modifier = Modifier.size(28.dp))
-        Text(label, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold), color = tile.content,
-            modifier = Modifier.padding(top = 10.dp), maxLines = 1)
-        Text(sub, style = MaterialTheme.typography.bodySmall, color = tile.content.copy(alpha = 0.75f), maxLines = 1)
+private fun RecentChip(scan: FoodScanEntity, modifier: Modifier, onClick: () -> Unit) {
+    val v = runCatching { Verdict.valueOf(scan.verdict) }.getOrDefault(Verdict.SOMETIMES)
+    val t = verdictChipColors(v)
+    Column(
+        modifier.clip(BentoTileShape).background(t.container)
+            .then(if (scan.barcode != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+    ) {
+        Text(scan.name, style = MaterialTheme.typography.labelLarge.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold), color = t.content,
+            maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(verdictShort(v), style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp), color = t.content, maxLines = 1)
     }
 }
 
+/** One meal slot of today's log: sand tile with the slot name, total and each entry. */
 @Composable
 private fun LogGroup(slot: MealSlot, entries: List<FoodLogEntity>, onDelete: (Long) -> Unit) {
-    SectionCard(Modifier.fillMaxWidth()) {
-        Row {
-            Text(slotName(slot), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
-            Text(stringResource(R.string.food_kcal, fmt(entries.sumOf { it.kcal })), style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary)
+    val t = RaveTheme.colors.tileSand
+    BentoTile(t.container, Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            BentoKicker(slotName(slot), t.content, Modifier.weight(1f))
+            Text(stringResource(R.string.food_kcal, fmt(entries.sumOf { it.kcal })), style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                color = t.content)
         }
         entries.forEach { e ->
             Row(Modifier.fillMaxWidth().padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                 e.verdict?.let { v -> runCatching { Verdict.valueOf(v) }.getOrNull() }?.let { v ->
-                    Box(Modifier.size(10.dp).clip(CircleShape).background(verdictColors(v).content))
+                    Box(Modifier.size(10.dp).clip(CircleShape).background(verdictHeroColors(v).container))
                     Spacer(Modifier.width(8.dp))
                 }
-                Text(e.name, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f), maxLines = 1)
+                Text(e.name, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold), color = t.content,
+                    modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(stringResource(R.string.food_kcal, fmt(e.kcal)), style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    color = t.content.copy(alpha = 0.65f))
                 IconButton(onClick = { onDelete(e.id) }, modifier = Modifier.size(32.dp)) {
-                    Icon(Icons.Rounded.Close, stringResource(R.string.action_delete), Modifier.size(16.dp))
+                    Icon(Icons.Rounded.Close, stringResource(R.string.action_delete), tint = t.content, modifier = Modifier.size(16.dp))
                 }
             }
         }
     }
 }
 
+/** Peach MEAL PLAN tile that opens the week's plan. */
 @Composable
-private fun ScanRow(scan: FoodScanEntity, onClick: () -> Unit) {
-    val v = runCatching { Verdict.valueOf(scan.verdict) }.getOrDefault(Verdict.SOMETIMES)
-    val c = verdictColors(v)
-    SectionCard(Modifier.fillMaxWidth(), onClick = if (scan.barcode != null) onClick else null) {
+private fun MealPlanTile(onClick: () -> Unit) {
+    val t = RaveTheme.colors.tilePeach
+    BentoTile(t.container, Modifier.fillMaxWidth(), onClick = onClick) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(34.dp).clip(CircleShape).background(c.container), contentAlignment = Alignment.Center) {
-                Icon(verdictIcon(v), null, tint = c.content, modifier = Modifier.size(20.dp))
-            }
-            Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
-                Text(scan.name, style = MaterialTheme.typography.bodyMedium, maxLines = 1)
-                Text(listOf(scan.brand, verdictTitle(v)).filter { it.isNotBlank() }.joinToString(" · "),
-                    style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                BentoKicker(stringResource(R.string.bscan_meal_plan_kicker), t.content)
+                Text(stringResource(R.string.food_meal_plan_body), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
+                    color = t.content, modifier = Modifier.padding(top = 6.dp))
             }
-            scan.kcal?.let { Text(stringResource(R.string.food_kcal, fmt(it)), style = MaterialTheme.typography.labelMedium) }
+            Spacer(Modifier.width(12.dp))
+            Box(Modifier.size(48.dp).clip(CircleShape).background(RaveTheme.colors.tileInk.container), contentAlignment = Alignment.Center) {
+                Icon(Icons.Rounded.RestaurantMenu, stringResource(R.string.food_meal_plan), tint = RaveTheme.colors.tileInk.content, modifier = Modifier.size(24.dp))
+            }
         }
     }
 }
@@ -425,17 +526,18 @@ private fun QuickAddSheet(defaultSlot: MealSlot, onAdd: (DesiFood, Int, MealSlot
     var picked by remember { mutableStateOf<DesiFood?>(null) }
     var servings by remember { mutableIntStateOf(1) }
     var slot by remember { mutableStateOf(defaultSlot) }
-    Column(Modifier.fillMaxWidth().padding(horizontal = Dimens.ScreenPadding).padding(bottom = 24.dp)) {
+    val c = RaveTheme.colors
+    Column(Modifier.fillMaxWidth().padding(horizontal = ScanGutter).padding(bottom = 24.dp)) {
         val p = picked
         if (p == null) {
             OutlinedTextField(query, { query = it }, placeholder = { Text(stringResource(R.string.food_search_hint)) }, singleLine = true,
-                modifier = Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.medium)
+                modifier = Modifier.fillMaxWidth(), shape = BentoSquareShape)
             Spacer(Modifier.height(8.dp))
             LazyColumn(Modifier.fillMaxWidth().height(380.dp)) {
                 items(DesiFoods.search(query), key = { it.id }) { f ->
                     Row(Modifier.fillMaxWidth().clickable { picked = f; servings = 1 }.padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
-                            Text(f.name, style = MaterialTheme.typography.bodyMedium)
+                            Text(f.name, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold))
                             Text(f.serving, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         Text(stringResource(R.string.food_kcal, f.kcal.toString()), style = MaterialTheme.typography.labelMedium)
@@ -443,23 +545,25 @@ private fun QuickAddSheet(defaultSlot: MealSlot, onAdd: (DesiFood, Int, MealSlot
                 }
             }
         } else {
-            Text(p.name, style = MaterialTheme.typography.titleMedium)
+            BentoBig(p.name, MaterialTheme.colorScheme.onSurface, size = 26.sp)
             Text(p.serving, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(12.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.food_servings), modifier = Modifier.weight(1f))
-                TextButton(onClick = { if (servings > 1) servings-- }) { Text("−") }
-                Text("$servings", style = MaterialTheme.typography.titleMedium)
-                TextButton(onClick = { if (servings < 9) servings++ }) { Text("+") }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                listOf(MealSlot.BREAKFAST, MealSlot.LUNCH, MealSlot.DINNER, MealSlot.SNACK).forEach { s ->
-                    com.rave.app.ui.components.PillChip(slot == s, slotName(s), { slot = s })
-                }
+                Text(stringResource(R.string.food_servings), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), modifier = Modifier.weight(1f))
+                BentoIconButton(Icons.Rounded.Remove, null, onClick = { if (servings > 1) servings-- }, size = 40.dp)
+                Text("$servings", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold), modifier = Modifier.padding(horizontal = 14.dp))
+                BentoIconButton(Icons.Rounded.Add, null, onClick = { if (servings < 9) servings++ }, size = 40.dp)
             }
             Spacer(Modifier.height(12.dp))
-            TonalPillButton(
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                listOf(MealSlot.BREAKFAST, MealSlot.LUNCH, MealSlot.DINNER, MealSlot.SNACK).forEach { s ->
+                    BentoToggleChip(slotName(s), slot == s, { slot = s })
+                }
+            }
+            Spacer(Modifier.height(14.dp))
+            BentoButton(
                 stringResource(R.string.food_log_action) + " · " + stringResource(R.string.food_kcal, (p.kcal * servings).toString()),
+                container = c.tileInk.container, content = c.tileInk.content,
                 onClick = { onAdd(p, servings, slot) }, modifier = Modifier.fillMaxWidth(),
             )
         }
