@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.runtime.staticCompositionLocalOf
+import com.rave.app.domain.model.AppStyle
 
 internal val LightColors = lightColorScheme(
     primary = LightAccent,
@@ -86,6 +87,80 @@ internal val DarkColors = darkColorScheme(
     scrim = Black,
 )
 
+internal val ClassicLightColors = lightColorScheme(
+    primary = ClassicLightAccent,
+    onPrimary = White,
+    primaryContainer = ClassicTilePeach,
+    onPrimaryContainer = ClassicLightTextPrimary,
+    secondary = ClassicLightAccentCard,
+    onSecondary = White,
+    secondaryContainer = ClassicTilePeach,
+    onSecondaryContainer = ClassicLightTextPrimary,
+    tertiary = ClassicOnTileGreen,
+    onTertiary = White,
+    tertiaryContainer = ClassicTileGreen,
+    onTertiaryContainer = ClassicLightTextPrimary,
+    background = ClassicLightBackgroundTop,
+    onBackground = ClassicLightTextPrimary,
+    surface = LightSurface,
+    onSurface = ClassicLightTextPrimary,
+    surfaceVariant = ClassicLightSurfaceWarm,
+    onSurfaceVariant = ClassicLightTextSecondary,
+    surfaceTint = ClassicLightAccent,
+    surfaceBright = LightSurface,
+    surfaceDim = ClassicLightBackgroundBottom,
+    surfaceContainerLowest = LightSurface,
+    surfaceContainerLow = LightSurface,
+    surfaceContainer = ClassicLightSurfaceSoft,
+    surfaceContainerHigh = ClassicLightSurfaceWarm,
+    surfaceContainerHighest = ClassicLightBackgroundBottom,
+    inverseSurface = ClassicLightAccentCard,
+    inverseOnSurface = ClassicLightBackgroundTop,
+    inversePrimary = ClassicDarkAccent,
+    outline = ClassicLightOutline,
+    outlineVariant = ClassicLightOutlineVariant,
+    error = LightError,
+    onError = White,
+    scrim = Black,
+)
+
+internal val ClassicDarkColors = darkColorScheme(
+    primary = ClassicDarkAccent,
+    onPrimary = ClassicDarkOnAccent,
+    primaryContainer = ClassicDarkAccentContainer,
+    onPrimaryContainer = ClassicDarkOnAccentContainer,
+    secondary = ClassicDarkTextPrimary,
+    onSecondary = ClassicDarkBackground,
+    secondaryContainer = ClassicDarkSurfaceHighest,
+    onSecondaryContainer = ClassicDarkTextPrimary,
+    tertiary = ClassicDarkOnTileGreen,
+    onTertiary = ClassicDarkBackground,
+    tertiaryContainer = ClassicDarkTileGreen,
+    onTertiaryContainer = ClassicDarkTextPrimary,
+    background = ClassicDarkBackground,
+    onBackground = ClassicDarkTextPrimary,
+    surface = ClassicDarkSurface,
+    onSurface = ClassicDarkTextPrimary,
+    surfaceVariant = ClassicDarkSurfaceHigh,
+    onSurfaceVariant = ClassicDarkTextSecondary,
+    surfaceTint = ClassicDarkAccent,
+    surfaceBright = ClassicDarkSurfaceHighest,
+    surfaceDim = ClassicDarkBackground,
+    surfaceContainerLowest = ClassicDarkBackground,
+    surfaceContainerLow = ClassicDarkSurface,
+    surfaceContainer = ClassicDarkSurface,
+    surfaceContainerHigh = ClassicDarkSurfaceHigh,
+    surfaceContainerHighest = ClassicDarkSurfaceHighest,
+    inverseSurface = ClassicDarkTextPrimary,
+    inverseOnSurface = ClassicDarkBackground,
+    inversePrimary = ClassicLightAccent,
+    outline = ClassicDarkBorder,
+    outlineVariant = ClassicDarkBorder,
+    error = DarkError,
+    onError = ClassicDarkBackground,
+    scrim = Black,
+)
+
 /**
  * App theme. Wraps MaterialTheme and also provides [ExtendedColors] for
  * tokens Material 3 has no slot for (gradient, habit tiles, chart colours…).
@@ -93,9 +168,22 @@ internal val DarkColors = darkColorScheme(
 @Composable
 fun RaveTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    style: AppStyle = AppStyle.BENTO,
     content: @Composable () -> Unit,
 ) {
-    val extended = if (darkTheme) DarkExtendedColors else LightExtendedColors
+    val classic = style == AppStyle.CLASSIC
+    val extended = when {
+        classic && darkTheme -> ClassicDarkExtendedColors
+        classic -> ClassicLightExtendedColors
+        darkTheme -> DarkExtendedColors
+        else -> LightExtendedColors
+    }
+    val scheme = when {
+        classic && darkTheme -> ClassicDarkColors
+        classic -> ClassicLightColors
+        darkTheme -> DarkColors
+        else -> LightColors
+    }
     // Ignore the system font-size setting so text, buttons and cards keep the same size on
     // every phone (the layout is designed around this fixed scale).
     val density = LocalDensity.current
@@ -107,7 +195,7 @@ fun RaveTheme(
         LocalDensity provides fixedDensity,
     ) {
         MaterialTheme(
-            colorScheme = if (darkTheme) DarkColors else LightColors,
+            colorScheme = scheme,
             typography = RaveTypography,
             shapes = RaveShapes,
             content = content,

@@ -49,6 +49,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
+            val appStyle by viewModel.appStyle.collectAsStateWithLifecycle()
             val darkTheme = when (themeMode) {
                 ThemeMode.LIGHT -> false
                 ThemeMode.DARK -> true
@@ -69,7 +70,7 @@ class MainActivity : ComponentActivity() {
                 onDispose { }
             }
 
-            RaveTheme(darkTheme = darkTheme) {
+            RaveTheme(darkTheme = darkTheme, style = appStyle) {
                 Box {
                     RaveApp(viewModel)
                     if (showSplash) SplashOverlay(onFinished = { showSplash = false })

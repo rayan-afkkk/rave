@@ -19,6 +19,7 @@ import com.rave.app.data.repository.WaterRepository
 import com.rave.app.domain.food.FoodSource
 import com.rave.app.domain.food.MealSlot
 import com.rave.app.domain.model.ActivityStatus
+import com.rave.app.domain.model.AppStyle
 import com.rave.app.domain.model.ActivityType
 import com.rave.app.domain.model.Habit
 import com.rave.app.domain.model.HabitColor
@@ -125,7 +126,7 @@ class AppScreenshots {
         food.log("Greek yogurt", 130, 11.0, 9.0, 4.0, 6.0, FoodSource.MANUAL, MealSlot.SNACK)
     }
 
-    private fun shoot(name: String, route: Any?, settleMs: Long = 2500) {
+    private fun shoot(name: String, route: Any?, settleMs: Long = 2500, style: AppStyle = AppStyle.BENTO) {
         // Some screens run endless animations (pulses, the buddy), so the compose clock is driven
         // by hand: with auto-advance off, waiting for idle doesn't wait for those to finish.
         compose.mainClock.autoAdvance = false
@@ -133,7 +134,7 @@ class AppScreenshots {
         compose.setContent {
             nav = rememberNavController()
             val vm: MainViewModel = hiltViewModel()
-            RaveTheme(darkTheme = false) { RaveApp(vm, nav) }
+            RaveTheme(darkTheme = false, style = style) { RaveApp(vm, nav) }
         }
         settle(500)
         if (route != null) compose.runOnUiThread { nav.navigate(route) }
@@ -168,4 +169,6 @@ class AppScreenshots {
     @Test fun s09_habit() = shoot("09_new_habit", AddEditHabitRoute())
     @Test fun s10_mealplan() = shoot("10_meal_plan", MealPlanRoute)
     @Test fun s11_paywall() = shoot("11_paywall", PaywallRoute())
+    @Test fun s12_home_classic() = shoot("12_home_classic", null, style = AppStyle.CLASSIC)
+    @Test fun s13_scan_classic() = shoot("13_scan_classic", FoodRoute, style = AppStyle.CLASSIC)
 }

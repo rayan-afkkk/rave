@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import com.rave.app.domain.model.AppStyle
 import com.rave.app.domain.model.NotificationCategory
 import com.rave.app.domain.model.ThemeMode
 import com.rave.app.domain.model.UserSettings
@@ -33,6 +34,8 @@ class SettingsRepository @Inject constructor(
     val settings: Flow<UserSettings> = prefs.map { it.toSettings() }.distinctUntilChanged()
 
     val themeMode: Flow<ThemeMode> = settings.map { it.themeMode }.distinctUntilChanged()
+
+    val appStyle: Flow<AppStyle> = settings.map { it.appStyle }.distinctUntilChanged()
 
     suspend fun current(): UserSettings = settings.first()
 
@@ -69,6 +72,7 @@ class SettingsRepository @Inject constructor(
         val d = UserSettings()
         return UserSettings(
             themeMode = enumOr(this[Keys.THEME], d.themeMode),
+            appStyle = enumOr(this[Keys.STYLE], d.appStyle),
             unit = enumOr(this[Keys.UNIT], d.unit),
             weightKg = this[Keys.WEIGHT] ?: d.weightKg,
             heightCm = this[Keys.HEIGHT] ?: d.heightCm,
@@ -105,6 +109,7 @@ class SettingsRepository @Inject constructor(
 
     private fun MutablePreferences.write(s: UserSettings) {
         this[Keys.THEME] = s.themeMode.name
+        this[Keys.STYLE] = s.appStyle.name
         this[Keys.UNIT] = s.unit.name
         this[Keys.WEIGHT] = s.weightKg
         this[Keys.HEIGHT] = s.heightCm
@@ -135,6 +140,7 @@ class SettingsRepository @Inject constructor(
 
     private object Keys {
         val THEME = stringPreferencesKey("theme_mode")
+        val STYLE = stringPreferencesKey("app_style")
         val UNIT = stringPreferencesKey("unit")
         val WEIGHT = floatPreferencesKey("weight_kg")
         val HEIGHT = floatPreferencesKey("height_cm")

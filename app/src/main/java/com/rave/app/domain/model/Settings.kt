@@ -3,6 +3,9 @@ package com.rave.app.domain.model
 /** Appearance setting. */
 enum class ThemeMode { LIGHT, DARK, SYSTEM }
 
+/** Visual style: the bold Bento tiles, or the original warm orange / off-white look. */
+enum class AppStyle { BENTO, CLASSIC }
+
 enum class ProfileVisibility { FRIENDS, PRIVATE }
 
 /** Notification categories users can toggle individually. */
@@ -10,6 +13,7 @@ enum class NotificationCategory { REMINDERS, FRIENDS, COMPETITIONS, AUTO_DETECT,
 
 data class UserSettings(
     val themeMode: ThemeMode = ThemeMode.LIGHT,
+    val appStyle: AppStyle = AppStyle.BENTO,
     val unit: DistanceUnit = DistanceUnit.KM,
     val weightKg: Float = 70f,
     val heightCm: Float = 170f,

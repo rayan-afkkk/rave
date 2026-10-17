@@ -285,6 +285,9 @@
     <string name="settings_phone">Find me by phone number</string>
     <string name="settings_phone_help">Optional. Only a salted hash of your number is stored, so friends who have you in their contacts can find you. Leave empty to remove.</string>
     <string name="settings_appearance">Appearance</string>
+    <string name="settings_app_style">Theme</string>
+    <string name="style_bento">Bento</string>
+    <string name="style_classic">Classic</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_system">System</string>

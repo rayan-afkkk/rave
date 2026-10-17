@@ -59,6 +59,7 @@ import com.rave.app.ui.theme.RaveTheme
 import com.rave.app.domain.model.DistanceUnit
 import com.rave.app.domain.model.NotificationCategory
 import com.rave.app.domain.model.ProfileVisibility
+import com.rave.app.domain.model.AppStyle
 import com.rave.app.domain.model.ThemeMode
 import com.rave.app.ui.components.ConfirmDialog
 import com.rave.app.ui.components.RaveScreen
@@ -151,6 +152,13 @@ fun SettingsScreen(
 
             // Appearance
             SettingsSection(stringResource(R.string.settings_appearance)) {
+                Text(stringResource(R.string.settings_app_style), style = MaterialTheme.typography.labelLarge)
+                Spacer(Modifier.height(6.dp))
+                Segmented(
+                    listOf(AppStyle.BENTO to R.string.style_bento, AppStyle.CLASSIC to R.string.style_classic),
+                    s.appStyle,
+                ) { style -> viewModel.update { it.copy(appStyle = style) } }
+                Spacer(Modifier.height(10.dp))
                 Segmented(
                     listOf(ThemeMode.LIGHT to R.string.theme_light, ThemeMode.DARK to R.string.theme_dark, ThemeMode.SYSTEM to R.string.theme_system),
                     s.themeMode,
