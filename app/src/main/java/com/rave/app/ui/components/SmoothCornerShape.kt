@@ -21,9 +21,9 @@ import kotlin.math.tan
  * straight edges instead of meeting them abruptly, so tiles look softer than a plain
  * [androidx.compose.foundation.shape.RoundedCornerShape]. Same maths as Figma's corner smoothing.
  *
- * @param smoothing 0 = ordinary rounded corner, 1 = maximum smoothing (0.6 matches iOS).
+ * @param smoothing 0 = ordinary rounded corner, 1 = maximum smoothing (0.6 matches iOS; Rave uses 1 for extra-soft corners).
  */
-class SmoothCornerShape(private val radius: Dp, private val smoothing: Float = 0.6f) : Shape {
+class SmoothCornerShape(private val radius: Dp, private val smoothing: Float = 1f) : Shape {
 
     override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
         val budget = min(size.width, size.height) / 2f

@@ -187,7 +187,7 @@ private fun Headline(modifier: Modifier = Modifier) {
             Spacer(Modifier.width(12.dp))
             Text(
                 stringResource(R.string.bplan_pro_word), style = style, color = RaveTheme.colors.onHighlight, maxLines = 1,
-                modifier = Modifier.clip(SmoothCornerShape(14.dp)).background(RaveTheme.colors.highlight).padding(horizontal = 10.dp),
+                modifier = Modifier.clip(SmoothCornerShape(18.dp)).background(RaveTheme.colors.highlight).padding(horizontal = 10.dp),
             )
         }
         Text(stringResource(R.string.bplan_pro_further), style = style, color = ink.content)

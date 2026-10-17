@@ -278,7 +278,7 @@ private fun TrackingMap(state: TrackingState, follow: Boolean, onUserMovedMap: (
 
 private fun List<LatLngPoint>.toLatLng(): List<LatLng> = map { LatLng(it.lat, it.lng) }
 
-private val SheetShape = SmoothCornerShape(34.dp)
+private val SheetShape = SmoothCornerShape(38.dp)
 
 @Composable
 private fun LiveChip(text: String) {

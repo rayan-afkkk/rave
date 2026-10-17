@@ -179,7 +179,7 @@ fun FriendsScreen(
                     item(key = "invite") {
                         SquadMember(stringResource(R.string.action_invite), Modifier.clickable(onClick = onInvite)) {
                             Box(
-                                Modifier.size(56.dp).clip(SmoothCornerShape(16.dp)).background(c.tileSand.container),
+                                Modifier.size(56.dp).clip(SmoothCornerShape(20.dp)).background(c.tileSand.container),
                                 contentAlignment = Alignment.Center,
                             ) { Icon(Icons.Rounded.Add, contentDescription = null, tint = c.tileSand.content, modifier = Modifier.size(24.dp)) }
                         }

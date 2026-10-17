@@ -130,9 +130,9 @@ private val TEMPLATES = listOf(
         HabitForm(icon = "read", color = HabitColor.PEACH, type = HabitType.TIMED, timedMinutes = "20")),
 )
 
-private val SwatchShape = SmoothCornerShape(14.dp)
-private val IconTileShape = SmoothCornerShape(22.dp)
-private val DayShape = SmoothCornerShape(14.dp)
+private val SwatchShape = SmoothCornerShape(18.dp)
+private val IconTileShape = SmoothCornerShape(26.dp)
+private val DayShape = SmoothCornerShape(18.dp)
 
 @Composable
 private fun bigStyle(size: TextUnit): ComposeTextStyle = MaterialTheme.typography.displaySmall.copy(
@@ -651,7 +651,7 @@ private fun InlineField(value: String, hint: String, onValueChange: (String) -> 
     val sand = RaveTheme.colors.tileSand
     val style = MaterialTheme.typography.bodyMedium.copy(color = sand.content, fontWeight = FontWeight.SemiBold)
     Box(
-        Modifier.fillMaxWidth().clip(SmoothCornerShape(14.dp)).background(sand.content.copy(alpha = 0.06f))
+        Modifier.fillMaxWidth().clip(SmoothCornerShape(18.dp)).background(sand.content.copy(alpha = 0.06f))
             .padding(horizontal = 12.dp, vertical = 10.dp),
     ) {
         if (value.isEmpty()) Text(hint, style = style, color = sand.content.copy(alpha = 0.45f), maxLines = 1)
@@ -678,7 +678,7 @@ private fun IconPickerDialog(selected: String, tile: androidx.compose.ui.graphic
                 HabitIcons.all.forEach { (key, icon) ->
                     val on = key == selected
                     Box(
-                        Modifier.size(52.dp).clip(SmoothCornerShape(16.dp))
+                        Modifier.size(52.dp).clip(SmoothCornerShape(20.dp))
                             .background(if (on) c.tileInk.container else c.tileSand.container)
                             .clickable(role = Role.RadioButton) { onPick(key) }
                             .semantics { this.selected = on; contentDescription = key },

@@ -232,14 +232,14 @@ fun ActivitySummaryScreen(
                             OutlinedTextField(
                                 value = state.name, onValueChange = viewModel::setName,
                                 label = { Text(stringResource(R.string.summary_name)) }, singleLine = true,
-                                shape = SmoothCornerShape(18.dp), modifier = Modifier.fillMaxWidth(),
+                                shape = SmoothCornerShape(22.dp), modifier = Modifier.fillMaxWidth(),
                                 colors = sandFieldColors(),
                             )
                             Spacer(Modifier.height(10.dp))
                             OutlinedTextField(
                                 value = state.note, onValueChange = viewModel::setNote,
                                 label = { Text(stringResource(R.string.summary_note)) }, minLines = 2,
-                                shape = SmoothCornerShape(18.dp), modifier = Modifier.fillMaxWidth(),
+                                shape = SmoothCornerShape(22.dp), modifier = Modifier.fillMaxWidth(),
                                 colors = sandFieldColors(),
                             )
                         }

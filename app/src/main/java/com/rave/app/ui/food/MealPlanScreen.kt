@@ -196,7 +196,7 @@ fun MealPlanScreen(onBack: () -> Unit, onOpenSettings: () -> Unit, viewModel: Me
 private fun DayChip(day: DayPlan, selected: Boolean, locked: Boolean, modifier: Modifier, onClick: () -> Unit) {
     val tile = if (selected) RaveTheme.colors.tileInk else RaveTheme.colors.tileSand
     Column(
-        modifier.height(58.dp).clip(SmoothCornerShape(18.dp)).background(tile.container).clickable(onClick = onClick),
+        modifier.height(58.dp).clip(SmoothCornerShape(22.dp)).background(tile.container).clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -289,7 +289,7 @@ private fun MealCard(meal: PlannedMeal, done: Boolean, onAte: () -> Unit) {
         val bg = if (done) c.tileInk.container else c.tileInk.content.copy(alpha = 0.7f)
         val fg = if (done) c.highlight else c.tileInk.container
         Box(
-            Modifier.size(40.dp).clip(SmoothCornerShape(14.dp)).background(bg).clickable(enabled = !done, onClick = onAte),
+            Modifier.size(40.dp).clip(SmoothCornerShape(18.dp)).background(bg).clickable(enabled = !done, onClick = onAte),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
