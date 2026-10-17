@@ -112,6 +112,9 @@ android {
     }
     testOptions {
         unitTests.isReturnDefaultValues = true
+        // Robolectric screenshot tests (app/src/test/.../screens) need the merged resources.
+        unitTests.isIncludeAndroidResources = true
+        unitTests.all { it.maxHeapSize = "3g" }
     }
 }
 
@@ -201,6 +204,14 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    // Screenshot tests: real screens rendered on the JVM with Robolectric + Hilt.
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    testImplementation("org.robolectric:robolectric:4.16")
+    testImplementation("com.google.dagger:hilt-android-testing:${libs.versions.hilt.get()}")
+    kspTest(libs.hilt.compiler)
+    testImplementation("androidx.work:work-testing:${libs.versions.work.get()}")
+    testImplementation("androidx.test:core-ktx:1.6.1")
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
