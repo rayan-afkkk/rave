@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Bento Pop profile -->
+    <string name="bprofile_badges_count">%1$d / %2$d</string>
+    <string name="bprofile_wrapped">Wrapped</string>
+    <string name="bprofile_pro">PRO</string>
+    <string name="bprofile_xp">%1$d / %2$d XP</string>
+    <string name="bprofile_freezes">Streak freezes</string>
+    <!-- Bento Pop habit editor -->
+    <string name="bprofile_goal_type">Goal type</string>
+    <string name="bprofile_count">Count</string>
+    <string name="bprofile_days">Days</string>
+    <string name="bprofile_reminder">Reminder</string>
+    <string name="bprofile_create_habit">Create habit</string>
+    <string name="bprofile_name_hint">Name your habit</string>
+    <string name="bprofile_change_icon">Change icon</string>
+    <string name="bprofile_decrease">Decrease</string>
+    <string name="bprofile_increase">Increase</string>
+</resources>
