@@ -25,6 +25,8 @@ jobs:
           ./gradlew :app:assembleDebug :app:assembleStaging --stacktrace --console=plain
       - name: Unit tests + screenshots
         run: ./gradlew :app:testDebugUnitTest --console=plain --continue
+      - name: Render screenshots (always re-run, never from cache)
+        run: ./gradlew :app:testDebugUnitTest --tests '*AppScreenshots*' --rerun --console=plain
       - name: Commit screenshots to docs/screenshots
         if: github.event_name == 'push'
         run: |
