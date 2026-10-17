@@ -146,7 +146,7 @@ fun ActivitySummaryScreen(
                         BentoBig(
                             state.name.ifBlank { stringResource(defaultTitleRes(a)) },
                             MaterialTheme.colorScheme.onBackground,
-                            Modifier.padding(top = 12.dp), size = 34.sp,
+                            Modifier.padding(top = 12.dp), size = 28.sp,
                         )
                         Text(
                             stringResource(

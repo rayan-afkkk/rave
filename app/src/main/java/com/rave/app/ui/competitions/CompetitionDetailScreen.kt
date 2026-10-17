@@ -268,7 +268,7 @@ fun CompetitionDetailScreen(onBack: () -> Unit, onResults: (String) -> Unit, vie
                 BentoTile(colors.tileOrange.container, Modifier.fillMaxWidth()) {
                     BentoKicker(stringResource(R.string.bfriends_comp_kicker, stringResource(competitionTypeRes(c.type))), ink)
                     Spacer(Modifier.height(6.dp))
-                    BentoBig(c.name, ink, size = 34.sp, maxLines = 3)
+                    BentoBig(c.name, ink, size = 28.sp, maxLines = 3)
                     Spacer(Modifier.height(12.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         BentoChip(
@@ -371,16 +371,16 @@ fun CompetitionDetailScreen(onBack: () -> Unit, onResults: (String) -> Unit, vie
                     when {
                         status == CompetitionStatus.ENDED -> BentoButton(
                             stringResource(R.string.comp_view_results), primaryBg, primaryFg, onClick = { onResults(c.id) },
-                            modifier = Modifier.fillMaxWidth(), leading = Icons.Rounded.EmojiEvents, height = 58.dp,
+                            modifier = Modifier.fillMaxWidth(), leading = Icons.Rounded.EmojiEvents, height = 50.dp,
                         )
                         !isMember -> BentoButton(
                             stringResource(R.string.comp_join), primaryBg, primaryFg, onClick = { viewModel.join() },
-                            modifier = Modifier.fillMaxWidth(), height = 58.dp,
+                            modifier = Modifier.fillMaxWidth(), height = 50.dp,
                         )
                         status == CompetitionStatus.ACTIVE && state.squadFriends.isNotEmpty() -> BentoButton(
                             stringResource(if (state.squadNudged) R.string.bfriends_nudged_squad else R.string.bfriends_nudge_squad),
                             primaryBg, primaryFg, onClick = { viewModel.nudgeSquad() },
-                            modifier = Modifier.fillMaxWidth(), leading = Icons.Rounded.Bolt, enabled = !state.squadNudged, height = 58.dp,
+                            modifier = Modifier.fillMaxWidth(), leading = Icons.Rounded.Bolt, enabled = !state.squadNudged, height = 50.dp,
                         )
                         else -> Unit
                     }
@@ -388,7 +388,7 @@ fun CompetitionDetailScreen(onBack: () -> Unit, onResults: (String) -> Unit, vie
                         BentoButton(
                             stringResource(R.string.comp_invite_friends), colors.tileSand.container, colors.tileSand.content,
                             onClick = { inviting = true }, modifier = Modifier.fillMaxWidth(), leading = Icons.Rounded.PersonAdd,
-                            enabled = state.friends.isNotEmpty() && c.members.size < Competition.MAX_PARTICIPANTS, height = 58.dp,
+                            enabled = state.friends.isNotEmpty() && c.members.size < Competition.MAX_PARTICIPANTS, height = 50.dp,
                         )
                     }
                 }

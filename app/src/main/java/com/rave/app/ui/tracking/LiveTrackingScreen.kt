@@ -173,7 +173,7 @@ private fun LiveTrackingContent(viewModel: LiveTrackingViewModel, onBack: () -> 
                 Text(
                     Format.distance(state.distanceM, unit), color = ink.content, maxLines = 1,
                     style = MaterialTheme.typography.displayLarge.copy(
-                        fontSize = 78.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-3).sp, lineHeight = 74.sp,
+                        fontSize = 64.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-3).sp, lineHeight = 60.sp,
                     ),
                 )
                 Text(

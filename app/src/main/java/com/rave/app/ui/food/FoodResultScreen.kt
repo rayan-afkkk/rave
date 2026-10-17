@@ -230,13 +230,13 @@ private fun ResultContent(
                 if (sugar != null) {
                     BentoTile(c.tileInk.container, Modifier.weight(1f).fillMaxHeight()) {
                         BentoKicker(stringResource(R.string.food_sugar), c.tileInk.content)
-                        BentoBig(stringResource(R.string.bscan_grams, grams(sugar)), c.tileInk.content, Modifier.padding(top = 6.dp), size = 40.sp, maxLines = 1)
+                        BentoBig(stringResource(R.string.bscan_grams, grams(sugar)), c.tileInk.content, Modifier.padding(top = 6.dp), size = 32.sp, maxLines = 1)
                     }
                 }
                 if (kcal != null) {
                     BentoTile(c.tileSand.container, Modifier.weight(1f).fillMaxHeight()) {
                         BentoKicker(stringResource(R.string.food_energy), c.tileSand.content)
-                        BentoBig(kcal.roundToInt().toString(), c.tileSand.content, Modifier.padding(top = 6.dp), size = 40.sp, maxLines = 1)
+                        BentoBig(kcal.roundToInt().toString(), c.tileSand.content, Modifier.padding(top = 6.dp), size = 32.sp, maxLines = 1)
                         Text(stringResource(R.string.unit_kcal), style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
                             color = c.tileSand.content.copy(alpha = 0.65f))
                     }
@@ -295,7 +295,7 @@ private fun VerdictHero(food: ScannedFood, a: FoodAssessment) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 BentoKicker(listOf(food.name, food.servingLabel).filter { it.isNotBlank() }.joinToString(" · "), t.content)
-                BentoBig(verdictHeadline(a.verdict), t.content, Modifier.padding(top = 8.dp), size = 48.sp, maxLines = 1)
+                BentoBig(verdictHeadline(a.verdict), t.content, Modifier.padding(top = 8.dp), size = 38.sp, maxLines = 1)
                 Text(verdictSub(a.verdict), style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold), color = t.content,
                     modifier = Modifier.padding(top = 4.dp))
             }
@@ -355,14 +355,14 @@ private fun LogRow(defaultSlot: MealSlot, logged: MealSlot?, onLog: (MealSlot) -
     var menu by remember { mutableStateOf(false) }
     Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(BentoGap)) {
         BentoButton(stringResource(R.string.food_scan_another), c.tileSand.container, c.tileSand.content, onClick = onScanAnother,
-            modifier = Modifier.weight(1f), height = 58.dp)
+            modifier = Modifier.weight(1f), height = 50.dp)
         Box(Modifier.weight(1f)) {
             if (logged != null) {
                 BentoButton(stringResource(R.string.food_logged, slotName(logged)), c.highlight, c.onHighlight, onClick = { menu = true },
-                    modifier = Modifier.fillMaxWidth(), leading = Icons.Rounded.Check, height = 58.dp)
+                    modifier = Modifier.fillMaxWidth(), leading = Icons.Rounded.Check, height = 50.dp)
             } else {
                 BentoButton(stringResource(R.string.bscan_log_it), c.tileInk.container, c.tileInk.content, onClick = { menu = true },
-                    modifier = Modifier.fillMaxWidth(), trailing = Icons.Rounded.Add, height = 58.dp)
+                    modifier = Modifier.fillMaxWidth(), trailing = Icons.Rounded.Add, height = 50.dp)
             }
             DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
                 listOf(MealSlot.BREAKFAST, MealSlot.LUNCH, MealSlot.DINNER, MealSlot.SNACK).forEach { s ->

@@ -99,7 +99,8 @@ fun RaveTheme(
     // Ignore the system font-size setting so text, buttons and cards keep the same size on
     // every phone (the layout is designed around this fixed scale).
     val density = LocalDensity.current
-    val fixedDensity = remember(density.density) { Density(density.density, fontScale = 1f) }
+    // Slightly compact UI scale so the chunky bento tiles and text don't feel oversized.
+    val fixedDensity = remember(density.density) { Density(density.density * UI_SCALE, fontScale = 1f) }
     CompositionLocalProvider(
         LocalExtendedColors provides extended,
         LocalIsDarkTheme provides darkTheme,
@@ -127,3 +128,7 @@ object RaveTheme {
         @Composable @ReadOnlyComposable
         get() = LocalIsDarkTheme.current
 }
+
+
+/** Global UI scale applied on top of the device density (1 = Android default sizes). */
+private const val UI_SCALE = 0.92f

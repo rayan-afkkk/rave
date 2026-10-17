@@ -95,7 +95,7 @@ fun BentoPillAction(
     onLongClick: (() -> Unit)? = null,
 ) {
     Row(
-        modifier.height(58.dp).clip(BentoPillShape)
+        modifier.height(50.dp).clip(BentoPillShape)
             .background(if (enabled) container else container.copy(alpha = 0.4f))
             .combinedClickable(enabled = enabled, onClickLabel = onClickLabel, onLongClick = onLongClick, onClick = onClick)
             .padding(horizontal = 16.dp),

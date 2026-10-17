@@ -60,9 +60,9 @@ import java.util.Locale
  * Steps (black, with the week's bars) · Streak (lime) · Water (sky) · Habits (lilac) · Start a walk (orange).
  */
 
-private val TileShape = RoundedCornerShape(28.dp)
+private val TileShape = RoundedCornerShape(24.dp)
 private val TilePad = 16.dp
-private const val STEPS_TILE_HEIGHT = 236
+private const val STEPS_TILE_HEIGHT = 204
 
 private fun fmt(n: Int) = NumberFormat.getIntegerInstance().format(n)
 
@@ -73,7 +73,7 @@ private fun Label(text: String, color: Color, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun Big(text: String, color: Color, size: TextUnit = 40.sp) {
+private fun Big(text: String, color: Color, size: TextUnit = 32.sp) {
     Text(text, color = color, style = MaterialTheme.typography.displaySmall.copy(fontSize = size, fontWeight = FontWeight.ExtraBold, letterSpacing = (-1.5).sp, lineHeight = size))
 }
 
@@ -91,7 +91,7 @@ fun BentoHeader(state: HomeUiState, modifier: Modifier = Modifier) {
     Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(
             stringResource(R.string.bento_greeting, name),
-            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.ExtraBold, letterSpacing = (-1).sp, lineHeight = 36.sp),
+            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.ExtraBold, letterSpacing = (-1).sp, lineHeight = 30.sp),
             color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.weight(1f),
         )
         Box(
@@ -149,7 +149,7 @@ private fun StepsTile(onOpenBatteryGuide: () -> Unit, modifier: Modifier, viewMo
                     modifier = Modifier.padding(top = 10.dp))
                 else -> {
                     Spacer(Modifier.height(10.dp))
-                    Big(fmt(s.steps), on, 44.sp)
+                    Big(fmt(s.steps), on, 36.sp)
                     Text(
                         stringResource(R.string.bento_steps_sub, fmt(s.goal), Format.distance(s.distanceM, s.unit), unitLabel(s.unit)),
                         style = MaterialTheme.typography.bodySmall, color = on.copy(alpha = 0.7f), maxLines = 1, overflow = TextOverflow.Ellipsis,
@@ -192,7 +192,7 @@ private fun StreakTile(streak: Int, freezes: Int, modifier: Modifier) {
         Column {
             Label(stringResource(R.string.bento_streak), t.content)
             Spacer(Modifier.height(6.dp))
-            Big("$streak🔥", t.content, 34.sp)
+            Big("$streak🔥", t.content, 28.sp)
             Text(stringResource(R.string.bento_streak_sub, freezes), style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
                 color = t.content, maxLines = 1)
         }
@@ -211,7 +211,7 @@ private fun WaterTile(modifier: Modifier, viewModel: WaterViewModel = hiltViewMo
             }
             Spacer(Modifier.height(6.dp))
             Row(verticalAlignment = Alignment.Bottom) {
-                Big("${w.glasses}", t.content, 34.sp)
+                Big("${w.glasses}", t.content, 28.sp)
                 Text("/${w.goal}", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = t.content,
                     modifier = Modifier.padding(bottom = 4.dp))
             }

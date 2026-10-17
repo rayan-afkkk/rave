@@ -233,7 +233,7 @@ private fun DaySummary(plan: DayPlan) {
                     },
                     color = tile.content, maxLines = 1, modifier = Modifier.padding(top = 4.dp),
                     style = MaterialTheme.typography.displaySmall.copy(
-                        fontSize = 34.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-1.5).sp, lineHeight = 34.sp,
+                        fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-1.5).sp, lineHeight = 28.sp,
                     ),
                 )
             }
@@ -267,7 +267,7 @@ private fun MealCard(meal: PlannedMeal, done: Boolean, onAte: () -> Unit) {
         Modifier.fillMaxWidth().clip(BentoTileShape).background(tile.container).padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(emoji, style = MaterialTheme.typography.headlineMedium.copy(fontSize = 30.sp, lineHeight = 34.sp))
+        Text(emoji, style = MaterialTheme.typography.headlineMedium.copy(fontSize = 26.sp, lineHeight = 28.sp))
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
             Text(

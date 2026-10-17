@@ -411,7 +411,7 @@ private fun TodayTile(state: FoodUiState, onAdd: () -> Unit) {
                         withStyle(SpanStyle(fontSize = 16.sp, letterSpacing = (-0.5).sp)) { append(suffix) }
                     },
                     color = ink, maxLines = 1, modifier = Modifier.padding(top = 6.dp),
-                    style = MaterialTheme.typography.displaySmall.copy(fontSize = 34.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-1.5).sp, lineHeight = 34.sp),
+                    style = MaterialTheme.typography.displaySmall.copy(fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-1.5).sp, lineHeight = 28.sp),
                 )
             }
             BentoChip(

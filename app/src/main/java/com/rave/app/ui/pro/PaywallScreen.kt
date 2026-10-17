@@ -163,7 +163,7 @@ fun PaywallScreen(onClose: () -> Unit, viewModel: PaywallViewModel = hiltViewMod
                     val activity = context.findActivity()
                     if (activity == null || !viewModel.buy(activity, offer)) Toast.makeText(context, unavailable, Toast.LENGTH_LONG).show()
                 },
-                modifier = Modifier.fillMaxWidth().padding(top = 14.dp), height = 58.dp,
+                modifier = Modifier.fillMaxWidth().padding(top = 14.dp), height = 50.dp,
             )
             Text(
                 stringResource(if (offer.plan == ProPlan.LIFETIME) R.string.pro_fine_print_once else R.string.bplan_fine_print),
@@ -179,7 +179,7 @@ fun PaywallScreen(onClose: () -> Unit, viewModel: PaywallViewModel = hiltViewMod
 private fun Headline(modifier: Modifier = Modifier) {
     val ink = RaveTheme.colors.tileInk
     val style = MaterialTheme.typography.displayMedium.copy(
-        fontSize = 44.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-1.5).sp, lineHeight = 46.sp,
+        fontSize = 36.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-1.5).sp, lineHeight = 38.sp,
     )
     Column(modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {

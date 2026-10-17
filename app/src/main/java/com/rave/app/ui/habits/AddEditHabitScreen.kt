@@ -615,7 +615,7 @@ private fun StepperTile(
 ) {
     val sand = RaveTheme.colors.tileSand
     val color = if (error) MaterialTheme.colorScheme.error else sand.content
-    val style = bigStyle(34.sp).copy(color = color)
+    val style = bigStyle(28.sp).copy(color = color)
     BentoTile(sand.container, Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {

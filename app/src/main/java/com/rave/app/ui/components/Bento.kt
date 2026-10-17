@@ -39,7 +39,7 @@ import java.util.Locale
  * uppercase kickers, chunky numbers, pill chips and pill buttons.
  */
 
-val BentoTileShape = RoundedCornerShape(28.dp)
+val BentoTileShape = RoundedCornerShape(24.dp)
 val BentoPillShape = RoundedCornerShape(50)
 val BentoSquareShape = RoundedCornerShape(16.dp)
 val BentoGap = 10.dp
@@ -49,7 +49,7 @@ val BentoGap = 10.dp
 fun BentoTile(
     color: Color,
     modifier: Modifier = Modifier,
-    padding: Dp = 16.dp,
+    padding: Dp = 14.dp,
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -73,7 +73,7 @@ fun BentoKicker(text: String, color: Color, modifier: Modifier = Modifier) {
 
 /** Chunky tight number or headline. */
 @Composable
-fun BentoBig(text: String, color: Color, modifier: Modifier = Modifier, size: TextUnit = 34.sp, maxLines: Int = 2) {
+fun BentoBig(text: String, color: Color, modifier: Modifier = Modifier, size: TextUnit = 28.sp, maxLines: Int = 2) {
     Text(
         text, color = color, modifier = modifier, maxLines = maxLines, overflow = TextOverflow.Ellipsis,
         style = MaterialTheme.typography.displaySmall.copy(
@@ -86,12 +86,12 @@ fun BentoBig(text: String, color: Color, modifier: Modifier = Modifier, size: Te
 /** Big screen title ("Scan it. Know it.", "Squad", "Profile"). */
 @Composable
 fun BentoTitle(text: String, modifier: Modifier = Modifier, color: Color = MaterialTheme.colorScheme.onBackground) {
-    BentoBig(text, color, modifier, size = 34.sp, maxLines = 3)
+    BentoBig(text, color, modifier, size = 28.sp, maxLines = 3)
 }
 
 /** A value + uppercase caption tile (412 KM, 32:18 TIME). */
 @Composable
-fun BentoStat(value: String, label: String, tile: TileColor, modifier: Modifier = Modifier, valueSize: TextUnit = 24.sp) {
+fun BentoStat(value: String, label: String, tile: TileColor, modifier: Modifier = Modifier, valueSize: TextUnit = 21.sp) {
     BentoTile(tile.container, modifier, padding = 14.dp) {
         BentoBig(value, tile.content, size = valueSize, maxLines = 1)
         Spacer(Modifier.height(2.dp))
@@ -134,7 +134,7 @@ fun BentoButton(
     leading: ImageVector? = null,
     trailing: ImageVector? = null,
     enabled: Boolean = true,
-    height: Dp = 56.dp,
+    height: Dp = 50.dp,
 ) {
     Row(
         modifier.height(height).clip(BentoPillShape).background(if (enabled) container else container.copy(alpha = 0.4f))
@@ -145,7 +145,7 @@ fun BentoButton(
             Icon(leading, null, tint = content, modifier = Modifier.size(22.dp))
             Spacer(Modifier.width(8.dp))
         }
-        Text(text, style = MaterialTheme.typography.titleMedium.copy(fontSize = 17.sp, fontWeight = FontWeight.ExtraBold), color = content, maxLines = 1)
+        Text(text, style = MaterialTheme.typography.titleMedium.copy(fontSize = 15.sp, fontWeight = FontWeight.ExtraBold), color = content, maxLines = 1)
         if (trailing != null) {
             Spacer(Modifier.width(8.dp))
             Icon(trailing, null, tint = content, modifier = Modifier.size(22.dp))
@@ -162,7 +162,7 @@ fun BentoIconButton(
     modifier: Modifier = Modifier,
     container: Color = RaveTheme.colors.tileSand.container,
     content: Color = RaveTheme.colors.tileSand.content,
-    size: Dp = 46.dp,
+    size: Dp = 42.dp,
 ) {
     Box(
         modifier.size(size).clip(BentoSquareShape).background(container).clickable(onClick = onClick),
