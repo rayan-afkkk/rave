@@ -7,7 +7,8 @@ import kotlin.math.hypot
 /**
  * Turns raw GPS fixes into a clean line for drawing without a map (share cards):
  * - one line per recording segment, so pauses don't become straight jumps,
- * - fixes worse than [MAX_ACCURACY_M] dropped,
+ * - fixes worse than [MAX_ACCURACY_M] dropped (the same limit the tracker records with, so the
+ *   card shows every part of the route the summary map shows),
  * - jitter smoothed with a small moving average (ends kept exact),
  * - tiny zig-zags removed with a tolerance relative to the route's size.
  *
@@ -15,7 +16,7 @@ import kotlin.math.hypot
  * scribble; this keeps the shape you actually walked.
  */
 object RouteCleaner {
-    const val MAX_ACCURACY_M = 20f
+    const val MAX_ACCURACY_M = 25f
     private const val SMOOTH_RADIUS = 2 // 5-point window
 
     fun clean(points: List<TrackPoint>): List<List<LatLngPoint>> {

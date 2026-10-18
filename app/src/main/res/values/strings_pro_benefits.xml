@@ -10,11 +10,12 @@
 
     <!-- Live tracking: free users see the route on a plain canvas instead of the map -->
     <string name="pb_h_live_map">See the live street map on every walk</string>
+    <string name="pb_summary_map_chip">Street map is Pro</string>
     <string name="pb_live_map_chip">Live map is Pro · Tap to unlock</string>
     <string name="pb_live_route_desc">Your route so far</string>
 
-    <string name="pb_live_map_title">Live map while you track</string>
-    <string name="pb_live_map_sub">Real streets under your route as you go</string>
+    <string name="pb_live_map_title">Street maps for your routes</string>
+    <string name="pb_live_map_sub">Live while you track and on every walk summary</string>
     <string name="pb_live_map_body">Watch your route draw itself over a real street map in real time, with follow mode, re-centre and your planned route on top.</string>
     <string name="pb_live_map_free">Your walk is recorded exactly the same and drawn on a plain background. GPS, stats, pause and finish all work.</string>
     <string name="pb_live_map_pro">The full live street map behind your route. Pan and zoom any time.</string>

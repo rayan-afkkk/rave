@@ -7,6 +7,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Map
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
+import com.rave.app.R
+import com.rave.app.data.billing.ProReason
+import com.rave.app.ui.components.BentoChip
+import com.rave.app.ui.pro.rememberPro
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,7 +35,10 @@ fun RouteMapCard(segments: List<List<LatLngPoint>>, modifier: Modifier = Modifie
     val routeColor = RaveTheme.colors.tileOrange.container
 
     Box(modifier = modifier.fillMaxWidth().height(height).clip(BentoTileShape).background(RaveTheme.colors.tileSand.container)) {
-        if (all.size < 2) {
+        // Map tiles are billed per request, so the street map is Pro. Free users get the same
+        // route drawn on a plain tile.
+        val pro = rememberPro()
+        if (all.size < 2 || !pro.isPro) {
             RouteCanvas(
                 segments = segments,
                 color = routeColor,
@@ -36,6 +47,14 @@ fun RouteMapCard(segments: List<List<LatLngPoint>>, modifier: Modifier = Modifie
                 showEndpoints = true,
                 endpointColor = RaveTheme.colors.tileInk.container
             )
+            if (all.size >= 2) {
+                BentoChip(
+                    stringResource(R.string.pb_summary_map_chip),
+                    container = RaveTheme.colors.tileInk.container, content = RaveTheme.colors.tileInk.content,
+                    icon = Icons.Rounded.Map, onClick = { pro.upgrade(ProReason.LIVE_MAP) },
+                    modifier = Modifier.align(Alignment.BottomStart).padding(10.dp),
+                )
+            }
             return@Box
         }
 
