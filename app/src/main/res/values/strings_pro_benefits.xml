@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Paywall: full list of Rave Pro benefits (expandable rows) -->
+    <string name="pb_section_title">Everything in Pro</string>
+    <string name="pb_section_sub">Tap any benefit to see exactly what you get.</string>
+    <string name="pb_label_free">Free</string>
+    <string name="pb_label_pro">Pro</string>
+    <string name="pb_show_details">Show details</string>
+    <string name="pb_hide_details">Hide details</string>
+
+    <!-- Live tracking: free users see the route on a plain canvas instead of the map -->
+    <string name="pb_h_live_map">See the live street map on every walk</string>
+    <string name="pb_live_map_chip">Live map is Pro · Tap to unlock</string>
+    <string name="pb_live_route_desc">Your route so far</string>
+
+    <string name="pb_live_map_title">Live map while you track</string>
+    <string name="pb_live_map_sub">Real streets under your route as you go</string>
+    <string name="pb_live_map_body">Watch your route draw itself over a real street map in real time, with follow mode, re-centre and your planned route on top.</string>
+    <string name="pb_live_map_free">Your walk is recorded exactly the same and drawn on a plain background. GPS, stats, pause and finish all work.</string>
+    <string name="pb_live_map_pro">The full live street map behind your route. Pan and zoom any time.</string>
+
+    <string name="pb_barcode_title">Unlimited barcode scans</string>
+    <string name="pb_barcode_sub">Scan every packet you pick up</string>
+    <string name="pb_barcode_body">Point the camera at any barcode to get the food\'s verdict, calories and macros in a second.</string>
+    <string name="pb_barcode_free">5 barcode scans a day.</string>
+    <string name="pb_barcode_pro">Unlimited barcode scans, every day.</string>
+
+    <string name="pb_ai_title">Unlimited AI food scans</string>
+    <string name="pb_ai_sub">Meal photos and label reading</string>
+    <string name="pb_ai_body">Snap your plate to estimate calories and macros, or let AI read a nutrition label and ingredients list for you.</string>
+    <string name="pb_ai_free">2 AI scans a day (photos and labels combined).</string>
+    <string name="pb_ai_pro">Unlimited meal photos and label scans.</string>
+
+    <string name="pb_meals_title">Full-week meal plan</string>
+    <string name="pb_meals_sub">Plan all 7 days and regenerate</string>
+    <string name="pb_meals_body">Your meal plan is built around your calorie goal. Plan ahead for the whole week and regenerate it whenever you want fresh ideas.</string>
+    <string name="pb_meals_free">Today\'s plan only.</string>
+    <string name="pb_meals_pro">All 7 days, plus regenerate the plan any time.</string>
+
+    <string name="pb_freeze_title">3 streak freezes a month</string>
+    <string name="pb_freeze_sub">Miss a day without losing your streak</string>
+    <string name="pb_freeze_body">A freeze covers a missed day automatically, so one busy day doesn\'t reset weeks of progress. Freezes refill every month.</string>
+    <string name="pb_freeze_free">1 freeze a month.</string>
+    <string name="pb_freeze_pro">3 freezes every month.</string>
+
+    <string name="pb_repair_title">Streak repair</string>
+    <string name="pb_repair_sub">Bring back a streak you just lost</string>
+    <string name="pb_repair_body">If your streak broke yesterday or the day before, repair the missed day and keep your streak as if nothing happened.</string>
+    <string name="pb_repair_free">Broken streaks stay broken.</string>
+    <string name="pb_repair_pro">Repair one missed day each month (for streaks of 2 days or more).</string>
+
+    <string name="pb_trends_title">Monthly and yearly trends</string>
+    <string name="pb_trends_sub">Your distance over months and years</string>
+    <string name="pb_trends_body">Switch the Progress chart from weeks to months or a whole year to see how far you\'ve really come.</string>
+    <string name="pb_trends_free">Weekly chart.</string>
+    <string name="pb_trends_pro">Weekly, monthly and yearly charts.</string>
+
+    <string name="pb_records_title">Personal records history</string>
+    <string name="pb_records_sub">Fastest 1k, fastest 5k, longest distance</string>
+    <string name="pb_records_body">All your best efforts in one place on the Progress screen, so you always know what to beat next.</string>
+    <string name="pb_records_free">Personal records are locked.</string>
+    <string name="pb_records_pro">Your full personal records history.</string>
+
+    <string name="pb_splits_title">Splits and pace chart</string>
+    <string name="pb_splits_sub">Pace for every km or mile</string>
+    <string name="pb_splits_body">Every activity summary breaks your walk into splits with a pace chart, so you can see where you sped up or slowed down.</string>
+    <string name="pb_splits_free">Totals only: distance, time and average pace.</string>
+    <string name="pb_splits_pro">Per-km (or per-mile) splits and the pace chart on every walk.</string>
+
+    <string name="pb_templates_title">Premium share cards</string>
+    <string name="pb_templates_sub">4 extra card designs</string>
+    <string name="pb_templates_body">Share your walks, weekly reports and competition results with designs that stand out in any feed.</string>
+    <string name="pb_templates_free">Warm and Sticker cards.</string>
+    <string name="pb_templates_pro">Adds Dark, Minimal, Night and Sunset.</string>
+
+    <string name="pb_colours_title">Route colours</string>
+    <string name="pb_colours_sub">Pick the colour of your route on cards</string>
+    <string name="pb_colours_body">Make your route pop on activity share cards in white, blue, green, pink or gold.</string>
+    <string name="pb_colours_free">Default route colour.</string>
+    <string name="pb_colours_pro">5 extra route colours to choose from.</string>
+
+    <string name="pb_watermark_title">No watermark</string>
+    <string name="pb_watermark_sub">Clean cards, just your stats</string>
+    <string name="pb_watermark_body">Remove the Rave watermark from every card you share or save to your gallery.</string>
+    <string name="pb_watermark_free">Cards carry a small Rave watermark.</string>
+    <string name="pb_watermark_pro">No watermark, ever.</string>
+
+    <string name="pb_comps_title">Create competitions</string>
+    <string name="pb_comps_sub">Challenge your friends</string>
+    <string name="pb_comps_body">Start your own competition, set the goal and invite friends to race you on the leaderboard.</string>
+    <string name="pb_comps_free">Join competitions you\'re invited to.</string>
+    <string name="pb_comps_pro">Create as many competitions as you like.</string>
+
+    <string name="pb_offline_title">Offline maps</string>
+    <string name="pb_offline_sub">Streets still show with no signal</string>
+    <string name="pb_offline_body">Save the map around you (2, 3 or 5 km) before you head out. GPS tracking works offline either way.</string>
+    <string name="pb_offline_free">The map needs an internet connection.</string>
+    <string name="pb_offline_pro">Save areas for offline use and walk anywhere.</string>
+</resources>

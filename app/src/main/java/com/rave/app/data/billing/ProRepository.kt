@@ -48,7 +48,7 @@ data class PlanOffer(
 )
 
 /** What a paywall was opened for; shown as its headline. */
-enum class ProReason { GENERAL, SCANS, AI_SCANS, MEAL_PLAN, STREAK, STATS, SHARE, OFFLINE_MAPS, COMPETITIONS }
+enum class ProReason { GENERAL, SCANS, AI_SCANS, MEAL_PLAN, STREAK, STATS, SHARE, OFFLINE_MAPS, COMPETITIONS, LIVE_MAP }
 
 /**
  * Rave Pro state from Google Play Billing. Pro = an active monthly/yearly subscription or the

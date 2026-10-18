@@ -63,6 +63,16 @@ import com.rave.app.ui.components.PillProgress
 import com.rave.app.ui.permissions.LocationPermissionGate
 import com.rave.app.ui.theme.RaveTheme
 import com.rave.app.ui.unitLabel
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.material.icons.rounded.Map
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import com.rave.app.data.billing.ProReason
+import com.rave.app.ui.pro.rememberPro
 
 @Composable
 fun LiveTrackingScreen(
@@ -106,9 +116,26 @@ private fun LiveTrackingContent(viewModel: LiveTrackingViewModel, onBack: () -> 
     BackHandler(enabled = locked) { /* swallow back while locked */ }
     val c = RaveTheme.colors
     val ink = c.tileInk
+    val pro = rememberPro()
+    val density = LocalDensity.current
+    var statsCardHeightPx by remember { mutableIntStateOf(0) }
 
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-        TrackingMap(state, follow, onUserMovedMap = { follow = false })
+        if (pro.isPro) {
+            TrackingMap(state, follow, onUserMovedMap = { follow = false })
+        } else {
+            // Free: no map tiles at all (they cost money); the route is drawn on a plain canvas.
+            // Recording is unaffected: the tracking service stores every point either way.
+            LiveRouteCanvas(
+                segments = state.segments,
+                current = state.current?.let { LatLngPoint(it.lat, it.lng) },
+                start = state.start,
+                guide = state.guide,
+                topInset = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 116.dp,
+                bottomInset = with(density) { statsCardHeightPx.toDp() } + 24.dp,
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
 
         // Top controls floating on the map
         Row(
@@ -126,9 +153,18 @@ private fun LiveTrackingContent(viewModel: LiveTrackingViewModel, onBack: () -> 
             )
         }
 
+        if (!pro.isPro) {
+            BentoChip(
+                stringResource(R.string.pb_live_map_chip),
+                container = ink.container, content = ink.content, icon = Icons.Rounded.Map,
+                onClick = { if (!locked) pro.upgrade(ProReason.LIVE_MAP) },
+                modifier = Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(top = 64.dp),
+            )
+        }
+
         // Re-centre
         AnimatedVisibility(
-            visible = !follow && !locked,
+            visible = pro.isPro && !follow && !locked,
             enter = fadeIn(), exit = fadeOut(),
             modifier = Modifier.align(Alignment.CenterEnd).padding(end = 16.dp),
         ) {
@@ -143,6 +179,7 @@ private fun LiveTrackingContent(viewModel: LiveTrackingViewModel, onBack: () -> 
             Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
+                .onSizeChanged { statsCardHeightPx = it.height }
                 .navigationBarsPadding()
                 .padding(start = 12.dp, end = 12.dp, bottom = 14.dp)
                 .clip(SheetShape)
