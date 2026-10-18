@@ -157,6 +157,7 @@ fun LegalAgreementText(
     @StringRes lead: Int = R.string.legal_agree_lead,
     color: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurfaceVariant,
     linkColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface,
+    textAlign: TextAlign = TextAlign.Center,
 ) {
     var open by rememberSaveable { mutableStateOf<LegalDoc?>(null) }
     val terms = stringResource(R.string.legal_terms)
@@ -174,7 +175,7 @@ fun LegalAgreementText(
         withLink(LinkAnnotation.Clickable("privacy", linkStyle) { open = LegalDoc.PRIVACY }) { append(privacy) }
         append(".")
     }
-    Text(text, style = MaterialTheme.typography.bodySmall, color = color, textAlign = TextAlign.Center, modifier = modifier)
+    Text(text, style = MaterialTheme.typography.bodySmall, color = color, textAlign = textAlign, modifier = modifier)
     open?.let { doc ->
         ModalBottomSheet(
             onDismissRequest = { open = null },

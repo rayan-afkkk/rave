@@ -563,6 +563,8 @@
     <string name="legal_agree_lead">By continuing, you agree to the</string>
     <string name="legal_agree_purchase">Subscriptions renew automatically until cancelled in Google Play. See the</string>
     <string name="food_off_credit">Product data from Open Food Facts (ODbL)</string>
+    <string name="legal_consent_lead">I have read and agree to the</string>
+    <string name="legal_consent_needed">Please accept to continue</string>
     <string name="settings_about">About &amp; legal</string>
     <string name="about_blurb">Habits, walks, steps, workouts and food, with friends. Most of your data stays on your phone.</string>
     <string name="about_contact">Contact support</string>

@@ -329,6 +329,7 @@ private fun SignInPage(
 ) {
     val context = LocalContext.current
     val c = RaveTheme.colors
+    val consent = com.rave.app.ui.legal.rememberLegalConsent()
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
         verticalArrangement = Arrangement.spacedBy(BentoGap),
@@ -357,22 +358,23 @@ private fun SignInPage(
             }
         }
         Spacer(Modifier.height(4.dp))
+        com.rave.app.ui.legal.LegalConsentRow(consent)
         if (available) {
-            GoogleSignInButton(onClick = { onGoogle(context) }, busy = busy)
+            GoogleSignInButton(onClick = { consent.require { onGoogle(context) } }, busy = busy)
             error?.let {
                 Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth())
             }
-            BentoButton(stringResource(R.string.onb_signin_email), c.tileSand.container, c.tileSand.content, onClick = onEmail,
+            BentoButton(stringResource(R.string.onb_signin_email), c.tileSand.container, c.tileSand.content, onClick = { consent.require(onEmail) },
                 enabled = !busy, modifier = Modifier.fillMaxWidth())
         } else {
             Text(stringResource(R.string.cloud_unavailable), style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         }
-        TextButton(onClick = onGuest, enabled = !busy, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+        TextButton(onClick = { consent.require(onGuest) }, enabled = !busy, modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Text(stringResource(R.string.signin_continue_guest))
         }
-        com.rave.app.ui.legal.LegalAgreementText(Modifier.fillMaxWidth().padding(bottom = 12.dp))
+        Spacer(Modifier.height(12.dp))
     }
 }
 

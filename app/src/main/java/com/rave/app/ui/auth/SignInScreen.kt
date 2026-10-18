@@ -115,6 +115,7 @@ fun SignInScreen(onDone: () -> Unit, onSkip: () -> Unit, viewModel: SignInViewMo
     var name by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
+    val consent = com.rave.app.ui.legal.rememberLegalConsent()
 
     RaveScreen(title = stringResource(R.string.signin_title), onBack = onSkip) {
         Column(
@@ -128,7 +129,8 @@ fun SignInScreen(onDone: () -> Unit, onSkip: () -> Unit, viewModel: SignInViewMo
                 TonalPillButton(stringResource(R.string.signin_continue_guest), onClick = onSkip, modifier = Modifier.fillMaxWidth())
                 return@RaveScreen
             }
-            GoogleSignInButton(onClick = { viewModel.google(context) }, busy = state.busy)
+            com.rave.app.ui.legal.LegalConsentRow(consent)
+            GoogleSignInButton(onClick = { consent.require { viewModel.google(context) } }, busy = state.busy)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 HorizontalDivider(Modifier.weight(1f))
                 Text("  " + stringResource(R.string.signin_or) + "  ", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -147,7 +149,7 @@ fun SignInScreen(onDone: () -> Unit, onSkip: () -> Unit, viewModel: SignInViewMo
             if (state.resetSent) Text(stringResource(R.string.signin_reset_sent), color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.bodySmall)
             TonalPillButton(
                 stringResource(if (signUp) R.string.signin_create else R.string.signin_email_button),
-                onClick = { if (signUp) viewModel.signUp(name, email, password) else viewModel.email(email, password) },
+                onClick = { consent.require { if (signUp) viewModel.signUp(name, email, password) else viewModel.email(email, password) } },
                 enabled = !state.busy && email.contains('@') && password.length >= 6 && (!signUp || name.isNotBlank()),
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -157,7 +159,6 @@ fun SignInScreen(onDone: () -> Unit, onSkip: () -> Unit, viewModel: SignInViewMo
             }
             Spacer(Modifier.height(4.dp))
             TextButton(onClick = onSkip, modifier = Modifier.align(Alignment.CenterHorizontally)) { Text(stringResource(R.string.signin_continue_guest)) }
-            com.rave.app.ui.legal.LegalAgreementText(Modifier.fillMaxWidth())
         }
     }
 }
