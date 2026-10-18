@@ -111,6 +111,7 @@ class MealPlanViewModel @Inject constructor(
         if (sd == null) return@combine MealPlanUi(target, s)
         val options = PlannerOptions(
             dailyKcal = target.kcal, vegetarian = s.food.vegetarian, goal = s.food.goal, budget = s.budgetMeals,
+            halalOnly = s.food.halalOnly, cuisines = s.food.cuisines,
         )
         val week = MealPlanner.week(weekStart, options, sd)
         MealPlanUi(target, s, week)

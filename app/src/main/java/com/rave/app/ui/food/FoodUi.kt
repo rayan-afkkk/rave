@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.rave.app.R
 import com.rave.app.domain.food.Allergen
+import com.rave.app.domain.food.Cuisine
 import com.rave.app.domain.food.FoodGoal
 import com.rave.app.domain.food.FoodReason
 import com.rave.app.domain.food.MealSlot
@@ -166,6 +167,19 @@ fun allergenName(a: Allergen) = stringResource(
         Allergen.FISH -> R.string.allergen_fish
         Allergen.SHELLFISH -> R.string.allergen_shellfish
         Allergen.SESAME -> R.string.allergen_sesame
+    },
+)
+
+@Composable
+fun cuisineName(c: Cuisine) = stringResource(
+    when (c) {
+        Cuisine.GLOBAL -> R.string.cuisine_global
+        Cuisine.SOUTH_ASIAN -> R.string.cuisine_south_asian
+        Cuisine.MIDDLE_EASTERN -> R.string.cuisine_middle_eastern
+        Cuisine.MEDITERRANEAN -> R.string.cuisine_mediterranean
+        Cuisine.EAST_ASIAN -> R.string.cuisine_east_asian
+        Cuisine.LATIN_AMERICAN -> R.string.cuisine_latin_american
+        Cuisine.AMERICAN_EUROPEAN -> R.string.cuisine_american_european
     },
 )
 

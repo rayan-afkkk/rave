@@ -46,8 +46,8 @@ class FoodAi @Inject constructor(private val firebase: FirebaseProvider) {
         const val MODEL = "gemini-2.5-flash"
 
         private val PROMPT = """
-            You are a nutrition assistant for a fitness app used mostly in Pakistan and South Asia.
-            Identify the food or drink in the photo (desi dishes, street food, snacks, packaged food)
+            You are a nutrition assistant for a fitness app used worldwide.
+            Identify the food or drink in the photo (dishes from any cuisine, street food, snacks, packaged food)
             and estimate nutrition for the portion visible. Reply with JSON only:
             {"isFood": true, "name": "short English name", "portion": "e.g. 1 plate", "grams": 250,
              "kcal": 0, "protein": 0, "carbs": 0, "sugar": 0, "fat": 0, "satFat": 0, "fiber": 0, "salt": 0,

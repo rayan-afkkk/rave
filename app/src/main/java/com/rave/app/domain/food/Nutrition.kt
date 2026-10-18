@@ -35,6 +35,8 @@ data class FoodPreferences(
     val halalOnly: Boolean = true,
     val vegetarian: Boolean = false,
     val allergies: Set<Allergen> = emptySet(),
+    /** Cuisines the meal planner draws from (search always covers every cuisine, these first). */
+    val cuisines: Set<Cuisine> = setOf(Cuisine.GLOBAL),
 )
 
 enum class FoodSource { BARCODE, LABEL, PHOTO, MANUAL, PLAN }

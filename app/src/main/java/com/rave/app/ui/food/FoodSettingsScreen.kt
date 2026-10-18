@@ -35,6 +35,7 @@ import com.rave.app.R
 import com.rave.app.data.food.FoodRepository
 import com.rave.app.data.preferences.SettingsRepository
 import com.rave.app.domain.food.Allergen
+import com.rave.app.domain.food.Cuisine
 import com.rave.app.domain.food.DailyTarget
 import com.rave.app.domain.food.FoodGoal
 import com.rave.app.domain.food.Sex
@@ -110,6 +111,23 @@ fun FoodSettingsScreen(onBack: () -> Unit, viewModel: FoodSettingsViewModel = hi
                 }
                 ToggleRow(stringResource(R.string.food_budget), stringResource(R.string.food_budget_help), st.budgetMeals) { on ->
                     viewModel.update { it.copy(budgetMeals = on) }
+                }
+            }
+            SectionCard(Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.food_cuisines), style = MaterialTheme.typography.titleSmall)
+                Text(stringResource(R.string.food_cuisines_help), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(Modifier.height(6.dp))
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Cuisine.entries.forEach { c ->
+                        val on = c in st.food.cuisines
+                        PillChip(on, cuisineName(c), {
+                            viewModel.update {
+                                val next = if (c in it.food.cuisines) it.food.cuisines - c else it.food.cuisines + c
+                                // Keep at least one cuisine selected.
+                                if (next.isEmpty()) it else it.copy(food = it.food.copy(cuisines = next))
+                            }
+                        })
+                    }
                 }
             }
             SectionCard(Modifier.fillMaxWidth()) {

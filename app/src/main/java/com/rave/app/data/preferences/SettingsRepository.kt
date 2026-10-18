@@ -87,6 +87,10 @@ class SettingsRepository @Inject constructor(
                 allergies = this[Keys.ALLERGIES]
                     ?.mapNotNull { runCatching { com.rave.app.domain.food.Allergen.valueOf(it) }.getOrNull() }?.toSet()
                     ?: d.food.allergies,
+                cuisines = this[Keys.CUISINES]
+                    ?.mapNotNull { runCatching { com.rave.app.domain.food.Cuisine.valueOf(it) }.getOrNull() }?.toSet()
+                    ?.takeIf { it.isNotEmpty() }
+                    ?: d.food.cuisines,
             ),
             budgetMeals = this[Keys.BUDGET] ?: d.budgetMeals,
             autoDetectWalks = this[Keys.AUTO_DETECT] ?: d.autoDetectWalks,
@@ -121,6 +125,7 @@ class SettingsRepository @Inject constructor(
         this[Keys.HALAL] = s.food.halalOnly
         this[Keys.VEG] = s.food.vegetarian
         this[Keys.ALLERGIES] = s.food.allergies.map { it.name }.toSet()
+        this[Keys.CUISINES] = s.food.cuisines.map { it.name }.toSet()
         this[Keys.BUDGET] = s.budgetMeals
         this[Keys.AUTO_DETECT] = s.autoDetectWalks
         this[Keys.BATTERY_SAVER] = s.batterySaverGps
@@ -152,6 +157,7 @@ class SettingsRepository @Inject constructor(
         val HALAL = booleanPreferencesKey("food_halal")
         val VEG = booleanPreferencesKey("food_veg")
         val ALLERGIES = stringSetPreferencesKey("food_allergies")
+        val CUISINES = stringSetPreferencesKey("food_cuisines")
         val BUDGET = booleanPreferencesKey("food_budget")
         val AUTO_DETECT = booleanPreferencesKey("auto_detect")
         val BATTERY_SAVER = booleanPreferencesKey("battery_saver")

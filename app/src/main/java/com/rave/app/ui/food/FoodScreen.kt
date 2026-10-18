@@ -96,8 +96,9 @@ import com.rave.app.data.preferences.SettingsRepository
 import com.rave.app.data.repository.StepRepository
 import com.rave.app.domain.fitness.FitnessMath
 import com.rave.app.domain.food.DailyTarget
-import com.rave.app.domain.food.DesiFood
-import com.rave.app.domain.food.DesiFoods
+import com.rave.app.domain.food.Cuisine
+import com.rave.app.domain.food.FoodCatalog
+import com.rave.app.domain.food.FoodItem
 import com.rave.app.domain.food.FoodSource
 import com.rave.app.domain.food.MealSlot
 import com.rave.app.domain.food.Verdict
@@ -123,6 +124,8 @@ data class FoodUiState(
     val target: DailyTarget? = null,
     val burnedKcal: Int = 0,
     val scans: List<FoodScanEntity> = emptyList(),
+    val cuisines: Set<Cuisine> = emptySet(),
+    val halalOnly: Boolean = false,
 )
 
 @HiltViewModel
@@ -137,7 +140,7 @@ class FoodViewModel @Inject constructor(
     val state: StateFlow<FoodUiState> = combine(
         food.observeToday(), food.observeTarget(), steps.observeToday(), settings.settings, food.observeRecentScans(),
     ) { day, target, stepsToday, s, scans ->
-        FoodUiState(day, target, FitnessMath.stepCalories(stepsToday, s.weightKg, s.heightCm), scans)
+        FoodUiState(day, target, FitnessMath.stepCalories(stepsToday, s.weightKg, s.heightCm), scans, s.food.cuisines, s.food.halalOnly)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), FoodUiState())
 
     private val _busy = MutableStateFlow(false)
@@ -180,7 +183,7 @@ class FoodViewModel @Inject constructor(
         }
     }
 
-    fun quickAdd(item: DesiFood, servings: Int, slot: MealSlot) = viewModelScope.launch {
+    fun quickAdd(item: FoodItem, servings: Int, slot: MealSlot) = viewModelScope.launch {
         food.log(item.name, item.kcal * servings, item.protein * servings, item.carbs * servings, item.fat * servings, null, FoodSource.MANUAL, slot)
     }
 
@@ -309,7 +312,7 @@ fun FoodScreen(
 
     if (showAdd) {
         ModalBottomSheet(onDismissRequest = { showAdd = false }, containerColor = MaterialTheme.colorScheme.surface) {
-            QuickAddSheet(defaultSlot = viewModel.slotNow()) { food, servings, slot ->
+            QuickAddSheet(defaultSlot = viewModel.slotNow(), cuisines = state.cuisines, halalOnly = state.halalOnly) { food, servings, slot ->
                 viewModel.quickAdd(food, servings, slot)
                 showAdd = false
             }
@@ -512,9 +515,9 @@ private fun MealPlanTile(onClick: () -> Unit) {
 }
 
 @Composable
-private fun QuickAddSheet(defaultSlot: MealSlot, onAdd: (DesiFood, Int, MealSlot) -> Unit) {
+private fun QuickAddSheet(defaultSlot: MealSlot, cuisines: Set<Cuisine>, halalOnly: Boolean, onAdd: (FoodItem, Int, MealSlot) -> Unit) {
     var query by rememberSaveable { mutableStateOf("") }
-    var picked by remember { mutableStateOf<DesiFood?>(null) }
+    var picked by remember { mutableStateOf<FoodItem?>(null) }
     var servings by remember { mutableIntStateOf(1) }
     var slot by remember { mutableStateOf(defaultSlot) }
     val c = RaveTheme.colors
@@ -525,7 +528,7 @@ private fun QuickAddSheet(defaultSlot: MealSlot, onAdd: (DesiFood, Int, MealSlot
                 modifier = Modifier.fillMaxWidth(), shape = BentoSquareShape)
             Spacer(Modifier.height(8.dp))
             LazyColumn(Modifier.fillMaxWidth().height(380.dp)) {
-                items(DesiFoods.search(query), key = { it.id }) { f ->
+                items(FoodCatalog.search(query, cuisines, halalOnly), key = { it.id }) { f ->
                     Row(Modifier.fillMaxWidth().clickable { picked = f; servings = 1 }.padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(f.name, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold))
