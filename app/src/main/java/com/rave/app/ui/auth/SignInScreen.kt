@@ -157,6 +157,7 @@ fun SignInScreen(onDone: () -> Unit, onSkip: () -> Unit, viewModel: SignInViewMo
             }
             Spacer(Modifier.height(4.dp))
             TextButton(onClick = onSkip, modifier = Modifier.align(Alignment.CenterHorizontally)) { Text(stringResource(R.string.signin_continue_guest)) }
+            com.rave.app.ui.legal.LegalAgreementText(Modifier.fillMaxWidth())
         }
     }
 }

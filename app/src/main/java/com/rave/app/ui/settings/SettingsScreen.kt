@@ -76,6 +76,7 @@ fun SettingsScreen(
     onOfflineMaps: () -> Unit,
     onSignIn: () -> Unit,
     onAccountGone: () -> Unit,
+    onAbout: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -236,6 +237,10 @@ fun SettingsScreen(
                     stringResource(if (state.user != null) R.string.settings_delete_account else R.string.settings_delete_data),
                     destructive = true,
                 ) { dialog = DIALOG_DELETE }
+            }
+
+            SettingsSection(stringResource(R.string.settings_about)) {
+                NavRow(stringResource(R.string.settings_about), onClick = onAbout)
             }
 
             Text(

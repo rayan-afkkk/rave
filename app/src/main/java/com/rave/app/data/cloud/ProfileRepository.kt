@@ -225,19 +225,42 @@ class ProfileRepository @Inject constructor(
         }.filter { it.uid != me }
     }
 
-    /** Best-effort removal of everything this user owns in Firestore. */
+    /**
+     * Best-effort removal of everything about this user in Firestore: their own documents, their
+     * side of friendships, requests, nudges, invites, league entries, shared streaks and
+     * competitions. Each step is independent so one failure doesn't stop the rest.
+     */
     suspend fun deleteCloudData(uid: String) {
         val db = firebase.requireFirestore()
         val userRef = users().document(uid)
-        for (sub in listOf("friends", "tokens", "activities", "days", "backup")) {
-            runCatching {
-                userRef.collection(sub).get().await().documents.chunked(400).forEach { batch ->
-                    db.runBatch { b -> batch.forEach { b.delete(it.reference) } }.await()
+        suspend fun deleteAll(docs: List<DocumentSnapshot>) = docs.chunked(400).forEach { batch ->
+            db.runBatch { b -> batch.forEach { b.delete(it.reference) } }.await()
+        }
+        // Remove me from my friends' lists (needs my own list, so before it is deleted).
+        runCatching {
+            userRef.collection("friends").get().await().documents.forEach { f ->
+                runCatching { users().document(f.id).collection("friends").document(uid).delete().await() }
+            }
+        }
+        for (field in listOf("from", "to")) {
+            runCatching { deleteAll(db.collection("friendRequests").whereEqualTo(field, uid).get().await().documents) }
+            runCatching { deleteAll(db.collection("nudges").whereEqualTo(field, uid).get().await().documents) }
+        }
+        runCatching { deleteAll(db.collection(INVITES).whereEqualTo("createdBy", uid).get().await().documents) }
+        runCatching { deleteAll(db.collection("weeklySteps").whereEqualTo("uid", uid).get().await().documents) }
+        runCatching { deleteAll(db.collection("sharedStreaks").whereArrayContains("members", uid).get().await().documents) }
+        runCatching {
+            db.collection("competitions").whereArrayContains("members", uid).get().await().documents.forEach { c ->
+                runCatching {
+                    c.reference.collection("participants").document(uid).delete().await()
+                    if (c.getString("createdBy") == uid) c.reference.delete().await()
+                    else c.reference.update("members", FieldValue.arrayRemove(uid), "invited", FieldValue.arrayRemove(uid)).await()
                 }
             }
         }
-        runCatching {
-            db.collection("feed").whereEqualTo("ownerUid", uid).get().await().documents.forEach { it.reference.delete().await() }
+        runCatching { deleteAll(db.collection("feed").whereEqualTo("ownerUid", uid).get().await().documents) }
+        for (sub in listOf("friends", "tokens", "activities", "days", "backup")) {
+            runCatching { deleteAll(userRef.collection(sub).get().await().documents) }
         }
         runCatching { userRef.delete().await() }
     }

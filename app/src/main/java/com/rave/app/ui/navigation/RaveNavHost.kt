@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.rave.app.domain.model.ActivityType
 import com.rave.app.ui.activity.ActivitySummaryScreen
 import com.rave.app.ui.auth.SignInScreen
@@ -153,9 +154,17 @@ fun RaveNavHost(
                 onOfflineMaps = { navController.navigate(OfflineMapsRoute) },
                 onSignIn = { navController.navigate(SignInRoute) },
                 onAccountGone = { navController.navigate(OnboardingRoute) { popUpTo(navController.graph.id) { inclusive = true } } },
+                onAbout = { navController.navigate(AboutRoute) },
             )
         }
         composable<PrivacyZonesRoute> { PrivacyZonesScreen(onBack = back) }
+        composable<AboutRoute> {
+            com.rave.app.ui.legal.AboutScreen(onBack = back, onOpen = { navController.navigate(LegalRoute(it.name)) })
+        }
+        composable<LegalRoute> { entry ->
+            val doc = entry.toRoute<LegalRoute>().doc
+            com.rave.app.ui.legal.LegalScreen(com.rave.app.ui.legal.LegalDoc.valueOf(doc), onBack = back)
+        }
         composable<BatteryGuideRoute> { com.rave.app.ui.settings.BatteryGuideScreen(onBack = back) }
         composable<WrappedRoute> { com.rave.app.ui.wrapped.WrappedScreen(onBack = back) }
 

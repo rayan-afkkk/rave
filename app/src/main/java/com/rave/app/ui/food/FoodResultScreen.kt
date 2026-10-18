@@ -78,6 +78,7 @@ import com.rave.app.data.preferences.SettingsRepository
 import com.rave.app.domain.food.Allergen
 import com.rave.app.domain.food.FoodAssessment
 import com.rave.app.domain.food.FoodSource
+import androidx.compose.ui.text.style.TextAlign
 import com.rave.app.domain.food.FoodVerdictEngine
 import com.rave.app.domain.food.FoodWarning
 import com.rave.app.domain.food.MealSlot
@@ -255,6 +256,10 @@ private fun ResultContent(
             }
         }
         LogRow(defaultSlot, logged, onLog, onScanAnother, Modifier.padding(top = 2.dp))
+        if (food.source == FoodSource.BARCODE) {
+            Text(stringResource(R.string.food_off_credit), style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        }
         if (a.reasons.isNotEmpty()) {
             val t = c.tilePink
             BentoTile(t.container, Modifier.fillMaxWidth()) {

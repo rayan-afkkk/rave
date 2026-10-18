@@ -52,7 +52,8 @@ service cloud.firestore {
       // Only the recipient can accept/decline; the sender can cancel (delete).
       allow update: if signedIn() && resource.data.to == request.auth.uid && onlyChanges(['status'])
         && request.resource.data.status in ['ACCEPTED', 'DECLINED'];
-      allow delete: if signedIn() && resource.data.from == request.auth.uid;
+      // Either side can delete (cancel, or clean up when deleting an account).
+      allow delete: if signedIn() && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
     }
 
     // ---- Nudges: id = {from}_{to}_{yyyyMMdd} → max one per friend per day ----
@@ -62,7 +63,8 @@ service cloud.firestore {
         && request.resource.data.from == request.auth.uid
         && id.matches(request.auth.uid + '_' + request.resource.data.to + '_[0-9]{8}')
         && exists(/databases/$(database)/documents/users/$(request.auth.uid)/friends/$(request.resource.data.to));
-      allow update, delete: if false;
+      allow update: if false;
+      allow delete: if signedIn() && (resource.data.to == request.auth.uid || resource.data.from == request.auth.uid);
     }
 
     // ---- Weekly step league: id = {isoWeek}_{uid} (e.g. 2026-W42_abc) ----
@@ -74,6 +76,7 @@ service cloud.firestore {
         && request.resource.data.uid == request.auth.uid
         && id == request.resource.data.week + '_' + request.auth.uid
         && request.resource.data.steps is int && request.resource.data.steps >= 0 && request.resource.data.steps < 2000000;
+      allow list: if signedIn() && resource.data.uid == request.auth.uid;
       allow delete: if signedIn() && id.split('_')[1] == request.auth.uid;
     }
 
@@ -104,7 +107,8 @@ service cloud.firestore {
       allow update: if signedIn() && request.auth.uid in resource.data.members
         && request.resource.data.members == resource.data.members
         && request.resource.data.invitedBy == resource.data.invitedBy;
-      allow delete: if false;
+      // Either member can delete it (leaving, or deleting their account).
+      allow delete: if signedIn() && request.auth.uid in resource.data.members;
     }
 
     // ---- Competitions ----

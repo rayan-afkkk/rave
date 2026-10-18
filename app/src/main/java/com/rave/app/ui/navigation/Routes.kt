@@ -28,6 +28,8 @@ import kotlinx.serialization.Serializable
 // Settings
 @Serializable data object SettingsRoute
 @Serializable data object PrivacyZonesRoute
+@Serializable data object AboutRoute
+@Serializable data class LegalRoute(val doc: String)
 @Serializable data object BatteryGuideRoute
 @Serializable data class WrappedRoute(val year: Int)
 

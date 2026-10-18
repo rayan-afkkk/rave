@@ -229,6 +229,10 @@ fun PaywallScreen(onClose: () -> Unit, viewModel: PaywallViewModel = hiltViewMod
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp), color = RaveTheme.colors.navContent,
                 textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             )
+            com.rave.app.ui.legal.LegalAgreementText(
+                Modifier.fillMaxWidth().padding(top = 4.dp), lead = R.string.legal_agree_purchase,
+                color = RaveTheme.colors.navContent, linkColor = ink.content,
+            )
         }
     }
 }

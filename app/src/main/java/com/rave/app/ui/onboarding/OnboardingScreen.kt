@@ -372,6 +372,7 @@ private fun SignInPage(
         TextButton(onClick = onGuest, enabled = !busy, modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Text(stringResource(R.string.signin_continue_guest))
         }
+        com.rave.app.ui.legal.LegalAgreementText(Modifier.fillMaxWidth().padding(bottom = 12.dp))
     }
 }
 

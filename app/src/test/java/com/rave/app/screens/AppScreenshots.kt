@@ -30,7 +30,9 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeLeft
 import com.rave.app.ui.navigation.ActivitySummaryRoute
+import com.rave.app.ui.navigation.AboutRoute
 import com.rave.app.ui.navigation.AddEditHabitRoute
+import com.rave.app.ui.navigation.LegalRoute
 import com.rave.app.ui.navigation.CompetitionsRoute
 import com.rave.app.ui.navigation.FoodResultRoute
 import com.rave.app.ui.navigation.FoodRoute
@@ -208,6 +210,10 @@ class AppScreenshots {
                 save(name)
             }
     }
+
+    @Test fun s23_about() = shoot("23_about", AboutRoute)
+    @Test fun s24_privacy() = shoot("24_privacy_policy", LegalRoute("PRIVACY"))
+    @Test fun s25_credits() = shoot("25_credits", LegalRoute("CREDITS"))
 
     /** Every built-in exercise figure, plus one full guide. */
     @Test fun s21_exercise_figures() {

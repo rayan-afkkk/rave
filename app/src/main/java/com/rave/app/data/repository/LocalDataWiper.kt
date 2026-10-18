@@ -24,6 +24,7 @@ class LocalDataWiper @Inject constructor(
         db.clearAllTables()
         settings.clearAll()
         File(context.cacheDir, "shared").deleteRecursively()
+        File(context.cacheDir, "map_tiles").deleteRecursively()
         widget.refresh()
     }
 }
