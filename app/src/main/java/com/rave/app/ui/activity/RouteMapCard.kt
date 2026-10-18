@@ -42,7 +42,8 @@ fun RouteMapCard(segments: List<List<LatLngPoint>>, modifier: Modifier = Modifie
             RouteCanvas(
                 segments = segments,
                 color = routeColor,
-                modifier = Modifier.fillMaxSize().padding(24.dp),
+                // Leave room at the bottom for the Pro chip so it never covers the route.
+                modifier = Modifier.fillMaxSize().padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = if (all.size >= 2) 56.dp else 24.dp),
                 strokeWidth = 7.dp,
                 showEndpoints = true,
                 endpointColor = RaveTheme.colors.tileInk.container
