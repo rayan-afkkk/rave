@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="guide_muscles">Muscles worked</string>
+    <string name="guide_how_to">How to do it</string>
+    <string name="guide_avoid">Common mistakes</string>
+    <string name="guide_open">How to do %1$s</string>
+    <string name="guide_m_quads">Quads</string>
+    <string name="guide_m_hamstrings">Hamstrings</string>
+    <string name="guide_m_glutes">Glutes</string>
+    <string name="guide_m_calves">Calves</string>
+    <string name="guide_m_chest">Chest</string>
+    <string name="guide_m_abs">Abs</string>
+    <string name="guide_m_lats">Lats</string>
+    <string name="guide_m_lower_back">Lower back</string>
+    <string name="guide_m_shoulders">Shoulders</string>
+    <string name="guide_m_biceps">Biceps</string>
+    <string name="guide_m_triceps">Triceps</string>
+    <string name="guide_m_forearms">Forearms</string>
+    <string-array name="guide_bench_press_steps">
+        <item>Lie on the bench with your eyes under the bar and feet flat on the floor.</item>
+        <item>Grip a little wider than your shoulders and lower the bar to your mid chest.</item>
+        <item>Press it back up until your arms are straight, keeping your back slightly arched.</item>
+    </string-array>
+    <string-array name="guide_bench_press_avoid">
+        <item>Bouncing the bar off your chest.</item>
+        <item>Flaring your elbows straight out to the sides.</item>
+    </string-array>
+    <string-array name="guide_incline_db_press_steps">
+        <item>Set the bench to about 30–45° and sit back with a dumbbell in each hand.</item>
+        <item>Lower the dumbbells to the sides of your upper chest, elbows a little tucked.</item>
+        <item>Press up and slightly together until your arms are straight.</item>
+    </string-array>
+    <string-array name="guide_incline_db_press_avoid">
+        <item>Setting the bench too steep, which turns it into a shoulder press.</item>
+        <item>Letting the dumbbells drift too far apart at the bottom.</item>
+    </string-array>
+    <string-array name="guide_push_up_steps">
+        <item>Start in a high plank with your hands just wider than your shoulders.</item>
+        <item>Keep your body in a straight line and lower your chest towards the floor.</item>
+        <item>Push the floor away until your arms are straight again.</item>
+    </string-array>
+    <string-array name="guide_push_up_avoid">
+        <item>Letting your hips sag or pike up.</item>
+        <item>Only going halfway down.</item>
+    </string-array>
+    <string-array name="guide_deadlift_steps">
+        <item>Stand with the bar over your mid-foot and grip it just outside your legs.</item>
+        <item>Brace your core, keep your back flat and push the floor away with your legs.</item>
+        <item>Stand tall with hips and knees locked, then lower the bar the same way.</item>
+    </string-array>
+    <string-array name="guide_deadlift_avoid">
+        <item>Rounding your lower back.</item>
+        <item>Letting the bar drift away from your legs.</item>
+    </string-array>
+    <string-array name="guide_barbell_row_steps">
+        <item>Hinge forward with a flat back and soft knees, bar hanging below your shoulders.</item>
+        <item>Pull the bar to your lower ribs, driving your elbows back.</item>
+        <item>Squeeze your shoulder blades, then lower with control.</item>
+    </string-array>
+    <string-array name="guide_barbell_row_avoid">
+        <item>Jerking the weight up with your hips.</item>
+        <item>Standing too upright, which shortens the movement.</item>
+    </string-array>
+    <string-array name="guide_lat_pulldown_steps">
+        <item>Sit with your thighs under the pads and grip the bar wider than your shoulders.</item>
+        <item>Lean back slightly and pull the bar down to your upper chest.</item>
+        <item>Let it rise slowly until your arms are straight.</item>
+    </string-array>
+    <string-array name="guide_lat_pulldown_avoid">
+        <item>Pulling the bar behind your neck.</item>
+        <item>Swinging your body to move the weight.</item>
+    </string-array>
+    <string-array name="guide_pull_up_steps">
+        <item>Hang from the bar with your hands a bit wider than your shoulders.</item>
+        <item>Pull your chest up until your chin is over the bar.</item>
+        <item>Lower yourself all the way down with control.</item>
+    </string-array>
+    <string-array name="guide_pull_up_avoid">
+        <item>Kicking or swinging to get up.</item>
+        <item>Stopping short of straight arms at the bottom.</item>
+    </string-array>
+    <string-array name="guide_squat_steps">
+        <item>Rest the bar on your upper back with feet about shoulder-width apart.</item>
+        <item>Brace, then sit your hips back and down until your thighs are at least parallel.</item>
+        <item>Drive up through your whole foot until you are standing tall.</item>
+    </string-array>
+    <string-array name="guide_squat_avoid">
+        <item>Letting your knees cave inwards.</item>
+        <item>Lifting your heels off the floor.</item>
+    </string-array>
+    <string-array name="guide_leg_press_steps">
+        <item>Sit with your back flat on the pad and feet shoulder-width on the platform.</item>
+        <item>Lower the platform until your knees are bent to about 90°.</item>
+        <item>Press back up without locking your knees hard.</item>
+    </string-array>
+    <string-array name="guide_leg_press_avoid">
+        <item>Letting your lower back lift off the pad.</item>
+        <item>Locking your knees at the top.</item>
+    </string-array>
+    <string-array name="guide_lunge_steps">
+        <item>Stand tall holding dumbbells and take a long step forward.</item>
+        <item>Lower until your back knee nearly touches the floor.</item>
+        <item>Push through your front heel to come back up.</item>
+    </string-array>
+    <string-array name="guide_lunge_avoid">
+        <item>Letting your front knee collapse inwards.</item>
+        <item>Leaning your upper body too far forward.</item>
+    </string-array>
+    <string-array name="guide_rdl_steps">
+        <item>Stand holding the bar with soft knees.</item>
+        <item>Push your hips back and slide the bar down your thighs, keeping your back flat.</item>
+        <item>Stop when you feel a stretch in your hamstrings, then drive your hips forward.</item>
+    </string-array>
+    <string-array name="guide_rdl_avoid">
+        <item>Rounding your back to reach lower.</item>
+        <item>Turning it into a squat by bending your knees too much.</item>
+    </string-array>
+    <string-array name="guide_calf_raise_steps">
+        <item>Stand on the balls of your feet on a step, heels hanging off.</item>
+        <item>Rise up onto your toes as high as you can.</item>
+        <item>Lower your heels slowly below the step.</item>
+    </string-array>
+    <string-array name="guide_calf_raise_avoid">
+        <item>Bouncing quickly through the reps.</item>
+        <item>Cutting the range short at the bottom.</item>
+    </string-array>
+    <string-array name="guide_ohp_steps">
+        <item>Hold the bar at your shoulders, hands just outside them.</item>
+        <item>Brace your core and glutes and press the bar straight up.</item>
+        <item>Move your head through once the bar passes your face and lock out overhead.</item>
+    </string-array>
+    <string-array name="guide_ohp_avoid">
+        <item>Leaning back to push the weight up.</item>
+        <item>Pressing the bar out in front instead of overhead.</item>
+    </string-array>
+    <string-array name="guide_lateral_raise_steps">
+        <item>Stand with a dumbbell in each hand at your sides.</item>
+        <item>With a slight bend in your elbows, raise your arms out to the sides.</item>
+        <item>Stop at shoulder height, then lower slowly.</item>
+    </string-array>
+    <string-array name="guide_lateral_raise_avoid">
+        <item>Swinging the weights up with your body.</item>
+        <item>Shrugging your shoulders towards your ears.</item>
+    </string-array>
+    <string-array name="guide_bicep_curl_steps">
+        <item>Stand with dumbbells at your sides, palms facing forward.</item>
+        <item>Keep your elbows by your sides and curl the weights up.</item>
+        <item>Squeeze at the top, then lower all the way down.</item>
+    </string-array>
+    <string-array name="guide_bicep_curl_avoid">
+        <item>Swinging your body to lift the weight.</item>
+        <item>Letting your elbows drift forward.</item>
+    </string-array>
+    <string-array name="guide_tricep_pushdown_steps">
+        <item>Face the cable and grip the handle with your elbows tucked at your sides.</item>
+        <item>Push the handle down until your arms are straight.</item>
+        <item>Let it come back up slowly, keeping your elbows still.</item>
+    </string-array>
+    <string-array name="guide_tricep_pushdown_avoid">
+        <item>Letting your elbows move forward and back.</item>
+        <item>Leaning over the handle to push with your body.</item>
+    </string-array>
+    <string-array name="guide_dip_steps">
+        <item>Support yourself on the bars with straight arms.</item>
+        <item>Lean slightly forward and lower until your upper arms are about parallel to the floor.</item>
+        <item>Press back up to straight arms.</item>
+    </string-array>
+    <string-array name="guide_dip_avoid">
+        <item>Dropping too deep and straining your shoulders.</item>
+        <item>Swinging your legs for momentum.</item>
+    </string-array>
+    <string-array name="guide_plank_steps">
+        <item>Rest on your forearms with elbows under your shoulders.</item>
+        <item>Lift your body so it forms a straight line from head to heels.</item>
+        <item>Brace your core and glutes and breathe steadily.</item>
+    </string-array>
+    <string-array name="guide_plank_avoid">
+        <item>Letting your hips sag towards the floor.</item>
+        <item>Holding your breath.</item>
+    </string-array>
+    <string-array name="guide_crunch_steps">
+        <item>Lie on your back with knees bent and feet flat.</item>
+        <item>Cross your arms on your chest and curl your shoulders off the floor.</item>
+        <item>Pause, then lower slowly.</item>
+    </string-array>
+    <string-array name="guide_crunch_avoid">
+        <item>Pulling on your neck.</item>
+        <item>Using momentum instead of your abs.</item>
+    </string-array>
+    <string-array name="guide_kettlebell_swing_steps">
+        <item>Stand with feet wider than hips and hinge to grab the kettlebell.</item>
+        <item>Hike it back between your legs, then snap your hips forward.</item>
+        <item>Let it float to chest height, then guide it back down.</item>
+    </string-array>
+    <string-array name="guide_kettlebell_swing_avoid">
+        <item>Squatting the weight up instead of hinging.</item>
+        <item>Lifting the bell with your arms.</item>
+    </string-array>
+    <string-array name="guide_burpee_steps">
+        <item>From standing, squat down and put your hands on the floor.</item>
+        <item>Jump your feet back into a plank.</item>
+        <item>Jump your feet back in, stand up and jump with your arms overhead.</item>
+    </string-array>
+    <string-array name="guide_burpee_avoid">
+        <item>Letting your hips sag in the plank.</item>
+        <item>Landing stiff-legged from the jump.</item>
+    </string-array>
+</resources>

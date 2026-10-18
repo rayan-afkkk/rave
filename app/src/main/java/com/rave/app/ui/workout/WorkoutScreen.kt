@@ -7,6 +7,10 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.rounded.Info
+import com.rave.app.ui.workout.guide.ExerciseGuideSheet
+import com.rave.app.ui.workout.guide.ExerciseThumb
+import com.rave.app.ui.workout.guide.rememberGuide
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -210,11 +214,22 @@ private fun Strip(value: String, label: String) {
 private fun ExerciseCard(block: ExerciseBlock, pounds: Boolean, viewModel: WorkoutViewModel, modifier: Modifier) {
     val ex = block.exercise
     var menu by remember { mutableStateOf(false) }
+    var showGuide by remember { mutableStateOf(false) }
+    val guide = rememberGuide(ex)
     SectionCard(modifier = modifier, contentPadding = PaddingValues(start = 14.dp, end = 6.dp, top = 12.dp, bottom = 8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
+            if (guide != null) {
+                ExerciseThumb(guide, ex.muscle, Modifier.size(52.dp).clickable { showGuide = true })
+                Spacer(Modifier.width(12.dp))
+            }
             Column(Modifier.weight(1f)) {
                 Text(ex.name, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
                 Text(stringResource(muscleRes(ex.muscle)), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            if (guide != null) {
+                IconButton(onClick = { showGuide = true }) {
+                    Icon(Icons.Rounded.Info, stringResource(R.string.guide_open, ex.name), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
             Box {
                 IconButton(onClick = { menu = true }) { Icon(Icons.Rounded.MoreVert, contentDescription = stringResource(R.string.workout_exercise_options)) }
@@ -236,6 +251,7 @@ private fun ExerciseCard(block: ExerciseBlock, pounds: Boolean, viewModel: Worko
             val label = if (set.warmup) "W" else (++working).toString()
             key(set.id) { SetRow(set, label, block.previous.getOrNull(set.setOrder), ex.kind, pounds, viewModel) }
         }
+        if (showGuide && guide != null) ExerciseGuideSheet(guide, ex.muscle, onDismiss = { showGuide = false })
         TextButton(onClick = { viewModel.addSet(ex.id) }) {
             Icon(Icons.Rounded.Add, null, Modifier.size(18.dp))
             Spacer(Modifier.width(4.dp))

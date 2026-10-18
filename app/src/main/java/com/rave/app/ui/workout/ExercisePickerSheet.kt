@@ -49,6 +49,13 @@ import com.rave.app.ui.components.IconTile
 import com.rave.app.ui.components.PillChip
 import com.rave.app.ui.theme.RaveTheme
 import androidx.compose.material.icons.rounded.FitnessCenter
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material3.IconButton
+import androidx.compose.foundation.layout.size
+import com.rave.app.ui.workout.guide.ExerciseGuide
+import com.rave.app.ui.workout.guide.ExerciseGuideSheet
+import com.rave.app.ui.workout.guide.ExerciseThumb
+import com.rave.app.ui.workout.guide.rememberGuide
 
 @StringRes
 fun muscleRes(m: MuscleGroup): Int = when (m) {
@@ -81,6 +88,7 @@ fun ExercisePickerSheet(
     var query by rememberSaveable { mutableStateOf("") }
     var muscle by rememberSaveable { mutableStateOf<MuscleGroup?>(null) }
     var creating by rememberSaveable { mutableStateOf(false) }
+    var info by remember { mutableStateOf<Pair<ExerciseGuide, MuscleGroup>?>(null) }
     val filtered = remember(library, query, muscle) {
         library.filter { (muscle == null || it.muscle == muscle) && it.name.contains(query.trim(), ignoreCase = true) }
     }
@@ -110,7 +118,9 @@ fun ExercisePickerSheet(
                         Modifier.fillMaxWidth().clickable(enabled = !added) { onPick(ex) }.heightIn(min = 56.dp).padding(vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        IconTile(Icons.Rounded.FitnessCenter, RaveTheme.colors.tiles[ex.muscle.ordinal % RaveTheme.colors.tiles.size], size = 40.dp, iconSize = 20.dp)
+                        val guide = rememberGuide(ex)
+                        if (guide != null) ExerciseThumb(guide, ex.muscle, Modifier.size(48.dp))
+                        else IconTile(Icons.Rounded.FitnessCenter, RaveTheme.colors.tiles[ex.muscle.ordinal % RaveTheme.colors.tiles.size], size = 48.dp, iconSize = 22.dp)
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
                             Text(ex.name, style = MaterialTheme.typography.bodyLarge)
@@ -118,6 +128,11 @@ fun ExercisePickerSheet(
                                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         if (added) Icon(Icons.Rounded.Check, stringResource(R.string.workout_already_added), tint = MaterialTheme.colorScheme.tertiary)
+                        if (guide != null) {
+                            IconButton(onClick = { info = guide to ex.muscle }) {
+                                Icon(Icons.Rounded.Info, stringResource(R.string.guide_open, ex.name), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
                     }
                 }
                 item {
@@ -131,6 +146,7 @@ fun ExercisePickerSheet(
             Spacer(Modifier.height(12.dp))
         }
     }
+    info?.let { (guide, group) -> ExerciseGuideSheet(guide, group, onDismiss = { info = null }) }
     if (creating) {
         CreateExerciseDialog(initialName = query.trim(), onDismiss = { creating = false }) { n, m, k ->
             creating = false

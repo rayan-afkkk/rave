@@ -52,6 +52,24 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 import org.robolectric.Shadows.shadowOf
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.rave.app.domain.workout.MuscleGroup
+import com.rave.app.ui.workout.guide.EXERCISE_GUIDES
+import com.rave.app.ui.workout.guide.ExerciseGuideContent
+import com.rave.app.ui.workout.guide.ExerciseThumb
 import java.io.File
 import java.time.LocalDate
 import java.time.LocalTime
@@ -189,6 +207,43 @@ class AppScreenshots {
                 }
                 save(name)
             }
+    }
+
+    /** Every built-in exercise figure, plus one full guide. */
+    @Test fun s21_exercise_figures() {
+        compose.mainClock.autoAdvance = false
+        compose.setContent {
+            RaveTheme(darkTheme = false) {
+                Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(8.dp)) {
+                    EXERCISE_GUIDES.chunked(4).forEach { row ->
+                        Row {
+                            row.forEach { g ->
+                                Column(Modifier.weight(1f).padding(3.dp)) {
+                                    ExerciseThumb(g, MuscleGroup.CHEST, Modifier.fillMaxWidth().aspectRatio(1.07f))
+                                    Text(stringResource(g.name), style = MaterialTheme.typography.labelSmall, maxLines = 1)
+                                }
+                            }
+                            repeat(4 - row.size) { Spacer(Modifier.weight(1f)) }
+                        }
+                    }
+                }
+            }
+        }
+        settle(500)
+        save("21_exercise_figures")
+    }
+
+    @Test fun s22_exercise_guide() {
+        compose.mainClock.autoAdvance = false
+        compose.setContent {
+            RaveTheme(darkTheme = false) {
+                Surface(Modifier.fillMaxSize()) {
+                    ExerciseGuideContent(EXERCISE_GUIDES.first { it.key == "squat" }, MuscleGroup.LEGS, Modifier.padding(top = 40.dp))
+                }
+            }
+        }
+        settle(1200)
+        save("22_exercise_guide")
     }
 
     private fun save(name: String) {
