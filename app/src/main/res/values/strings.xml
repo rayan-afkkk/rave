@@ -408,7 +408,7 @@
     <string name="food_today_log">Today\'s food</string>
     <string name="food_empty_log">Nothing logged yet. Scan a snack or add what you ate.</string>
     <string name="food_recent_scans">Recent scans</string>
-    <string name="food_disclaimer">Estimates to help you choose, not medical advice. Always check the pack for allergies.</string>
+    <string name="food_disclaimer">Estimates to help you choose, not medical advice. Always check the pack for allergies and halal certification.</string>
     <string name="food_reading">Reading…</string>
     <string name="food_label_failed">Couldn\'t read the label. Hold the phone steady over the nutrition panel and try again.</string>
     <string name="food_photo_failed">Couldn\'t recognise food in that photo. Try again closer up, in good light.</string>
@@ -568,7 +568,6 @@
     <string name="legal_and">and</string>
     <string name="legal_agree_lead">By continuing, you agree to the</string>
     <string name="legal_agree_purchase">Subscriptions renew automatically until cancelled in Google Play. See the</string>
-    <string name="food_disclaimer">Scores, calories and halal/allergen info are estimates. Always check the packaging.</string>
     <string name="food_off_credit">Product data from Open Food Facts (ODbL)</string>
     <string name="legal_consent_lead">I have read and agree to the</string>
     <string name="legal_consent_needed">Please accept to continue</string>
