@@ -29,9 +29,11 @@ import kotlinx.serialization.Serializable
 @Serializable data object SettingsRoute
 @Serializable data object PrivacyZonesRoute
 @Serializable data object AboutRoute
+@Serializable data class FriendProfileRoute(val uid: String, val name: String)
 @Serializable data class LegalRoute(val doc: String)
 @Serializable data object BatteryGuideRoute
-@Serializable data class WrappedRoute(val year: Int)
+/** [month] 1-12 for a monthly Wrapped, 0 for the whole year. */
+@Serializable data class WrappedRoute(val year: Int, val month: Int = 0)
 
 // Social
 @Serializable data object FriendRequestsRoute

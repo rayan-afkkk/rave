@@ -73,6 +73,22 @@ class FeedRepository @Inject constructor(
         ).await()
     }
 
+    /** A friend's recent activities that were shared with me, newest first. */
+    suspend fun activitiesOf(friendUid: String, max: Int = 30): List<FeedItem> {
+        val me = auth.currentUser.value?.uid ?: return emptyList()
+        if (firebase.firestore == null) return emptyList()
+        // Equality + array-contains merge existing single-field indexes; sorted here so no
+        // composite index is needed.
+        return firebase.requireFirestore().collection(FEED)
+            .whereEqualTo("ownerUid", friendUid)
+            .whereArrayContains("audience", me)
+            .limit(60)
+            .get().await()
+            .documents.mapNotNull { it.toFeedItem() }
+            .sortedByDescending { it.startTime }
+            .take(max)
+    }
+
     suspend fun remove(remoteId: String) {
         runCatching { firebase.requireFirestore().collection(FEED).document(remoteId).delete().await() }
     }

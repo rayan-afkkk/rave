@@ -68,7 +68,7 @@ fun RaveNavHost(
                 onOpenTimer = { navController.navigate(HabitTimerRoute(it)) },
                 onOpenProgress = { navController.navigate(ProgressRoute) },
                 onOpenBatteryGuide = { navController.navigate(BatteryGuideRoute) },
-                onOpenWrapped = { navController.navigate(WrappedRoute(it)) },
+                onOpenWrapped = { navController.navigate(WrappedRoute(it.year, it.month ?: 0)) },
             )
         }
         composable<RoutesRoute> {
@@ -88,6 +88,7 @@ fun RaveNavHost(
                 onInvite = { navController.navigate(InviteRoute) },
                 onCompetitions = { navController.navigate(CompetitionsRoute) },
                 onSharedStreaks = { navController.navigate(SharedStreaksRoute) },
+                onOpenFriend = { uid, name -> navController.navigate(FriendProfileRoute(uid, name)) },
             )
         }
         composable<ProfileRoute> {
@@ -95,7 +96,7 @@ fun RaveNavHost(
                 contentPadding = contentPadding,
                 onOpenSettings = { navController.navigate(SettingsRoute) },
                 onOpenProgress = { navController.navigate(ProgressRoute) },
-                onOpenWrapped = { navController.navigate(WrappedRoute(it)) },
+                onOpenWrapped = { navController.navigate(WrappedRoute(it.year, it.month ?: 0)) },
                 onSignIn = { navController.navigate(SignInRoute) },
             )
         }
@@ -158,6 +159,7 @@ fun RaveNavHost(
             )
         }
         composable<PrivacyZonesRoute> { PrivacyZonesScreen(onBack = back) }
+        composable<FriendProfileRoute> { com.rave.app.ui.friends.FriendProfileScreen(onBack = back) }
         composable<AboutRoute> {
             com.rave.app.ui.legal.AboutScreen(onBack = back, onOpen = { navController.navigate(LegalRoute(it.name)) })
         }

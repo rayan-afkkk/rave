@@ -88,7 +88,7 @@ fun ProfileScreen(
     contentPadding: PaddingValues,
     onOpenSettings: () -> Unit,
     onOpenProgress: () -> Unit,
-    onOpenWrapped: (Int) -> Unit,
+    onOpenWrapped: (com.rave.app.domain.wrapped.WrappedPeriod) -> Unit,
     onSignIn: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
@@ -166,16 +166,25 @@ fun ProfileScreen(
             }
         }
 
-        // Progress / Wrapped
-        val wrappedYear = remember { com.rave.app.domain.wrapped.WrappedCalculator.seasonYear(java.time.LocalDate.now()) ?: java.time.LocalDate.now().year }
+        // Progress, plus Wrapped when one is out (end of a month / year)
+        val wrapped = remember { com.rave.app.domain.wrapped.WrappedCalculator.available(java.time.LocalDate.now()) }
         Row(Modifier.fillMaxWidth().padding(top = 2.dp), horizontalArrangement = Arrangement.spacedBy(BentoGap)) {
             BentoButton(
                 stringResource(R.string.progress_title), c.tilePink.container, c.tilePink.content, onOpenProgress,
                 Modifier.weight(1f), leading = Icons.Rounded.Insights, height = 58.dp,
             )
+            wrapped.firstOrNull()?.let { period ->
+                BentoButton(
+                    stringResource(R.string.wrapped_button, com.rave.app.ui.wrapped.wrappedLabel(period)), c.tileSand.container, c.tileSand.content, { onOpenWrapped(period) },
+                    Modifier.weight(1f), leading = Icons.Rounded.AutoAwesome, height = 58.dp,
+                )
+            }
+        }
+        if (wrapped.size > 1) {
+            val period = wrapped[1]
             BentoButton(
-                stringResource(R.string.bprofile_wrapped), c.tileSand.container, c.tileSand.content, { onOpenWrapped(wrappedYear) },
-                Modifier.weight(1f), leading = Icons.Rounded.AutoAwesome, height = 58.dp,
+                stringResource(R.string.wrapped_button, com.rave.app.ui.wrapped.wrappedLabel(period)), c.tileSand.container, c.tileSand.content,
+                { onOpenWrapped(period) }, Modifier.fillMaxWidth(), leading = Icons.Rounded.AutoAwesome, height = 54.dp,
             )
         }
 

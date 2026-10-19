@@ -34,6 +34,10 @@ data class UserProfile(
     val bestStreak: Int = 0,
     val pointsWeek: Int = 0,
     val invitedBy: String? = null,
+    val activities: Int = 0,
+    val level: Int = 1,
+    /** Earned badge ids (BadgeId names). */
+    val badges: List<String> = emptyList(),
 ) {
     /** This week's km, or 0 if the stored summary is from an older week. */
     fun weekKmFor(weekStartEpochDay: Long): Double = if (this.weekStartEpochDay == weekStartEpochDay) weekKm else 0.0
@@ -47,6 +51,9 @@ data class StatsSummary(
     val currentStreak: Int,
     val bestStreak: Int,
     val pointsWeek: Int,
+    val activities: Int = 0,
+    val level: Int = 1,
+    val badges: List<String> = emptyList(),
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -172,16 +179,18 @@ class ProfileRepository @Inject constructor(
         runCatching { users().document(uid).set(mapOf("visibility" to visibility.name), SetOptions.merge()).await() }
     }
 
+    /** Publishes the profile summary friends see. Skipped when nothing changed, to save writes. */
     suspend fun pushStats(s: StatsSummary) {
         val uid = firebase.uid ?: return
-        users().document(uid).set(
-            mapOf(
-                "totalKm" to s.totalKm, "weekKm" to s.weekKm, "weekStart" to s.weekStartEpochDay,
-                "currentStreak" to s.currentStreak, "bestStreak" to s.bestStreak, "pointsWeek" to s.pointsWeek,
-                "updatedAt" to FieldValue.serverTimestamp(),
-            ),
-            SetOptions.merge(),
-        ).await()
+        val fields = mapOf(
+            "totalKm" to s.totalKm, "weekKm" to s.weekKm, "weekStart" to s.weekStartEpochDay,
+            "currentStreak" to s.currentStreak, "bestStreak" to s.bestStreak, "pointsWeek" to s.pointsWeek,
+            "activities" to s.activities, "level" to s.level, "badges" to s.badges,
+        )
+        val signature = "$uid|$fields"
+        if (settings.getString(KEY_STATS_SIGNATURE) == signature) return
+        users().document(uid).set(fields + ("updatedAt" to FieldValue.serverTimestamp()), SetOptions.merge()).await()
+        settings.putString(KEY_STATS_SIGNATURE, signature)
     }
 
     suspend fun setFields(fields: Map<String, Any?>) {
@@ -189,11 +198,14 @@ class ProfileRepository @Inject constructor(
         users().document(uid).set(fields, SetOptions.merge()).await()
     }
 
+    /** Stores the push token once per account/token pair (the hourly sync used to rewrite it every time). */
     suspend fun registerToken(token: String) {
         val uid = firebase.uid ?: return
+        if (settings.getString(KEY_TOKEN) == "$uid|$token") return
         runCatching {
             users().document(uid).collection("tokens").document(token)
                 .set(mapOf("createdAt" to FieldValue.serverTimestamp(), "platform" to "android")).await()
+            settings.putString(KEY_TOKEN, "$uid|$token")
         }
     }
 
@@ -268,6 +280,8 @@ class ProfileRepository @Inject constructor(
     companion object {
         const val USERS = "users"
         const val INVITES = "invites"
+        private const val KEY_STATS_SIGNATURE = "cloud_stats_signature"
+        private const val KEY_TOKEN = "cloud_fcm_token"
         val USERNAME = Regex("^[a-z0-9_]{3,20}$")
     }
 }
@@ -288,5 +302,8 @@ fun DocumentSnapshot.toProfile(): UserProfile? {
         bestStreak = int("bestStreak"),
         pointsWeek = int("pointsWeek"),
         invitedBy = getString("invitedBy"),
+        activities = int("activities"),
+        level = int("level").coerceAtLeast(1),
+        badges = (get("badges") as? List<*>)?.filterIsInstance<String>().orEmpty(),
     )
 }

@@ -84,7 +84,7 @@ fun HomeScreen(
     onOpenTimer: (Long) -> Unit,
     onOpenProgress: () -> Unit,
     onOpenBatteryGuide: () -> Unit,
-    onOpenWrapped: (Int) -> Unit,
+    onOpenWrapped: (com.rave.app.domain.wrapped.WrappedPeriod) -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -104,8 +104,8 @@ fun HomeScreen(
         ) {
             item(key = "header") { BentoHeader(state) }
             item(key = "repair") { StreakRepairCard() }
-            com.rave.app.domain.wrapped.WrappedCalculator.seasonYear(java.time.LocalDate.now())?.let { year ->
-                item(key = "wrapped") { WrappedBanner(year) { onOpenWrapped(year) } }
+            com.rave.app.domain.wrapped.WrappedCalculator.available(java.time.LocalDate.now()).firstOrNull()?.let { period ->
+                item(key = "wrapped") { WrappedBanner(period) { onOpenWrapped(period) } }
             }
             item(key = "bento") {
                 BentoGrid(
@@ -381,17 +381,17 @@ private fun habitSubtitle(item: HabitItem, unit: com.rave.app.domain.model.Dista
     return parts.take(2).joinToString(" · ")
 }
 
-/** December–January: invites the user to their yearly "Rave Wrapped". */
+/** End of a month / year: invites the user to their "Rave Wrapped". */
 @Composable
-private fun WrappedBanner(year: Int, onClick: () -> Unit) {
+private fun WrappedBanner(period: com.rave.app.domain.wrapped.WrappedPeriod, onClick: () -> Unit) {
     val colors = RaveTheme.colors
     SectionCard(Modifier.fillMaxWidth(), color = colors.splashBackground, onClick = onClick) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             com.rave.app.ui.components.RaveLogo(color = colors.splashMark, modifier = Modifier.size(40.dp))
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(stringResource(R.string.wrapped_banner_title, year), style = MaterialTheme.typography.titleMedium, color = colors.splashText)
-                Text(stringResource(R.string.wrapped_banner_body), style = MaterialTheme.typography.bodySmall, color = colors.splashText.copy(alpha = 0.75f))
+                Text(stringResource(R.string.wrapped_banner_title, com.rave.app.ui.wrapped.wrappedLabel(period)), style = MaterialTheme.typography.titleMedium, color = colors.splashText)
+                Text(stringResource(if (period.isYear) R.string.wrapped_banner_body else R.string.wrapped_banner_body_month), style = MaterialTheme.typography.bodySmall, color = colors.splashText.copy(alpha = 0.75f))
             }
         }
     }

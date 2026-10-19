@@ -96,7 +96,7 @@ class FriendsViewModel @Inject constructor(
             nudged = nudgedSet,
             liveCompetitions = live,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), FriendsUiState(cloudAvailable = auth.isAvailable))
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), FriendsUiState(cloudAvailable = auth.isAvailable, user = auth.currentUser.value))
 
     private data class Social(val friends: List<Friend>, val requests: Int, val shared: List<SharedStreak>, val invitations: Int)
 

@@ -53,6 +53,7 @@ import com.rave.app.data.repository.WrappedRepository
 import com.rave.app.domain.fitness.FitnessMath
 import com.rave.app.domain.wrapped.WrappedPersona
 import com.rave.app.domain.wrapped.WrappedSummary
+import com.rave.app.domain.wrapped.WrappedPeriod
 import com.rave.app.ui.components.LoadingState
 import com.rave.app.ui.components.RaveLogo
 import com.rave.app.ui.navigation.WrappedRoute
@@ -79,14 +80,21 @@ class WrappedViewModel @Inject constructor(
     repo: WrappedRepository,
     settings: SettingsRepository,
 ) : ViewModel() {
-    val year = savedState.toRoute<WrappedRoute>().year
+    val period = savedState.toRoute<WrappedRoute>().let { WrappedPeriod(it.year, it.month.takeIf { m -> m in 1..12 }) }
     private val _ui = MutableStateFlow<WrappedUi?>(null)
     val ui: StateFlow<WrappedUi?> = _ui.asStateFlow()
 
     init {
-        viewModelScope.launch { _ui.value = WrappedUi(repo.summary(year), settings.current().heightCm) }
+        viewModelScope.launch { _ui.value = WrappedUi(repo.summary(period), settings.current().heightCm) }
     }
 }
+
+/** "2026" for a yearly Wrapped, "October 2026" for a monthly one. */
+fun wrappedLabel(period: WrappedPeriod): String =
+    if (period.month == null) period.year.toString()
+    else java.time.YearMonth.of(period.year, period.month).format(DateTimeFormatter.ofPattern("LLLL yyyy", Locale.getDefault()))
+
+private fun wrappedLabel(s: WrappedSummary) = wrappedLabel(WrappedPeriod(s.year, s.month))
 
 private enum class WrappedPage { INTRO, STEPS, MOVES, HABITS, STRENGTH, PEAK, SHARE, EMPTY }
 
@@ -121,9 +129,9 @@ fun WrappedScreen(onBack: () -> Unit, viewModel: WrappedViewModel = hiltViewMode
                     ),
                 ) {
                     when (pages[index]) {
-                        WrappedPage.INTRO -> Intro(s.year, active)
+                        WrappedPage.INTRO -> Intro(s, active)
                         WrappedPage.STEPS -> BigStat(
-                            kicker = stringResource(R.string.wrapped_steps_kicker), value = s.totalSteps, active = active,
+                            kicker = stringResource(if (s.month == null) R.string.wrapped_steps_kicker else R.string.wrapped_steps_kicker_month), value = s.totalSteps, active = active,
                             label = stringResource(R.string.wrapped_steps_label),
                             lines = listOfNotNull(
                                 stringResource(R.string.wrapped_steps_km, "%.0f".format(FitnessMath.distanceM(s.totalSteps.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(), u.heightCm) / 1000)),
@@ -153,7 +161,7 @@ fun WrappedScreen(onBack: () -> Unit, viewModel: WrappedViewModel = hiltViewMode
                         )
                         WrappedPage.PEAK -> Peak(s, active)
                         WrappedPage.SHARE -> ShareFinale(s)
-                        WrappedPage.EMPTY -> Empty(s.year)
+                        WrappedPage.EMPTY -> Empty(s)
                     }
                 }
             }
@@ -199,7 +207,7 @@ private fun BoxScope.Centered(content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun BoxScope.Intro(year: Int, active: Boolean) {
+private fun BoxScope.Intro(s: WrappedSummary, active: Boolean) {
     val colors = RaveTheme.colors
     val p = remember { Animatable(0f) }
     LaunchedEffect(active) { if (active) { p.snapTo(0f); p.animateTo(1f, tween(900)) } }
@@ -207,10 +215,10 @@ private fun BoxScope.Intro(year: Int, active: Boolean) {
         RaveLogo(color = colors.splashMark, progress = p.value, modifier = Modifier.size(96.dp))
         Spacer(Modifier.height(18.dp))
         Text(stringResource(R.string.wrapped_kicker), color = colors.splashMark, style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 4.sp))
-        Text(stringResource(R.string.wrapped_your_year, year), color = colors.splashText,
+        Text(stringResource(R.string.wrapped_your_year, wrappedLabel(s)), color = colors.splashText,
             style = MaterialTheme.typography.displayLarge.copy(fontWeight = FontWeight.ExtraBold), textAlign = TextAlign.Center)
         Spacer(Modifier.height(10.dp))
-        Text(stringResource(R.string.wrapped_swipe), color = colors.splashText.copy(alpha = 0.7f), style = MaterialTheme.typography.bodyLarge)
+        Text(stringResource(if (s.month == null) R.string.wrapped_swipe else R.string.wrapped_swipe_month), color = colors.splashText.copy(alpha = 0.7f), style = MaterialTheme.typography.bodyLarge)
     }
 }
 
@@ -266,14 +274,14 @@ private fun personaName(p: WrappedPersona) = stringResource(
 private fun BoxScope.ShareFinale(s: WrappedSummary) {
     val colors = RaveTheme.colors
     val persona = personaName(s.persona)
-    val text = stringResource(R.string.wrapped_share_text, s.year, persona, stringResource(R.string.app_name))
+    val text = stringResource(R.string.wrapped_share_text, wrappedLabel(s), persona, stringResource(R.string.app_name))
     Column(Modifier.fillMaxSize().statusBarsPadding().padding(top = 36.dp)) {
         Text(stringResource(R.string.wrapped_you_are), color = colors.splashText.copy(alpha = 0.8f), style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.align(Alignment.CenterHorizontally))
         Text(persona, color = colors.splashMark, style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold),
             modifier = Modifier.align(Alignment.CenterHorizontally))
         // Wrapped is free marketing: every template is open to everyone.
-        SharePager(fileName = "rave-wrapped-${s.year}", shareText = text, modifier = Modifier.weight(1f).padding(top = 8.dp), isPro = true) { _, palette ->
+        SharePager(fileName = "rave-wrapped-${s.year}" + (s.month?.let { "-%02d".format(it) } ?: ""), shareText = text, modifier = Modifier.weight(1f).padding(top = 8.dp), isPro = true) { _, palette ->
             WrappedCard(s, persona, palette)
         }
     }
@@ -285,7 +293,7 @@ private fun BoxScope.WrappedCard(s: WrappedSummary, persona: String, p: SharePal
         Row(verticalAlignment = Alignment.CenterVertically) {
             RaveLogo(color = p.accent, modifier = Modifier.size(28.dp))
             Spacer(Modifier.width(6.dp))
-            Text(stringResource(R.string.wrapped_card_title, s.year), color = p.text, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(stringResource(R.string.wrapped_card_title, wrappedLabel(s)), color = p.text, fontWeight = FontWeight.Bold, fontSize = 18.sp)
         }
         Spacer(Modifier.height(4.dp))
         Text(persona, color = p.accent, fontWeight = FontWeight.ExtraBold, fontSize = 30.sp)
@@ -310,15 +318,15 @@ private fun WrappedRow(p: SharePalette, value: String, label: String) {
 }
 
 @Composable
-private fun BoxScope.Empty(year: Int) {
+private fun BoxScope.Empty(s: WrappedSummary) {
     val colors = RaveTheme.colors
     Centered {
         RaveLogo(color = colors.splashMark, modifier = Modifier.size(80.dp))
         Spacer(Modifier.height(16.dp))
-        Text(stringResource(R.string.wrapped_empty_title, year + 1), color = colors.splashText,
+        Text(if (s.month == null) stringResource(R.string.wrapped_empty_title, s.year + 1) else stringResource(R.string.wrapped_empty_title_month), color = colors.splashText,
             style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold), textAlign = TextAlign.Center)
         Spacer(Modifier.height(8.dp))
-        Text(stringResource(R.string.wrapped_empty_body), color = colors.splashText.copy(alpha = 0.75f),
+        Text(stringResource(if (s.month == null) R.string.wrapped_empty_body else R.string.wrapped_empty_body_month), color = colors.splashText.copy(alpha = 0.75f),
             style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center)
     }
 }

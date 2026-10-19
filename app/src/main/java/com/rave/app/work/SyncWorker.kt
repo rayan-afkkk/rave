@@ -136,7 +136,14 @@ class SyncWorker @AssistedInject constructor(
         var d = from
         while (!d.isAfter(today)) {
             val done = logs[d].orEmpty().mapNotNull { names[it.habitId] }
-            days.document(d.toEpochDay().toString()).set(mapOf("habitsCompleted" to done, "epochDay" to d.toEpochDay())).await()
+            // Only write days that changed since the last upload (saves ~8 writes every hour).
+            val key = "cloud_day_${d.toEpochDay()}"
+            val signature = done.sorted().joinToString("|")
+            if (settings.getString(key) != signature) {
+                days.document(d.toEpochDay().toString()).set(mapOf("habitsCompleted" to done, "epochDay" to d.toEpochDay())).await()
+                settings.putString(key, signature)
+            }
+            settings.putString("cloud_day_${d.minusDays(8).toEpochDay()}", null)
             d = d.plusDays(1)
         }
     }
@@ -151,6 +158,9 @@ class SyncWorker @AssistedInject constructor(
                 currentStreak = s.currentStreak,
                 bestStreak = s.bestStreak,
                 pointsWeek = s.pointsThisWeek,
+                activities = s.totalActivities,
+                level = s.level,
+                badges = s.badges.keys.map { it.name }.sorted(),
             ),
         )
     }

@@ -106,6 +106,7 @@ fun FriendsScreen(
     onInvite: () -> Unit,
     onCompetitions: () -> Unit,
     onSharedStreaks: () -> Unit,
+    onOpenFriend: (uid: String, name: String) -> Unit,
     viewModel: FriendsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -174,7 +175,7 @@ fun FriendsScreen(
             item {
                 LazyRow(Modifier.padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     items(state.friends, key = { "f_" + it.uid }) { f ->
-                        SquadMember(f.name) { BentoAvatar(f.name, personTile(f.name), size = 56.dp) }
+                        SquadMember(f.name, Modifier.clickable { onOpenFriend(f.uid, f.name) }) { BentoAvatar(f.name, personTile(f.name), size = 56.dp) }
                     }
                     item(key = "invite") {
                         SquadMember(stringResource(R.string.action_invite), Modifier.clickable(onClick = onInvite)) {
@@ -227,7 +228,9 @@ fun FriendsScreen(
         if (state.feed.isEmpty()) {
             item { Text(stringResource(R.string.friends_feed_empty), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
         } else {
-            items(state.feed, key = { "a_" + it.id }) { item -> FeedCard(item, me, state.unit) { viewModel.cheer(item) } }
+            items(state.feed, key = { "a_" + it.id }) { item ->
+                FeedCard(item, me, state.unit, onOpenOwner = { if (item.ownerUid != me) onOpenFriend(item.ownerUid, item.ownerName) }) { viewModel.cheer(item) }
+            }
         }
     }
 }
@@ -377,7 +380,7 @@ fun SharedStreakCard(s: SharedStreak, me: String, nudged: Boolean, onNudge: () -
 }
 
 @Composable
-private fun FeedCard(item: FeedItem, me: String, unit: DistanceUnit, onCheer: () -> Unit) {
+private fun FeedCard(item: FeedItem, me: String, unit: DistanceUnit, onOpenOwner: () -> Unit, onCheer: () -> Unit) {
     val c = RaveTheme.colors
     val cheered = me in item.cheers
     val distance = "${Format.distance(item.distanceM, unit, 1)} ${unitLabel(unit)}"
@@ -387,9 +390,9 @@ private fun FeedCard(item: FeedItem, me: String, unit: DistanceUnit, onCheer: ()
         .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT))
     BentoOutlinedCard {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            BentoAvatar(item.ownerName, personTile(item.ownerName), size = 36.dp, circle = true)
+            BentoAvatar(item.ownerName, personTile(item.ownerName), size = 36.dp, circle = true, modifier = Modifier.clickable(onClick = onOpenOwner))
             Spacer(Modifier.width(10.dp))
-            Column(Modifier.weight(1f)) {
+            Column(Modifier.weight(1f).clickable(onClick = onOpenOwner)) {
                 Text(
                     stringResource(if (item.type == ActivityType.RUN) R.string.bfriends_feed_ran else R.string.bfriends_feed_walked, item.ownerName, distance),
                     style = MaterialTheme.typography.titleSmall.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold),
