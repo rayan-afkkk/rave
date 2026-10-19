@@ -1,6 +1,8 @@
 package com.rave.app.ui.friends
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -68,6 +70,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
@@ -90,7 +93,17 @@ class FriendProfileViewModel @Inject constructor(
     private val feed: FeedRepository,
     private val settings: SettingsRepository,
     private val time: com.rave.app.core.TimeProvider,
+    private val friends: com.rave.app.data.cloud.FriendsRepository,
 ) : ViewModel() {
+    private val _done = kotlinx.coroutines.channels.Channel<Int>(kotlinx.coroutines.channels.Channel.BUFFERED)
+    /** One-off results: a message to show, then whether to leave the screen. */
+    val done = _done.receiveAsFlow()
+
+    fun remove() = viewModelScope.launch { _done.send(if (friends.removeFriend(route.uid).isSuccess) R.string.friend_removed else R.string.error_generic) }
+    fun block() = viewModelScope.launch { _done.send(if (friends.block(route.uid).isSuccess) R.string.friend_blocked else R.string.error_generic) }
+    fun report(reason: String, details: String) = viewModelScope.launch {
+        _done.send(if (friends.report(route.uid, reason, details).isSuccess) R.string.friend_reported else R.string.error_generic)
+    }
     private val route = savedState.toRoute<FriendProfileRoute>()
     val fallbackName: String = route.name
     private val _ui = MutableStateFlow(FriendProfileUi())
@@ -109,16 +122,90 @@ class FriendProfileViewModel @Inject constructor(
 @Composable
 fun FriendProfileScreen(onBack: () -> Unit, viewModel: FriendProfileViewModel = hiltViewModel()) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
-    FriendProfileContent(ui, viewModel.fallbackName, onBack)
+    val context = androidx.compose.ui.platform.LocalContext.current
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        viewModel.done.collect { msg ->
+            android.widget.Toast.makeText(context, context.getString(msg), android.widget.Toast.LENGTH_SHORT).show()
+            if (msg == R.string.friend_removed || msg == R.string.friend_blocked) onBack()
+        }
+    }
+    FriendProfileContent(ui, viewModel.fallbackName, onBack, viewModel::remove, viewModel::block, viewModel::report)
 }
+
+private val REPORT_REASONS = listOf(
+    R.string.report_reason_harassment, R.string.report_reason_inappropriate, R.string.report_reason_spam,
+    R.string.report_reason_impersonation, R.string.report_reason_cheating, R.string.report_reason_other,
+)
+
+/** Overflow menu: remove friend, block, report (with confirmation / reason dialogs). */
+@Composable
+private fun SafetyMenu(name: String, onRemove: () -> Unit, onBlock: () -> Unit, onReport: (String, String) -> Unit) {
+    var menu by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf(false) }
+    var dialog by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf("") }
+    Box {
+        androidx.compose.material3.IconButton(onClick = { menu = true }) {
+            Icon(Icons.Rounded.MoreVert, stringResource(R.string.friend_options))
+        }
+        androidx.compose.material3.DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+            androidx.compose.material3.DropdownMenuItem(text = { Text(stringResource(R.string.friend_remove)) }, onClick = { menu = false; dialog = "remove" })
+            androidx.compose.material3.DropdownMenuItem(text = { Text(stringResource(R.string.friend_block)) }, onClick = { menu = false; dialog = "block" })
+            androidx.compose.material3.DropdownMenuItem(text = { Text(stringResource(R.string.friend_report)) }, onClick = { menu = false; dialog = "report" })
+        }
+    }
+    when (dialog) {
+        "remove" -> com.rave.app.ui.components.ConfirmDialog(
+            title = stringResource(R.string.friend_remove_title, name), message = stringResource(R.string.friend_remove_body),
+            confirmLabel = stringResource(R.string.friend_remove), destructive = true,
+            onConfirm = { dialog = ""; onRemove() }, onDismiss = { dialog = "" },
+        )
+        "block" -> com.rave.app.ui.components.ConfirmDialog(
+            title = stringResource(R.string.friend_block_title, name), message = stringResource(R.string.friend_block_body),
+            confirmLabel = stringResource(R.string.friend_block), destructive = true,
+            onConfirm = { dialog = ""; onBlock() }, onDismiss = { dialog = "" },
+        )
+        "report" -> {
+            var reason by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf(REPORT_REASONS.first()) }
+            var details by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf("") }
+            val reasonText = stringResource(reason)
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { dialog = "" },
+                title = { Text(stringResource(R.string.friend_report_title, name)) },
+                text = {
+                    Column {
+                        REPORT_REASONS.forEach { r ->
+                            Row(Modifier.fillMaxWidth().clickable { reason = r }, verticalAlignment = Alignment.CenterVertically) {
+                                androidx.compose.material3.RadioButton(selected = reason == r, onClick = { reason = r })
+                                Text(stringResource(r), style = MaterialTheme.typography.bodyMedium)
+                            }
+                        }
+                        androidx.compose.material3.OutlinedTextField(
+                            details, { details = it.take(500) }, label = { Text(stringResource(R.string.friend_report_details)) },
+                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp), minLines = 2,
+                        )
+                    }
+                },
+                confirmButton = { androidx.compose.material3.TextButton(onClick = { dialog = ""; onReport(reasonText, details) }) { Text(stringResource(R.string.friend_report_send)) } },
+                dismissButton = { androidx.compose.material3.TextButton(onClick = { dialog = "" }) { Text(stringResource(R.string.action_cancel)) } },
+            )
+        }
+    }
+}
+
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun FriendProfileContent(ui: FriendProfileUi, fallbackName: String, onBack: () -> Unit) {
+fun FriendProfileContent(
+    ui: FriendProfileUi,
+    fallbackName: String,
+    onBack: () -> Unit,
+    onRemove: () -> Unit = {},
+    onBlock: () -> Unit = {},
+    onReport: (String, String) -> Unit = { _, _ -> },
+) {
     val c = RaveTheme.colors
     val p = ui.profile
     val name = p?.name?.ifBlank { null } ?: fallbackName
-    RaveScreen(title = name, onBack = onBack) {
+    RaveScreen(title = name, onBack = onBack, actions = { SafetyMenu(name, onRemove, onBlock, onReport) }) {
         if (ui.loading) { LoadingState(); return@RaveScreen }
         LazyColumn(
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 32.dp),

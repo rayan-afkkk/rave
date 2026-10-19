@@ -32,6 +32,8 @@ service cloud.firestore {
 
       // Private sub-collections (FCM tokens, activity summaries, day summaries, backup).
       match /tokens/{token} { allow read, write: if isMe(uid); }
+      // People this user blocked: they can't send friend requests or nudges.
+      match /blocked/{otherUid} { allow read, write: if isMe(uid); }
       match /backup/{doc} { allow read, write: if isMe(uid); }
       match /days/{day} { allow read, write: if isMe(uid); }
       match /activities/{activityId} {
@@ -48,7 +50,8 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.from == request.auth.uid
         && id == request.auth.uid + '_' + request.resource.data.to
-        && request.resource.data.status == 'PENDING';
+        && request.resource.data.status == 'PENDING'
+        && !exists(/databases/$(database)/documents/users/$(request.resource.data.to)/blocked/$(request.auth.uid));
       // Only the recipient can accept/decline; the sender can cancel (delete).
       allow update: if signedIn() && resource.data.to == request.auth.uid && onlyChanges(['status'])
         && request.resource.data.status in ['ACCEPTED', 'DECLINED'];
@@ -62,7 +65,8 @@ service cloud.firestore {
       allow create: if signedIn()
         && request.resource.data.from == request.auth.uid
         && id.matches(request.auth.uid + '_' + request.resource.data.to + '_[0-9]{8}')
-        && exists(/databases/$(database)/documents/users/$(request.auth.uid)/friends/$(request.resource.data.to));
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid)/friends/$(request.resource.data.to))
+        && !exists(/databases/$(database)/documents/users/$(request.resource.data.to)/blocked/$(request.auth.uid));
       allow update: if false;
       allow delete: if signedIn() && (resource.data.to == request.auth.uid || resource.data.from == request.auth.uid);
     }
@@ -109,6 +113,13 @@ service cloud.firestore {
         && request.resource.data.invitedBy == resource.data.invitedBy;
       // Either member can delete it (leaving, or deleting their account).
       allow delete: if signedIn() && request.auth.uid in resource.data.members;
+    }
+
+    // ---- Reports of other users (reviewed in the Firebase console) ----
+    match /reports/{id} {
+      allow create: if signedIn() && request.resource.data.reporter == request.auth.uid
+        && request.resource.data.reason is string && request.resource.data.details.size() <= 500;
+      allow read, update, delete: if false;
     }
 
     // ---- Competitions ----

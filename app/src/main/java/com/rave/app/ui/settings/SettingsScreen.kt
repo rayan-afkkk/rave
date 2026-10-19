@@ -102,20 +102,14 @@ fun SettingsScreen(
         uri?.let(viewModel::export)
     }
 
-    // Auto-detect needs activity recognition, then "Allow all the time" location.
-    val backgroundLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (!granted) context.openAppSettings()
-        viewModel.setAutoDetect(true)
-    }
+    // Auto-detect only needs physical activity (no background location).
     val recognitionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (granted) dialog = DIALOG_BACKGROUND else dialog = DIALOG_RECOGNITION_DENIED
+        if (granted) viewModel.setAutoDetect(true) else dialog = DIALOG_RECOGNITION_DENIED
     }
     fun startAutoDetectFlow() {
         when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !context.hasPermission(Manifest.permission.ACTIVITY_RECOGNITION) ->
                 dialog = DIALOG_RECOGNITION
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !context.hasPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) ->
-                dialog = DIALOG_BACKGROUND
             else -> viewModel.setAutoDetect(true)
         }
     }
@@ -144,7 +138,6 @@ fun SettingsScreen(
                 if (state.user != null) {
                     ValueRow(stringResource(R.string.settings_signed_in_as), state.user?.email ?: state.user?.name.orEmpty())
                     NavRow(stringResource(R.string.settings_edit_profile)) { dialog = DIALOG_PROFILE }
-                    NavRow(stringResource(R.string.settings_phone)) { dialog = DIALOG_PHONE }
                 } else {
                     NavRow(stringResource(R.string.settings_edit_name)) { dialog = DIALOG_PROFILE }
                     if (state.cloudAvailable) NavRow(stringResource(R.string.action_sign_in), onClick = onSignIn)
@@ -275,17 +268,6 @@ fun SettingsScreen(
             onConfirm = { dialog = null; context.openAppSettings() },
             onDismiss = { dialog = null },
         )
-        DIALOG_BACKGROUND -> ConfirmDialog(
-            title = stringResource(R.string.permission_background_title),
-            message = stringResource(R.string.permission_background_body),
-            confirmLabel = stringResource(R.string.action_continue),
-            onConfirm = {
-                dialog = null
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) backgroundLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-                else viewModel.setAutoDetect(true)
-            },
-            onDismiss = { dialog = null; viewModel.setAutoDetect(true) },
-        )
         DIALOG_PROFILE -> ProfileDialog(
             name = state.profile?.name ?: s.displayName,
             username = state.profile?.username.orEmpty(),
@@ -300,7 +282,6 @@ fun SettingsScreen(
 private const val DIALOG_DELETE = "delete"
 private const val DIALOG_RECOGNITION = "recognition"
 private const val DIALOG_RECOGNITION_DENIED = "recognition_denied"
-private const val DIALOG_BACKGROUND = "background"
 private const val DIALOG_PROFILE = "profile"
 private const val DIALOG_PHONE = "phone"
 

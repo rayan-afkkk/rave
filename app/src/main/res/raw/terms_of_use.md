@@ -31,10 +31,10 @@ Keep your login details safe. You are responsible for what happens on your accou
 
 ## 5. Friends, competitions and content
 
-- You are responsible for what you post: names, usernames, competition names, stakes and messages.
+- You are responsible for what you post: names, usernames, competition names, dares and messages.
 - Don't post anything illegal, hateful, harassing, sexual, or that infringes someone else's rights, and don't use Rave to bully, spam or cheat in competitions.
-- Competition "stakes" are a friendly text note between friends. Rave does not hold, transfer or guarantee any money or prizes, and gambling through the app is not allowed.
-- We may remove content or suspend accounts that break these rules.
+- A competition "dare" is a friendly text note between friends. Rave does not hold, transfer or guarantee any money or prizes, and betting or gambling through the app is not allowed.
+- You can block or report anyone from their profile. We review reports and may remove content or suspend accounts that break these rules.
 
 ## 6. Acceptable use
 

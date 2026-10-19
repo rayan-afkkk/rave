@@ -30,13 +30,11 @@ Signing in is optional. When you sign in with Google or with an email and passwo
 - **Activity summaries:** type, name, start and end time, distance and duration. The detailed GPS points are not uploaded.
 - **Friends' feed:** when your visibility is Friends, each finished activity is shared with your friends, including a simplified line of the route. Parts of the route inside your privacy zones are removed first, and the start and end can be hidden as well (Settings → Privacy).
 - **Habit backup:** a copy of your habits and check-ins, so they can be restored when you sign in on a new phone, plus a list of the habits you completed on each of the last 7 days. Only you can read these. The habit name of a shared streak or habit competition is visible to its members.
-- **Social features:** friends list, friend requests, nudges, invites, shared streaks, competitions you create or join (name, rules, the optional stake text, your score) and your weekly step total for the friends' step league.
-- **Phone number (optional):** if you add your number, we store only a one-way hash of it so friends who have your number can find you.
+- **Social features:** friends list, friend requests, nudges, people you blocked, invites, shared streaks, competitions you create or join (name, rules, the optional stake text, your score) and your weekly step total for the friends' step league.
 - **Notification token:** a Firebase Cloud Messaging token so we can send you friend and competition notifications.
 
 ## 3. Features that use other services
 
-- **Contacts (optional):** when you tap "Find friends from contacts", the app reads phone numbers on your device, turns each into a one-way hash and compares only the hashes with Rave accounts. Names and numbers in your contacts never leave your phone and are not stored.
 - **Barcode lookup:** when you scan a product, its barcode number is sent to Open Food Facts (world.openfoodfacts.org) to get the product details. Nothing else about you is sent.
 - **Nutrition label reading:** label photos are read on your phone with Google ML Kit. Only if that fails, the photo of the label is sent to Google's Gemini API (through Firebase AI Logic) to read the numbers. The photo is not stored by us.
 - **Maps:** to draw maps, the app downloads map images for the area on screen from a map provider (Mapbox, MapTiler, TomTom or OpenStreetMap). The provider sees which map area is requested and your IP address, like any website. Your route itself is drawn by the app and is not sent to the map provider.
@@ -46,11 +44,9 @@ Signing in is optional. When you sign in with Google or with an email and passwo
 
 ## 4. Permissions we ask for
 
-- **Location (while using the app):** to record walks, runs and rides.
-- **Location (all the time):** only if you turn on "Auto-detect walks", so the app can record a walk it detects while the app is closed. You can turn it off any time.
-- **Physical activity:** to count steps and detect when you start walking.
+- **Location (while using the app):** to record walks, runs and rides that you start. Location is only used while a walk is being recorded, shown by a notification.
+- **Physical activity:** to count steps and, if you turn on "Auto-detect walks", to notice when you start and stop walking. Detected walks are measured with the step counter; Rave never uses your location in the background.
 - **Camera:** to scan barcodes, nutrition labels and friend invite QR codes.
-- **Contacts:** only when you choose to find friends from your contacts.
 - **Notifications and alarms:** for habit reminders and friend activity.
 
 You can withdraw any permission in your phone's settings; the related feature will stop working.
@@ -59,13 +55,15 @@ You can withdraw any permission in your phone's settings; the related feature wi
 
 We use your information only to run the features you use: tracking and showing your progress, syncing your data, friends, feed, competitions and leagues, sending the notifications you turned on, providing Rave Pro and keeping accounts secure. We do not use your data for advertising, we do not sell or rent it, and we do not build profiles of you for third parties.
 
-Where the law requires a legal basis (for example the GDPR), we rely on performing our contract with you (providing the app), your consent (optional permissions such as contacts, background location and phone number, which you can withdraw), and our legitimate interest in keeping the service secure.
+Where the law requires a legal basis (for example the GDPR), we rely on performing our contract with you (providing the app), your consent (optional permissions such as physical activity and camera, which you can withdraw), and our legitimate interest in keeping the service and its users safe.
 
 ## 6. Who we share it with
 
 - **Your friends and competition members:** only what is described in section 2.
 - **Service providers** who process data for us: Google (Firebase Authentication, Cloud Firestore, Cloud Messaging, Gemini API, ML Kit, Google Play Billing), Open Food Facts, and the map provider in use. Their own privacy policies apply to the data they receive.
 - **When required by law**, or to protect the rights and safety of our users.
+
+**Reports and blocking:** you can block or report any user from their profile. A report contains your user ID, theirs, the reason and any note you add. It is kept for safety review and to enforce our Terms, even after an account is deleted.
 
 Cloud data is stored by Google Firebase and may be processed in the United States or other countries where Google operates. Google provides safeguards such as standard contractual clauses for these transfers.
 

@@ -191,5 +191,7 @@ fun ExerciseGuideContent(guide: ExerciseGuide, group: MuscleGroup, modifier: Mod
                 Text(tip, style = MaterialTheme.typography.bodyLarge, color = onSurface, modifier = Modifier.weight(1f).padding(top = 2.dp))
             }
         }
+        Spacer(Modifier.height(8.dp))
+        Text(stringResource(R.string.guide_disclaimer), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

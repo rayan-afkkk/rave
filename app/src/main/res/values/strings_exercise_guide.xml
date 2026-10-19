@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="guide_disclaimer">General guidance, not medical advice. Use a weight you can control and stop if you feel pain or dizziness.</string>
     <string name="guide_muscles">Muscles worked</string>
     <string name="guide_how_to">How to do it</string>
     <string name="guide_avoid">Common mistakes</string>

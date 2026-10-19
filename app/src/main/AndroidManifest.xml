@@ -6,10 +6,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- GPS tracking: precise while using; background only when auto-detect is enabled -->
+    <!-- GPS tracking: precise location only while a walk/run is being tracked (foreground service) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
 
@@ -23,9 +22,8 @@
     <!-- Exact habit reminders (user can grant in "Alarms & reminders"); falls back to inexact alarms. -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
-    <!-- QR scanning, contact matching (opt-in), legacy gallery saving -->
+    <!-- QR and barcode scanning, legacy gallery saving -->
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />

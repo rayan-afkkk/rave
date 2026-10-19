@@ -27,13 +27,11 @@
 <li><strong>Activity summaries:</strong> type, name, start and end time, distance and duration. The detailed GPS points are not uploaded.</li>
 <li><strong>Friends&#x27; feed:</strong> when your visibility is Friends, each finished activity is shared with your friends, including a simplified line of the route. Parts of the route inside your privacy zones are removed first, and the start and end can be hidden as well (Settings → Privacy).</li>
 <li><strong>Habit backup:</strong> a copy of your habits and check-ins, so they can be restored when you sign in on a new phone, plus a list of the habits you completed on each of the last 7 days. Only you can read these. The habit name of a shared streak or habit competition is visible to its members.</li>
-<li><strong>Social features:</strong> friends list, friend requests, nudges, invites, shared streaks, competitions you create or join (name, rules, the optional stake text, your score) and your weekly step total for the friends&#x27; step league.</li>
-<li><strong>Phone number (optional):</strong> if you add your number, we store only a one-way hash of it so friends who have your number can find you.</li>
+<li><strong>Social features:</strong> friends list, friend requests, nudges, people you blocked, invites, shared streaks, competitions you create or join (name, rules, the optional stake text, your score) and your weekly step total for the friends&#x27; step league.</li>
 <li><strong>Notification token:</strong> a Firebase Cloud Messaging token so we can send you friend and competition notifications.</li>
 </ul>
 <h2>3. Features that use other services</h2>
 <ul>
-<li><strong>Contacts (optional):</strong> when you tap &quot;Find friends from contacts&quot;, the app reads phone numbers on your device, turns each into a one-way hash and compares only the hashes with Rave accounts. Names and numbers in your contacts never leave your phone and are not stored.</li>
 <li><strong>Barcode lookup:</strong> when you scan a product, its barcode number is sent to Open Food Facts (world.openfoodfacts.org) to get the product details. Nothing else about you is sent.</li>
 <li><strong>Nutrition label reading:</strong> label photos are read on your phone with Google ML Kit. Only if that fails, the photo of the label is sent to Google&#x27;s Gemini API (through Firebase AI Logic) to read the numbers. The photo is not stored by us.</li>
 <li><strong>Maps:</strong> to draw maps, the app downloads map images for the area on screen from a map provider (Mapbox, MapTiler, TomTom or OpenStreetMap). The provider sees which map area is requested and your IP address, like any website. Your route itself is drawn by the app and is not sent to the map provider.</li>
@@ -43,23 +41,22 @@
 </ul>
 <h2>4. Permissions we ask for</h2>
 <ul>
-<li><strong>Location (while using the app):</strong> to record walks, runs and rides.</li>
-<li><strong>Location (all the time):</strong> only if you turn on &quot;Auto-detect walks&quot;, so the app can record a walk it detects while the app is closed. You can turn it off any time.</li>
-<li><strong>Physical activity:</strong> to count steps and detect when you start walking.</li>
+<li><strong>Location (while using the app):</strong> to record walks, runs and rides that you start. Location is only used while a walk is being recorded, shown by a notification.</li>
+<li><strong>Physical activity:</strong> to count steps and, if you turn on &quot;Auto-detect walks&quot;, to notice when you start and stop walking. Detected walks are measured with the step counter; Rave never uses your location in the background.</li>
 <li><strong>Camera:</strong> to scan barcodes, nutrition labels and friend invite QR codes.</li>
-<li><strong>Contacts:</strong> only when you choose to find friends from your contacts.</li>
 <li><strong>Notifications and alarms:</strong> for habit reminders and friend activity.</li>
 </ul>
 <p>You can withdraw any permission in your phone&#x27;s settings; the related feature will stop working.</p>
 <h2>5. How we use your information</h2>
 <p>We use your information only to run the features you use: tracking and showing your progress, syncing your data, friends, feed, competitions and leagues, sending the notifications you turned on, providing Rave Pro and keeping accounts secure. We do not use your data for advertising, we do not sell or rent it, and we do not build profiles of you for third parties.</p>
-<p>Where the law requires a legal basis (for example the GDPR), we rely on performing our contract with you (providing the app), your consent (optional permissions such as contacts, background location and phone number, which you can withdraw), and our legitimate interest in keeping the service secure.</p>
+<p>Where the law requires a legal basis (for example the GDPR), we rely on performing our contract with you (providing the app), your consent (optional permissions such as physical activity and camera, which you can withdraw), and our legitimate interest in keeping the service and its users safe.</p>
 <h2>6. Who we share it with</h2>
 <ul>
 <li><strong>Your friends and competition members:</strong> only what is described in section 2.</li>
 <li><strong>Service providers</strong> who process data for us: Google (Firebase Authentication, Cloud Firestore, Cloud Messaging, Gemini API, ML Kit, Google Play Billing), Open Food Facts, and the map provider in use. Their own privacy policies apply to the data they receive.</li>
 <li><strong>When required by law</strong>, or to protect the rights and safety of our users.</li>
 </ul>
+<p><strong>Reports and blocking:</strong> you can block or report any user from their profile. A report contains your user ID, theirs, the reason and any note you add. It is kept for safety review and to enforce our Terms, even after an account is deleted.</p>
 <p>Cloud data is stored by Google Firebase and may be processed in the United States or other countries where Google operates. Google provides safeguards such as standard contractual clauses for these transfers.</p>
 <h2>7. How long we keep it</h2>
 <p>Data on your device is kept until you delete it or uninstall the app. Cloud data is kept while your account exists. When you delete your account, your cloud data is deleted straight away. Copies held in Google&#x27;s backup systems are removed by Google within their standard backup cycle.</p>

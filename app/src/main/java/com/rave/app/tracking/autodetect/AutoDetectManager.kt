@@ -13,25 +13,15 @@ import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.ActivityTransitionRequest
 import com.google.android.gms.location.DetectedActivity
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import com.rave.app.R
 import com.rave.app.core.TimeProvider
 import com.rave.app.data.local.dao.ActivityDao
-import com.rave.app.data.local.dao.LocationPointDao
 import com.rave.app.data.local.entity.ActivityEntity
-import com.rave.app.data.local.entity.LocationPointEntity
-import com.rave.app.data.local.toTrackPoint
 import com.rave.app.data.preferences.SettingsRepository
 import com.rave.app.data.repository.ActivityProcessor
 import com.rave.app.domain.model.ActivityStatus
 import com.rave.app.domain.model.ActivityType
 import com.rave.app.domain.model.NotificationCategory
-import com.rave.app.domain.model.TrackPoint
-import com.rave.app.domain.tracking.FilterResult
-import com.rave.app.domain.tracking.TrackFilter
-import com.rave.app.domain.tracking.TrackStats
 import com.rave.app.domain.util.Format
 import com.rave.app.notifications.Notifier
 import com.rave.app.tracking.TrackingManager
@@ -42,33 +32,26 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Background walk detection. Activity Recognition tells us when a walk starts/ends; only
- * during that window do we request low-power location updates. A walk of 10+ minutes
- * becomes a "Looks like you walked 1.2 km — log it?" notification.
+ * Background walk detection without background location: Activity Recognition tells us when
+ * a walk starts and ends, and the phone's step counter measures it (distance = steps × stride
+ * from the user's height). A walk of 10+ minutes becomes a "Looks like you walked 1.2 km —
+ * log it?" notification. Logged walks have no GPS route; live tracking is for routes.
  */
 @Singleton
 class AutoDetectManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val activityDao: ActivityDao,
-    private val pointDao: LocationPointDao,
     private val processor: ActivityProcessor,
     private val tracking: TrackingManager,
     private val settings: SettingsRepository,
     private val notifier: Notifier,
     private val time: TimeProvider,
+    private val stepSensor: com.rave.app.tracking.steps.StepSensor,
 ) {
-    private val filter = TrackFilter(maxAccuracyM = 40f)
 
     fun hasRecognitionPermission(): Boolean =
         Build.VERSION.SDK_INT < Build.VERSION_CODES.Q ||
             ContextCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED
-
-    private fun hasBackgroundLocation(): Boolean {
-        val fine = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        val background = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q ||
-            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
-        return fine && background
-    }
 
     /** Registers (or removes) walking transition updates according to the setting. */
     @SuppressLint("MissingPermission")
@@ -87,44 +70,31 @@ class AutoDetectManager @Inject constructor(
         }
     }
 
-    /** Walking started: open a draft activity and start low-power location updates. */
-    @SuppressLint("MissingPermission")
+    /** Walking started: open a draft activity and remember the step counter. */
     suspend fun onWalkStarted() {
         if (!settings.current().autoDetectWalks) return
         if (tracking.state.value.isTracking || activityDao.getDetecting() != null) return
         activityDao.insert(
             ActivityEntity(type = ActivityType.WALK, status = ActivityStatus.DETECTING, startTime = time.nowMs(), autoDetected = true),
         )
-        if (!hasBackgroundLocation()) return
-        val request = LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 30_000)
-            .setMinUpdateIntervalMillis(15_000)
-            .build()
-        runCatching { LocationServices.getFusedLocationProviderClient(context).requestLocationUpdates(request, locationIntent()).await() }
+        settings.putString(KEY_START_STEPS, stepSensor.readOnce()?.toString())
     }
 
-    suspend fun onLocations(locations: List<android.location.Location>) {
-        val draft = activityDao.getDetecting() ?: return
-        var last: TrackPoint? = pointDao.forActivity(draft.id).lastOrNull()?.toTrackPoint()
-        for (loc in locations) {
-            val p = TrackPoint(loc.latitude, loc.longitude, null, loc.accuracy, if (loc.hasSpeed()) loc.speed else null, loc.time)
-            if (filter.evaluate(last, p) is FilterResult.Accept) {
-                pointDao.insert(LocationPointEntity(activityId = draft.id, lat = p.lat, lng = p.lng, accuracy = p.accuracy, speed = p.speed, timestamp = p.timeMs))
-                last = p
-            }
-        }
-    }
-
-    /** Walking ended: stop updates and ask the user whether to log it. */
+    /** Walking ended: measure it from the step counter and ask the user whether to log it. */
     suspend fun onWalkEnded() {
-        runCatching { LocationServices.getFusedLocationProviderClient(context).removeLocationUpdates(locationIntent()).await() }
         val draft = activityDao.getDetecting() ?: return
-        val points = pointDao.forActivity(draft.id).map { it.toTrackPoint() }
+        val start = settings.getString(KEY_START_STEPS)?.toLongOrNull()
+        val now = stepSensor.readOnce()
+        settings.putString(KEY_START_STEPS, null)
+        val steps = if (start != null && now != null && now >= start) (now - start).toInt() else 0
+        val prefs = settings.current()
+        val distance = com.rave.app.domain.fitness.FitnessMath.distanceM(steps, prefs.heightCm)
         val durationMs = time.nowMs() - draft.startTime
-        val distance = TrackStats.distance(points)
         if (durationMs < MIN_WALK_MS || distance < MIN_DISTANCE_M) {
             activityDao.delete(draft.id)
             return
         }
+        activityDao.update(draft.copy(distanceM = distance, durationS = durationMs / 1000))
         val unit = settings.current().unit
         val text = context.getString(R.string.notif_auto_detect_body, Format.distance(distance, unit, 1), context.getString(unitRes(unit)))
         val builder = notifier.builder(Notifier.Channels.ACTIVITY)
@@ -153,11 +123,6 @@ class AutoDetectManager @Inject constructor(
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
     )
 
-    private fun locationIntent(): PendingIntent = PendingIntent.getBroadcast(
-        context, 11, Intent(context, AutoDetectReceiver::class.java).setAction(AutoDetectReceiver.ACTION_LOCATION),
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
-    )
-
     private fun actionIntent(action: String, activityId: Long): PendingIntent = PendingIntent.getBroadcast(
         context, action.hashCode() + activityId.toInt(),
         Intent(context, AutoDetectReceiver::class.java).setAction(action).putExtra(AutoDetectReceiver.EXTRA_ACTIVITY_ID, activityId),
@@ -169,5 +134,6 @@ class AutoDetectManager @Inject constructor(
         const val ACTION_DISMISS = "com.rave.app.autodetect.DISMISS"
         private const val MIN_WALK_MS = 10 * 60_000L
         private const val MIN_DISTANCE_M = 300.0
+        private const val KEY_START_STEPS = "autodetect_start_steps"
     }
 }

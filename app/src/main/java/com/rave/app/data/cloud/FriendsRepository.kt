@@ -129,6 +129,27 @@ class FriendsRepository @Inject constructor(
         }.await()
     }
 
+    /**
+     * Block: removes the friendship and stops this person from sending requests or nudges
+     * (security rules check `users/{me}/blocked/{them}`). Their posts stop reaching us because
+     * they're no longer a friend.
+     */
+    suspend fun block(uid: String): Result<Unit> = runCatching {
+        val me = firebase.requireUid()
+        db().collection(ProfileRepository.USERS).document(me).collection("blocked").document(uid)
+            .set(mapOf("since" to FieldValue.serverTimestamp())).await()
+        runCatching { removeFriend(uid).getOrThrow() }
+        runCatching { db().collection(REQUESTS).document("${uid}_$me").delete().await() }
+    }
+
+    /** Sends a report for review (only the reporter can create it; nobody can read it from the app). */
+    suspend fun report(uid: String, reason: String, details: String): Result<Unit> = runCatching {
+        val me = firebase.requireUid()
+        db().collection("reports").add(
+            mapOf("reporter" to me, "reported" to uid, "reason" to reason, "details" to details.take(500), "createdAt" to FieldValue.serverTimestamp()),
+        ).await()
+    }
+
     private fun nudgeId(from: String, to: String) = "${from}_${to}_${time.today().format(DateTimeFormatter.BASIC_ISO_DATE)}"
 
     suspend fun hasNudgedToday(friendUid: String): Boolean {

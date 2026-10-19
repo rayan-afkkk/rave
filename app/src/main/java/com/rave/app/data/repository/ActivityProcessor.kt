@@ -56,12 +56,13 @@ class ActivityProcessor @Inject constructor(
         val prefs = settings.current()
         val now = time.nowMs()
 
-        val distance = TrackStats.distance(points)
+        // Auto-detected walks have no route; their distance comes from the step counter.
+        val distance = if (points.size >= 2) TrackStats.distance(points) else activity.distanceM
         // Live-tracked activities carry their active time; auto-detected ones use the point time span.
         val liveDuration = activity.durationS + (activity.resumedAt?.let { (now - it) / 1000 } ?: 0)
         val span = ((points.lastOrNull()?.timeMs ?: 0L) - (points.firstOrNull()?.timeMs ?: 0L)) / 1000
         val effectiveDuration = if (liveDuration > 0) liveDuration else span.coerceAtLeast(0)
-        val moving = TrackStats.movingTimeS(points).roundToLong().coerceAtMost(effectiveDuration)
+        val moving = if (points.size >= 2) TrackStats.movingTimeS(points).roundToLong().coerceAtMost(effectiveDuration) else effectiveDuration
         val pace = TrackStats.paceSecondsPerKm(moving.toDouble(), distance)
         val fastest1k = TrackStats.fastestWindowS(points, 1_000.0)
         val fastest5k = TrackStats.fastestWindowS(points, 5_000.0)

@@ -271,7 +271,7 @@ class ProfileRepository @Inject constructor(
             }
         }
         runCatching { deleteAll(db.collection("feed").whereEqualTo("ownerUid", uid).get().await().documents) }
-        for (sub in listOf("friends", "tokens", "activities", "days", "backup")) {
+        for (sub in listOf("friends", "tokens", "activities", "days", "backup", "blocked")) {
             runCatching { deleteAll(userRef.collection(sub).get().await().documents) }
         }
         runCatching { userRef.delete().await() }

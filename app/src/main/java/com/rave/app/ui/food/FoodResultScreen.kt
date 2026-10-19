@@ -256,6 +256,8 @@ private fun ResultContent(
             }
         }
         LogRow(defaultSlot, logged, onLog, onScanAnother, Modifier.padding(top = 2.dp))
+        Text(stringResource(R.string.food_disclaimer), style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         if (food.source == FoodSource.BARCODE) {
             Text(stringResource(R.string.food_off_credit), style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
