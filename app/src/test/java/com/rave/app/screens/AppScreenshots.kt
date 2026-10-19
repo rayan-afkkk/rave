@@ -41,6 +41,7 @@ import com.rave.app.ui.navigation.LiveTrackingRoute
 import com.rave.app.ui.navigation.MealPlanRoute
 import com.rave.app.ui.navigation.PaywallRoute
 import com.rave.app.ui.navigation.ProfileRoute
+import com.rave.app.ui.navigation.WrappedRoute
 import com.rave.app.ui.theme.RaveTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -214,6 +215,32 @@ class AppScreenshots {
     @Test fun s23_about() = shoot("23_about", AboutRoute)
     @Test fun s24_privacy() = shoot("24_privacy_policy", LegalRoute("PRIVACY"))
     @Test fun s25_credits() = shoot("25_credits", LegalRoute("CREDITS"))
+
+    @Test fun s26_wrapped_month() = shoot("26_wrapped_month", WrappedRoute(LocalDate.now().year, LocalDate.now().monthValue), settleMs = 3000)
+
+    /** A friend's profile with sample data (no Firebase in tests). */
+    @Test fun s27_friend_profile() {
+        compose.mainClock.autoAdvance = false
+        val route = (0..40).map { a -> com.rave.app.domain.model.LatLngPoint(31.48 + a * 0.0004 + sin(a / 6.0) * 0.0006, 74.32 + a * 0.0005) }
+        val loop = (0..40).map { a -> com.rave.app.domain.model.LatLngPoint(31.49 + sin(a / 6.5) * 0.003, 74.33 + cos(a / 6.5) * 0.004) }
+        val now = System.currentTimeMillis()
+        val ui = com.rave.app.ui.friends.FriendProfileUi(
+            loading = false,
+            profile = com.rave.app.data.cloud.UserProfile(
+                uid = "a", name = "Aisha", username = "aisha.walks", inviteCode = "", visibility = com.rave.app.domain.model.ProfileVisibility.FRIENDS,
+                totalKm = 214.6, weekKm = 18.4, weekStartEpochDay = 0, currentStreak = 23, bestStreak = 41, pointsWeek = 380,
+                activities = 96, level = 7, badges = com.rave.app.domain.habit.BadgeId.entries.take(6).map { it.name },
+            ),
+            activities = listOf(
+                com.rave.app.data.cloud.FeedItem("1", "a", "Aisha", ActivityType.WALK, "Morning walk", 4210.0, 2580, now - 3_600_000, listOf(route), emptyList()),
+                com.rave.app.data.cloud.FeedItem("2", "a", "Aisha", ActivityType.RUN, "Park loop", 5030.0, 1820, now - 86_400_000, listOf(loop), emptyList()),
+                com.rave.app.data.cloud.FeedItem("3", "a", "Aisha", ActivityType.WALK, "", 2380.0, 1500, now - 2 * 86_400_000, listOf(route.reversed()), emptyList()),
+            ),
+        )
+        compose.setContent { RaveTheme(darkTheme = false) { com.rave.app.ui.friends.FriendProfileContent(ui, "Aisha", onBack = {}) } }
+        settle(800)
+        save("27_friend_profile")
+    }
 
     /** Every built-in exercise figure, plus one full guide. */
     @Test fun s21_exercise_figures() {

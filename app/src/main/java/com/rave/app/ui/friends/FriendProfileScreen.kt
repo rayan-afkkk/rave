@@ -106,13 +106,18 @@ class FriendProfileViewModel @Inject constructor(
 }
 
 /** A friend's profile: their stats, badges and the routes they shared with you. */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FriendProfileScreen(onBack: () -> Unit, viewModel: FriendProfileViewModel = hiltViewModel()) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
+    FriendProfileContent(ui, viewModel.fallbackName, onBack)
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun FriendProfileContent(ui: FriendProfileUi, fallbackName: String, onBack: () -> Unit) {
     val c = RaveTheme.colors
     val p = ui.profile
-    val name = p?.name?.ifBlank { null } ?: viewModel.fallbackName
+    val name = p?.name?.ifBlank { null } ?: fallbackName
     RaveScreen(title = name, onBack = onBack) {
         if (ui.loading) { LoadingState(); return@RaveScreen }
         LazyColumn(
