@@ -577,7 +577,7 @@
     <string name="friend_activities">Activities</string>
     <string name="friend_streak">Day streak</string>
     <string name="friend_best_streak">Best streak</string>
-    <string name="friend_points">Points this week</string>
+    <string name="friend_points">Week pts</string>
     <string name="friend_badges">Badges · %1$d of %2$d</string>
     <string name="friend_no_badges">No badges yet.</string>
     <string name="friend_routes">Recent routes</string>

@@ -155,7 +155,7 @@ fun FriendProfileContent(ui: FriendProfileUi, fallbackName: String, onBack: () -
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         BentoStat("🔥 ${p.currentStreak}", stringResource(R.string.friend_streak), c.tilePink, Modifier.weight(1f))
                         BentoStat(p.bestStreak.toString(), stringResource(R.string.friend_best_streak), c.tileYellow, Modifier.weight(1f))
-                        BentoStat(p.pointsWeek.toString(), stringResource(R.string.friend_points), c.tileSand, Modifier.weight(1f))
+                        BentoStat(p.pointsWeek.toString(), stringResource(R.string.friend_points), c.tileInk, Modifier.weight(1f))
                     }
                 }
             }
