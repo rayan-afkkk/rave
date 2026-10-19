@@ -426,7 +426,7 @@ private fun headline(reason: ProReason) = when (reason) {
     ProReason.LIVE_MAP -> R.string.pb_h_live_map
 }
 
-private const val DEFAULT_SAVE_PERCENT = 54
+private const val DEFAULT_SAVE_PERCENT = 42
 
 private tailrec fun Context.findActivity(): Activity? = when (this) {
     is Activity -> this

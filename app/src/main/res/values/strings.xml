@@ -993,7 +993,7 @@ Permission was denied. You can turn it on in Settings.</string>
     <string name="pro_welcome">Welcome to Rave Pro!</string>
     <string name="pro_already">You have Rave Pro. Thank you!</string>
     <string name="pro_settings_title">Rave Pro</string>
-    <string name="pro_settings_free">Unlock everything from $1.99 a month</string>
+    <string name="pro_settings_free">Unlock everything from $3.99 a month</string>
     <string name="pro_settings_active">Active. Thanks for supporting Rave!</string>
     <!-- Offline maps (Pro) -->
     <string name="offline_title">Offline maps</string>
