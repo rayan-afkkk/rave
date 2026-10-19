@@ -901,6 +901,17 @@ Permission was denied. You can turn it on in Settings.</string>
     <string name="ex_crunch">Crunch</string>
     <string name="ex_kettlebell_swing">Kettlebell swing</string>
     <string name="ex_burpee">Burpee</string>
+    <string name="workout_no_equipment">No equipment</string>
+    <string name="ex_bodyweight_squat">Bodyweight squat</string>
+    <string name="ex_jumping_jack">Jumping jacks</string>
+    <string name="ex_mountain_climber">Mountain climbers</string>
+    <string name="ex_glute_bridge">Glute bridge</string>
+    <string name="ex_wall_sit">Wall sit</string>
+    <string name="ex_leg_raise">Leg raise</string>
+    <string name="ex_high_knees">High knees</string>
+    <string name="ex_superman">Superman</string>
+    <string name="ex_pike_push_up">Pike push-up</string>
+    <string name="ex_bodyweight_lunge">Bodyweight lunge</string>
     <string name="habit_type_workout">Workout</string>
     <string name="habit_type_workout_help">Ticks itself off when you finish a strength workout with at least this many working sets.</string>
     <string name="habit_workout_min_sets">Minimum sets</string>

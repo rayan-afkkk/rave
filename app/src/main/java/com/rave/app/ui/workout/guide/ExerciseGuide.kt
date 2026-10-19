@@ -84,7 +84,18 @@ val EXERCISE_GUIDES: List<ExerciseGuide> = listOf(
     ExerciseGuide("plank", R.string.ex_plank, R.array.guide_plank_steps, R.array.guide_plank_avoid),
     ExerciseGuide("crunch", R.string.ex_crunch, R.array.guide_crunch_steps, R.array.guide_crunch_avoid),
     ExerciseGuide("kettlebell_swing", R.string.ex_kettlebell_swing, R.array.guide_kettlebell_swing_steps, R.array.guide_kettlebell_swing_avoid),
-    ExerciseGuide("burpee", R.string.ex_burpee, R.array.guide_burpee_steps, R.array.guide_burpee_avoid),)
+    ExerciseGuide("burpee", R.string.ex_burpee, R.array.guide_burpee_steps, R.array.guide_burpee_avoid),
+    ExerciseGuide("bodyweight_squat", R.string.ex_bodyweight_squat, R.array.guide_bodyweight_squat_steps, R.array.guide_bodyweight_squat_avoid),
+    ExerciseGuide("jumping_jack", R.string.ex_jumping_jack, R.array.guide_jumping_jack_steps, R.array.guide_jumping_jack_avoid),
+    ExerciseGuide("mountain_climber", R.string.ex_mountain_climber, R.array.guide_mountain_climber_steps, R.array.guide_mountain_climber_avoid),
+    ExerciseGuide("glute_bridge", R.string.ex_glute_bridge, R.array.guide_glute_bridge_steps, R.array.guide_glute_bridge_avoid),
+    ExerciseGuide("wall_sit", R.string.ex_wall_sit, R.array.guide_wall_sit_steps, R.array.guide_wall_sit_avoid),
+    ExerciseGuide("leg_raise", R.string.ex_leg_raise, R.array.guide_leg_raise_steps, R.array.guide_leg_raise_avoid),
+    ExerciseGuide("high_knees", R.string.ex_high_knees, R.array.guide_high_knees_steps, R.array.guide_high_knees_avoid),
+    ExerciseGuide("superman", R.string.ex_superman, R.array.guide_superman_steps, R.array.guide_superman_avoid),
+    ExerciseGuide("pike_push_up", R.string.ex_pike_push_up, R.array.guide_pike_push_up_steps, R.array.guide_pike_push_up_avoid),
+    ExerciseGuide("bodyweight_lunge", R.string.ex_bodyweight_lunge, R.array.guide_bodyweight_lunge_steps, R.array.guide_bodyweight_lunge_avoid),
+)
 
 /**
  * The guide for an exercise, matched by name (built-in exercises are stored with their localized
@@ -93,11 +104,16 @@ val EXERCISE_GUIDES: List<ExerciseGuide> = listOf(
 @Composable
 fun rememberGuide(exercise: Exercise): ExerciseGuide? {
     val res = LocalContext.current.resources
-    return remember(exercise.name, exercise.custom) {
-        if (exercise.custom) null
-        else EXERCISE_GUIDES.firstOrNull { res.getString(it.name).equals(exercise.name.trim(), ignoreCase = true) }
-    }
+    return remember(exercise.name, exercise.custom) { guideFor(res, exercise) }
 }
+
+fun guideFor(res: android.content.res.Resources, exercise: Exercise): ExerciseGuide? =
+    if (exercise.custom) null
+    else EXERCISE_GUIDES.firstOrNull { res.getString(it.name).equals(exercise.name.trim(), ignoreCase = true) }
+
+/** Built-in exercises that need nothing but the floor (a mat or a wall at most). */
+fun needsNoEquipment(guide: ExerciseGuide?): Boolean =
+    guide != null && guide.move.gear.all { it == Gear.MAT || it == Gear.WALL }
 
 /** Light backdrop the figure stands on, picked by muscle group. */
 fun figureStage(group: MuscleGroup): Color = when (group) {

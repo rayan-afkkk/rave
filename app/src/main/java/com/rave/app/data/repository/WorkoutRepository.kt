@@ -58,10 +58,17 @@ class WorkoutRepository @Inject constructor(
 
     fun observeHistory(): Flow<List<WorkoutEntity>> = dao.observeHistory()
 
-    /** Adds the built-in exercise library the first time it's needed. */
+    private var seeded = false
+
+    /**
+     * Adds any built-in exercises that aren't in the library yet (once per launch). Names are
+     * unique and existing rows are ignored, so exercises added in an update reach people who
+     * already have the library, and nothing they changed is overwritten.
+     */
     suspend fun ensureSeeded() = seedMutex.withLock {
-        if (dao.exerciseCount() > 0) return@withLock
+        if (seeded) return@withLock
         dao.insertExercises(DEFAULTS.map { (res, muscle, kind) -> ExerciseEntity(name = context.getString(res), muscle = muscle, kind = kind) })
+        seeded = true
     }
 
     suspend fun createExercise(name: String, muscle: MuscleGroup, kind: ExerciseKind): Result<Long> = runCatching {
@@ -222,6 +229,17 @@ class WorkoutRepository @Inject constructor(
             Triple(R.string.ex_crunch, MuscleGroup.CORE, ExerciseKind.BODYWEIGHT_REPS),
             Triple(R.string.ex_kettlebell_swing, MuscleGroup.FULL_BODY, ExerciseKind.WEIGHT_REPS),
             Triple(R.string.ex_burpee, MuscleGroup.FULL_BODY, ExerciseKind.BODYWEIGHT_REPS),
+            // No equipment
+            Triple(R.string.ex_bodyweight_squat, MuscleGroup.LEGS, ExerciseKind.BODYWEIGHT_REPS),
+            Triple(R.string.ex_bodyweight_lunge, MuscleGroup.LEGS, ExerciseKind.BODYWEIGHT_REPS),
+            Triple(R.string.ex_glute_bridge, MuscleGroup.LEGS, ExerciseKind.BODYWEIGHT_REPS),
+            Triple(R.string.ex_wall_sit, MuscleGroup.LEGS, ExerciseKind.DURATION),
+            Triple(R.string.ex_pike_push_up, MuscleGroup.SHOULDERS, ExerciseKind.BODYWEIGHT_REPS),
+            Triple(R.string.ex_superman, MuscleGroup.BACK, ExerciseKind.BODYWEIGHT_REPS),
+            Triple(R.string.ex_leg_raise, MuscleGroup.CORE, ExerciseKind.BODYWEIGHT_REPS),
+            Triple(R.string.ex_mountain_climber, MuscleGroup.CORE, ExerciseKind.BODYWEIGHT_REPS),
+            Triple(R.string.ex_jumping_jack, MuscleGroup.FULL_BODY, ExerciseKind.BODYWEIGHT_REPS),
+            Triple(R.string.ex_high_knees, MuscleGroup.FULL_BODY, ExerciseKind.BODYWEIGHT_REPS),
         )
     }
 }

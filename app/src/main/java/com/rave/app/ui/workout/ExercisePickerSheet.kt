@@ -56,6 +56,8 @@ import com.rave.app.ui.workout.guide.ExerciseGuide
 import com.rave.app.ui.workout.guide.ExerciseGuideSheet
 import com.rave.app.ui.workout.guide.ExerciseThumb
 import com.rave.app.ui.workout.guide.rememberGuide
+import com.rave.app.ui.workout.guide.guideFor
+import com.rave.app.ui.workout.guide.needsNoEquipment
 
 @StringRes
 fun muscleRes(m: MuscleGroup): Int = when (m) {
@@ -87,10 +89,15 @@ fun ExercisePickerSheet(
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     var muscle by rememberSaveable { mutableStateOf<MuscleGroup?>(null) }
+    var noEquipment by rememberSaveable { mutableStateOf(false) }
+    val res = androidx.compose.ui.platform.LocalContext.current.resources
+    val bodyweight = remember(library) { library.filter { needsNoEquipment(guideFor(res, it)) }.map { it.id }.toSet() }
     var creating by rememberSaveable { mutableStateOf(false) }
     var info by remember { mutableStateOf<Pair<ExerciseGuide, MuscleGroup>?>(null) }
-    val filtered = remember(library, query, muscle) {
-        library.filter { (muscle == null || it.muscle == muscle) && it.name.contains(query.trim(), ignoreCase = true) }
+    val filtered = remember(library, query, muscle, noEquipment, bodyweight) {
+        library.filter {
+            (muscle == null || it.muscle == muscle) && (!noEquipment || it.id in bodyweight) && it.name.contains(query.trim(), ignoreCase = true)
+        }
     }
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -107,7 +114,8 @@ fun ExercisePickerSheet(
             )
             Spacer(Modifier.height(10.dp))
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                item { PillChip(muscle == null, stringResource(R.string.filter_all), { muscle = null }) }
+                item { PillChip(muscle == null && !noEquipment, stringResource(R.string.filter_all), { muscle = null; noEquipment = false }) }
+                item { PillChip(noEquipment, stringResource(R.string.workout_no_equipment), { noEquipment = !noEquipment }) }
                 items(MuscleGroup.entries) { m -> PillChip(muscle == m, stringResource(muscleRes(m)), { muscle = m }) }
             }
             Spacer(Modifier.height(8.dp))

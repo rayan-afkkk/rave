@@ -200,4 +200,94 @@ internal val MOVES: Map<String, Move> = mapOf(
             pose(150f, 20f, 150f, 44f, 150f, 120f, 152f, 176f, 150f, 232f, 146f, 176f, 146f, 232f, 154f, 10f, 156f, -24f, 158f, 10f, 160f, -24f, N, N, N, N, N, N, N, N, N, N, N, N),
         ),
     ),
+    "bodyweight_squat" to Move(
+        muscles = listOf(Muscle.QUAD, Muscle.GLUTE),
+        gear = listOf(Gear.MAT),
+        flip = 1f, front = false,
+        frames = listOf(
+            pose(150f, 40f, 150f, 64f, 150f, 140f, 152f, 196f, 150f, 252f, 146f, 196f, 146f, 252f, 184f, 66f, 218f, 68f, 186f, 67f, 220f, 69f, N, N, N, N, N, N, N, N, N, N, N, N),
+            pose(180f, 119f, 166f, 138f, 117f, 196f, 172f, 200f, 150f, 252f, 166f, 202f, 146f, 252f, 200f, 138f, 234f, 138f, 202f, 139f, 236f, 139f, N, N, N, N, N, N, N, N, N, N, N, N),
+        ),
+    ),
+    "jumping_jack" to Move(
+        muscles = listOf(Muscle.DELT, Muscle.CALF, Muscle.QUAD),
+        gear = listOf(),
+        flip = 1f, front = true,
+        frames = listOf(
+            pose(150f, 40f, 150f, 64f, 150f, 140f, 141f, 196f, 141f, 252f, 159f, 196f, 159f, 252f, 128f, 106f, 126f, 140f, 172f, 106f, 174f, 140f, 134f, 72f, 166f, 72f, 141f, 138f, 159f, 138f, 129f, 254f, 171f, 254f),
+            pose(150f, 30f, 150f, 54f, 150f, 130f, 122f, 184f, 104f, 238f, 178f, 184f, 196f, 238f, 116f, 30f, 128f, -2f, 184f, 30f, 172f, -2f, 134f, 62f, 166f, 62f, 141f, 128f, 159f, 128f, 92f, 242f, 208f, 242f),
+        ),
+    ),
+    "mountain_climber" to Move(
+        muscles = listOf(Muscle.ABS, Muscle.QUAD, Muscle.DELT),
+        gear = listOf(Gear.MAT),
+        flip = 1f, front = false,
+        frames = listOf(
+            pose(232f, 170f, 210f, 180f, 128f, 198f, 176f, 216f, 146f, 244f, 82f, 222f, 36f, 246f, 210f, 216f, 210f, 252f, 214f, 216f, 214f, 252f, N, N, N, N, N, N, N, N, N, N, N, N),
+            pose(232f, 170f, 210f, 180f, 128f, 198f, 82f, 222f, 36f, 246f, 176f, 216f, 146f, 244f, 210f, 216f, 210f, 252f, 214f, 216f, 214f, 252f, N, N, N, N, N, N, N, N, N, N, N, N),
+        ),
+    ),
+    "glute_bridge" to Move(
+        muscles = listOf(Muscle.GLUTE, Muscle.HAM),
+        gear = listOf(Gear.MAT),
+        flip = 1f, front = false,
+        frames = listOf(
+            pose(52f, 238f, 76f, 240f, 150f, 242f, 196f, 206f, 214f, 250f, 192f, 207f, 210f, 250f, 108f, 248f, 140f, 250f, 110f, 248f, 142f, 250f, N, N, N, N, N, N, N, N, N, N, N, N),
+            pose(52f, 238f, 76f, 240f, 150f, 214f, 198f, 200f, 214f, 250f, 194f, 201f, 210f, 250f, 108f, 248f, 140f, 250f, 110f, 248f, 142f, 250f, N, N, N, N, N, N, N, N, N, N, N, N),
+        ),
+    ),
+    "wall_sit" to Move(
+        muscles = listOf(Muscle.QUAD, Muscle.GLUTE),
+        gear = listOf(Gear.WALL),
+        flip = 1f, front = false,
+        frames = listOf(
+            pose(116f, 108f, 112f, 132f, 112f, 200f, 170f, 200f, 170f, 252f, 166f, 201f, 166f, 252f, 124f, 166f, 150f, 188f, 126f, 167f, 152f, 189f, N, N, N, N, N, N, N, N, N, N, N, N),
+            pose(116f, 106f, 112f, 130f, 112f, 200f, 170f, 200f, 170f, 252f, 166f, 201f, 166f, 252f, 124f, 165f, 150f, 187f, 126f, 166f, 152f, 188f, N, N, N, N, N, N, N, N, N, N, N, N),
+        ),
+    ),
+    "leg_raise" to Move(
+        muscles = listOf(Muscle.ABS),
+        gear = listOf(Gear.MAT),
+        flip = 1f, front = false,
+        frames = listOf(
+            pose(52f, 238f, 76f, 240f, 150f, 242f, 206f, 242f, 262f, 244f, 204f, 243f, 260f, 245f, 108f, 248f, 140f, 250f, 110f, 248f, 142f, 250f, N, N, N, N, N, N, N, N, 264f, 228f, 262f, 229f),
+            pose(52f, 238f, 76f, 240f, 150f, 242f, 169f, 189f, 188f, 136f, 167f, 190f, 186f, 137f, 108f, 248f, 140f, 250f, 110f, 248f, 142f, 250f, N, N, N, N, N, N, N, N, 201f, 128f, 199f, 129f),
+        ),
+    ),
+    "high_knees" to Move(
+        muscles = listOf(Muscle.QUAD, Muscle.CALF, Muscle.ABS),
+        gear = listOf(),
+        flip = 1f, front = false,
+        frames = listOf(
+            pose(150f, 36f, 150f, 60f, 150f, 136f, 204f, 134f, 204f, 190f, 148f, 192f, 148f, 248f, 128f, 92f, 138f, 122f, 170f, 86f, 192f, 66f, N, N, N, N, N, N, N, N, N, N, N, N),
+            pose(150f, 36f, 150f, 60f, 150f, 136f, 148f, 192f, 148f, 248f, 204f, 134f, 204f, 190f, 170f, 86f, 192f, 66f, 128f, 92f, 138f, 122f, N, N, N, N, N, N, N, N, N, N, N, N),
+        ),
+    ),
+    "superman" to Move(
+        muscles = listOf(Muscle.BACK, Muscle.GLUTE),
+        gear = listOf(Gear.MAT),
+        flip = -1f, front = false,
+        frames = listOf(
+            pose(60f, 236f, 84f, 238f, 160f, 240f, 214f, 242f, 268f, 244f, 214f, 243f, 268f, 245f, 50f, 238f, 20f, 240f, 52f, 239f, 22f, 241f, N, N, N, N, N, N, N, N, N, N, N, N),
+            pose(62f, 218f, 86f, 226f, 160f, 240f, 214f, 234f, 266f, 224f, 214f, 235f, 266f, 225f, 52f, 212f, 22f, 204f, 54f, 213f, 24f, 205f, N, N, N, N, N, N, N, N, N, N, N, N),
+        ),
+    ),
+    "pike_push_up" to Move(
+        muscles = listOf(Muscle.DELT, Muscle.TRICEPS),
+        gear = listOf(Gear.MAT),
+        flip = -1f, front = false,
+        frames = listOf(
+            pose(81f, 211f, 100f, 196f, 160f, 150f, 187f, 201f, 214f, 252f, 185f, 202f, 212f, 252f, 95f, 224f, 90f, 252f, 98f, 225f, 93f, 252f, N, N, N, N, N, N, N, N, N, N, N, N),
+            pose(94f, 240f, 112f, 222f, 164f, 158f, 189f, 205f, 214f, 252f, 187f, 206f, 212f, 252f, 120f, 246f, 90f, 252f, 123f, 247f, 93f, 252f, N, N, N, N, N, N, N, N, N, N, N, N),
+        ),
+    ),
+    "bodyweight_lunge" to Move(
+        muscles = listOf(Muscle.QUAD, Muscle.GLUTE),
+        gear = listOf(),
+        flip = 1f, front = false,
+        frames = listOf(
+            pose(150f, 46f, 150f, 70f, 150f, 146f, 176f, 198f, 190f, 252f, 132f, 198f, 98f, 250f, 128f, 104f, 146f, 134f, 132f, 105f, 150f, 135f, N, N, N, N, N, N, N, N, N, N, 112f, 256f),
+            pose(150f, 86f, 150f, 110f, 150f, 186f, 200f, 192f, 190f, 252f, 140f, 240f, 98f, 250f, 128f, 144f, 146f, 174f, 132f, 145f, 150f, 175f, N, N, N, N, N, N, N, N, N, N, 112f, 256f),
+        ),
+    ),
 )

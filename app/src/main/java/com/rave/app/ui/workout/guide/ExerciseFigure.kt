@@ -39,6 +39,7 @@ import com.rave.app.ui.theme.FigurePad
 import com.rave.app.ui.theme.FigurePlate
 import com.rave.app.ui.theme.FigurePlateRim
 import com.rave.app.ui.theme.FigureSteel
+import com.rave.app.ui.theme.FigureWall
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -74,7 +75,7 @@ enum class Muscle(
 
 internal enum class Part { THIGH, SHIN, FOOT, TORSO, UPPER_ARM, FOREARM, PELVIS, NECK }
 
-enum class Gear { BENCH, INCLINE, PULLBAR, DIPBARS, MAT, STEP, CABLE, PULLDOWN, LEGPRESS, PLATE, PLATE_BACK, DB, KB }
+enum class Gear { BENCH, INCLINE, PULLBAR, DIPBARS, MAT, STEP, WALL, CABLE, PULLDOWN, LEGPRESS, PLATE, PLATE_BACK, DB, KB }
 
 /**
  * One exercise animation: keyframe poses (see [J] for the joint layout) played in a loop. Two frames
@@ -363,6 +364,7 @@ private fun DrawScope.drawGearBehind(move: Move) {
         }
         Gear.MAT -> rr(10f, 252f, 290f, 6f, 3f, FigurePad)
         Gear.STEP -> rr(118f, 240f, 70f, 16f, 4f, FigureGear)
+        Gear.WALL -> { drawRect(FigureWall, Offset(70f, 20f), Size(26f, 236f)); drawRect(FigureFloor.copy(alpha = 0.12f), Offset(92f, 20f), Size(4f, 236f)) }
         Gear.CABLE -> { drawRect(FigureGear, Offset(226f, -20f), Size(14f, 276f)); drawCircle(FigureSteel, 7f, Offset(222f, 0f)) }
         Gear.PULLDOWN -> {
             drawRect(FigureGear, Offset(96f, -20f), Size(12f, 276f)); drawRect(FigureGear, Offset(96f, -20f), Size(90f, 10f))

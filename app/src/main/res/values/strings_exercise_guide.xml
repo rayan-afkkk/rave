@@ -205,4 +205,94 @@
         <item>Letting your hips sag in the plank.</item>
         <item>Landing stiff-legged from the jump.</item>
     </string-array>
+    <string-array name="guide_bodyweight_squat_steps">
+        <item>Stand with feet shoulder-width apart, toes turned out slightly.</item>
+        <item>Reach your arms forward and sit your hips back and down until your thighs are parallel.</item>
+        <item>Push through your heels to stand tall again.</item>
+    </string-array>
+    <string-array name="guide_bodyweight_squat_avoid">
+        <item>Letting your knees cave inwards.</item>
+        <item>Rounding your back or lifting your heels.</item>
+    </string-array>
+    <string-array name="guide_jumping_jack_steps">
+        <item>Stand tall with feet together and arms by your sides.</item>
+        <item>Jump your feet out wide while swinging your arms overhead.</item>
+        <item>Jump back to the start and keep a steady rhythm.</item>
+    </string-array>
+    <string-array name="guide_jumping_jack_avoid">
+        <item>Landing on flat, stiff legs; stay light on the balls of your feet.</item>
+        <item>Letting your arms only go halfway up.</item>
+    </string-array>
+    <string-array name="guide_mountain_climber_steps">
+        <item>Start in a high plank with hands under your shoulders.</item>
+        <item>Drive one knee towards your chest, then switch legs quickly.</item>
+        <item>Keep your hips low and your core tight the whole time.</item>
+    </string-array>
+    <string-array name="guide_mountain_climber_avoid">
+        <item>Bouncing your hips up high.</item>
+        <item>Letting your shoulders drift behind your hands.</item>
+    </string-array>
+    <string-array name="guide_glute_bridge_steps">
+        <item>Lie on your back with knees bent and feet flat, hip-width apart.</item>
+        <item>Squeeze your glutes and lift your hips until your body is straight from knees to shoulders.</item>
+        <item>Hold for a second, then lower slowly.</item>
+    </string-array>
+    <string-array name="guide_glute_bridge_avoid">
+        <item>Arching your lower back at the top.</item>
+        <item>Pushing through your toes instead of your heels.</item>
+    </string-array>
+    <string-array name="guide_wall_sit_steps">
+        <item>Lean your back flat against a wall.</item>
+        <item>Slide down until your knees are bent at about 90°, feet under your knees.</item>
+        <item>Hold the position and breathe steadily.</item>
+    </string-array>
+    <string-array name="guide_wall_sit_avoid">
+        <item>Letting your knees go past your toes.</item>
+        <item>Resting your hands on your thighs to push.</item>
+    </string-array>
+    <string-array name="guide_leg_raise_steps">
+        <item>Lie on your back with legs straight and arms by your sides.</item>
+        <item>Keeping your lower back pressed down, lift your legs until they point up.</item>
+        <item>Lower them slowly without touching the floor.</item>
+    </string-array>
+    <string-array name="guide_leg_raise_avoid">
+        <item>Arching your lower back off the floor.</item>
+        <item>Swinging your legs with momentum.</item>
+    </string-array>
+    <string-array name="guide_high_knees_steps">
+        <item>Stand tall with your feet hip-width apart.</item>
+        <item>Run on the spot, driving each knee up to hip height.</item>
+        <item>Pump your arms and stay on the balls of your feet.</item>
+    </string-array>
+    <string-array name="guide_high_knees_avoid">
+        <item>Leaning back as you get tired.</item>
+        <item>Letting your knees only come up halfway.</item>
+    </string-array>
+    <string-array name="guide_superman_steps">
+        <item>Lie face down with arms stretched out in front.</item>
+        <item>Lift your arms, chest and legs off the floor at the same time.</item>
+        <item>Hold for a moment, then lower with control.</item>
+    </string-array>
+    <string-array name="guide_superman_avoid">
+        <item>Throwing your head back; keep your neck in line.</item>
+        <item>Lifting too fast and jerking your back.</item>
+    </string-array>
+    <string-array name="guide_pike_push_up_steps">
+        <item>Start in an upside-down V with hips high and hands shoulder-width apart.</item>
+        <item>Bend your elbows to lower the top of your head towards the floor.</item>
+        <item>Press back up until your arms are straight.</item>
+    </string-array>
+    <string-array name="guide_pike_push_up_avoid">
+        <item>Letting your hips drop into a normal push-up.</item>
+        <item>Flaring your elbows straight out to the sides.</item>
+    </string-array>
+    <string-array name="guide_bodyweight_lunge_steps">
+        <item>Stand tall with hands on your hips.</item>
+        <item>Step back with one leg and lower until both knees are bent to about 90°.</item>
+        <item>Push through your front heel to return, then switch legs.</item>
+    </string-array>
+    <string-array name="guide_bodyweight_lunge_avoid">
+        <item>Letting your front knee collapse inwards.</item>
+        <item>Leaning your upper body forward.</item>
+    </string-array>
 </resources>
