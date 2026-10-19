@@ -65,6 +65,7 @@ class WrappedCalculatorTest {
         assertEquals(listOf(WrappedPeriod(2026), WrappedPeriod(2026, 12)), WrappedCalculator.available(d(1, 5, 2027)))
         assertEquals(listOf(WrappedPeriod(2026)), WrappedCalculator.available(d(1, 10, 2027)))
         assertEquals(emptyList<WrappedPeriod>(), WrappedCalculator.available(d(1, 20, 2027)))
-        assertEquals(emptyList<WrappedPeriod>(), WrappedCalculator.available(d(12, 5)))
+        assertEquals(listOf(WrappedPeriod(2026, 11)), WrappedCalculator.available(d(12, 5)))
+        assertEquals(emptyList<WrappedPeriod>(), WrappedCalculator.available(d(12, 15)))
     }
 }
