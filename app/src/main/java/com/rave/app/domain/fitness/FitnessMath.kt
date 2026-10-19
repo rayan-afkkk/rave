@@ -31,4 +31,12 @@ object FitnessMath {
         current >= previous -> current - previous
         else -> current
     }
+
+    /**
+     * Today's steps after a sync: the current total plus what the hardware counter saw since
+     * the last reading, or the Recording API's total if that's higher. Never goes down.
+     */
+    fun mergeSteps(current: Int, recorded: Int?, counterDelta: Long): Int =
+        maxOf(current.toLong() + counterDelta.coerceAtLeast(0), (recorded ?: 0).toLong(), current.toLong())
+            .coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
 }

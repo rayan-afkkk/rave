@@ -27,4 +27,17 @@ class FitnessMathTest {
         // Phone rebooted: counter restarted from 0 and is now at 300.
         assertEquals(300, FitnessMath.counterDelta(50_000, 300))
     }
+
+    @Test
+    fun `merged steps take the larger source and never go down`() {
+        // App was closed: the counter saw 800 new steps, the Recording API hasn't caught up yet.
+        assertEquals(3_800, FitnessMath.mergeSteps(current = 3_000, recorded = 3_200, counterDelta = 800))
+        // Recording API caught up with the same walk: no double counting.
+        assertEquals(3_800, FitnessMath.mergeSteps(current = 3_800, recorded = 3_800, counterDelta = 0))
+        // Recording API has steps the counter missed (e.g. after a reboot).
+        assertEquals(5_000, FitnessMath.mergeSteps(current = 3_800, recorded = 5_000, counterDelta = 0))
+        // A lower recorded value never pulls the total down.
+        assertEquals(2_900, FitnessMath.mergeSteps(current = 2_900, recorded = 1_500, counterDelta = 0))
+        assertEquals(10, FitnessMath.mergeSteps(current = 10, recorded = null, counterDelta = -5))
+    }
 }

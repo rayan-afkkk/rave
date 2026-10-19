@@ -5,9 +5,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Brings daily steps up to date. With the Recording API (most phones with Google Play) the
- * totals come straight from Play services, which counts in the background; otherwise the
- * hardware step counter is read and the difference since the last reading is added.
+ * Brings daily steps up to date from both the Recording API (Play services counts in the
+ * background) and the hardware step counter; see StepRepository.merge.
  */
 @Singleton
 class StepSync @Inject constructor(
@@ -22,10 +21,11 @@ class StepSync @Inject constructor(
 
     suspend fun sync() {
         if (!sensor.hasPermission()) return
-        if (recorded.isAvailable && recorded.subscribe()) {
-            recorded.daily(DAYS)?.let { steps.applyRecorded(it); return }
-        }
-        sensor.readOnce()?.let { steps.record(it) }
+        val days = if (recorded.isAvailable && recorded.subscribe()) recorded.daily(DAYS) else null
+        // Always read the hardware counter too: some phones' Recording API misses or delays
+        // steps taken while the app is closed.
+        val counter = sensor.readOnce()
+        if (days != null || counter != null) steps.merge(days, counter)
     }
 
     private companion object {
