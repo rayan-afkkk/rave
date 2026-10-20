@@ -51,36 +51,44 @@ class SignInViewModel @Inject constructor(private val auth: AuthRepository) : Vi
     private val _state = MutableStateFlow(SignInState())
     val state: StateFlow<SignInState> = _state.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            auth.currentUser.collect { user ->
+                if (user != null) {
+                    _state.update { it.copy(busy = false, done = true, error = null) }
+                }
+            }
+        }
+    }
+
     fun google(activityContext: Context) = execute { auth.signInWithGoogle(activityContext) }
 
     private fun execute(block: suspend () -> Result<Unit>) {
         _state.update { it.copy(busy = true, error = null) }
         viewModelScope.launch {
-            block()
+            val result = block()
+            result
                 .onSuccess {
-                    if (auth.currentUser.value != null) {
-                        _state.update { it.copy(busy = false, done = true) }
-                    } else {
-                        _state.update { it.copy(busy = false) }
-                    }
+                    _state.update { it.copy(busy = false, done = true, error = null) }
                 }
                 .onFailure { e ->
-                    if (e is androidx.credentials.exceptions.GetCredentialCancellationException) {
-                        android.util.Log.w("Auth", "Google Sign-In cancelled or dismissed: ${e.message}", e)
-                        _state.update { it.copy(busy = false) }
-                    } else {
-                        android.util.Log.e("Auth", "Sign-in failed", e)
-                        val msg = when {
-                            e.message?.contains("16") == true || e.message?.contains("Cannot find a matching credential") == true ->
-                                "No Google credential found on device. Ensure a Google account is logged in and SHA-1 is added in Firebase."
-                            e.message?.contains("10") == true || e.message?.contains("Developer error", ignoreCase = true) == true ->
-                                "Google Developer Error (10): Ensure SHA-1 fingerprint is added to your Android app in Firebase Console."
-                            e.message?.contains("PERMISSION_DENIED", ignoreCase = true) == true || e.message?.contains("insufficient permissions", ignoreCase = true) == true ->
-                                "Firestore Permission Error: Update your Firestore Security Rules in Firebase Console to allow read/write access."
-                            else -> e.message ?: e.javaClass.simpleName
+                    android.util.Log.e("Auth", "Sign-in failed with ${e.javaClass.name}: ${e.message}", e)
+                    val msg = when {
+                        e.message?.contains("16") == true || e.message?.contains("Cannot find a matching credential") == true ->
+                            "No Google credential found. Ensure SHA-1 is added and Google Sign-In is enabled in Firebase."
+                        e.message?.contains("10") == true || e.message?.contains("Developer error", ignoreCase = true) == true ->
+                            "Google Developer Error (10): Ensure SHA-1 is added in Firebase Console."
+                        e.message?.contains("operation is not allowed", ignoreCase = true) == true ->
+                            "Please enable Google provider in Firebase Console under Authentication > Sign-in method."
+                        e.message?.contains("PERMISSION_DENIED", ignoreCase = true) == true || e.message?.contains("insufficient permissions", ignoreCase = true) == true ->
+                            "Firestore Permission Error: Check Firestore Security Rules in Firebase Console."
+                        e is androidx.credentials.exceptions.GetCredentialCancellationException -> {
+                            android.util.Log.w("Auth", "Sign-in cancelled or closed: ${e.message}")
+                            null
                         }
-                        _state.update { it.copy(busy = false, error = msg) }
+                        else -> e.localizedMessage ?: e.message ?: e.javaClass.simpleName
                     }
+                    _state.update { it.copy(busy = false, error = msg) }
                 }
         }
     }
