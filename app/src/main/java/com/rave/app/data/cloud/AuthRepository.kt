@@ -12,7 +12,6 @@ import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import com.rave.app.R
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -85,9 +84,8 @@ class AuthRepository @Inject constructor(
         runCatching { migration.get().onSignedIn() }
     }
 
+    // Looked up by name: the resource only exists when google-services.json is present.
     private fun webClientId(): String? {
-        val direct = runCatching { context.getString(R.string.default_web_client_id) }.getOrNull()
-        if (!direct.isNullOrBlank()) return direct
         val resIdPkg = context.resources.getIdentifier("default_web_client_id", "string", context.packageName)
         if (resIdPkg != 0) {
             val v = runCatching { context.getString(resIdPkg) }.getOrNull()
