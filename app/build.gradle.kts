@@ -71,36 +71,44 @@ android {
         buildConfigField("boolean", "INVITE_REWARD_ENABLED", "true")
     }
 
-    signingConfigs {
-        create("debugConfig") {
-            storeFile = file("${rootDir}/release.keystore")
-            storePassword = "raveapprelease"
-            keyAlias = "releasekey"
-            keyPassword = "raveapprelease"
-        }
-        create("releaseConfig") {
-            storeFile = file("${rootDir}/release.keystore")
-            storePassword = "raveapprelease"
-            keyAlias = "releasekey"
-            keyPassword = "raveapprelease"
+    // Every build is signed with release.keystore when it's present, so one SHA-1 in Firebase works
+    // on every machine. The keystore and its passwords stay out of Git: put RELEASE_STORE_PASSWORD,
+    // RELEASE_KEY_ALIAS and RELEASE_KEY_PASSWORD in local.properties (or environment variables).
+    // Without them (e.g. CI) the default debug key is used.
+    val localProps = Properties().apply {
+        rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
+    }
+    fun signingValue(key: String): String? = System.getenv(key) ?: localProps.getProperty(key)
+    val releaseKeystore = rootProject.file("release.keystore")
+    val storePass = signingValue("RELEASE_STORE_PASSWORD")
+    val hasReleaseKey = releaseKeystore.exists() && storePass != null
+    if (hasReleaseKey) {
+        signingConfigs {
+            create("releaseConfig") {
+                storeFile = releaseKeystore
+                storePassword = storePass
+                keyAlias = signingValue("RELEASE_KEY_ALIAS") ?: "releasekey"
+                keyPassword = signingValue("RELEASE_KEY_PASSWORD") ?: storePass
+            }
         }
     }
+    val buildSigning = if (hasReleaseKey) "releaseConfig" else "debug"
 
     buildTypes {
         debug {
-            signingConfig = signingConfigs.getByName("releaseConfig")
+            signingConfig = signingConfigs.getByName(buildSigning)
         }
         // Same optimised code as release (R8 + baseline profiles) but signed with the debug key,
         // so it installs straight from Android Studio. Compose debug builds are several times
         // slower than this: pick the "staging" build variant to judge smoothness.
         create("staging") {
             initWith(getByName("release"))
-            signingConfig = signingConfigs.getByName("debugConfig")
+            signingConfig = signingConfigs.getByName(buildSigning)
             matchingFallbacks += listOf("release")
             isDebuggable = false
         }
         release {
-            signingConfig = signingConfigs.getByName("releaseConfig")
+            if (hasReleaseKey) signingConfig = signingConfigs.getByName("releaseConfig")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
