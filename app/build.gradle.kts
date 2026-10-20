@@ -58,7 +58,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.rave.applet"
+        applicationId = "app.rave.applet"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
