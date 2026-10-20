@@ -121,7 +121,7 @@ history, insights, share cards and the widget all work offline as a guest.
 1. Create a Firebase project and add an Android app with package `com.rave.app`.
 2. Download **`google-services.json`** into `app/` (it's git-ignored). The Google Services plugin
    is applied automatically when the file exists.
-3. Enable **Authentication** → Google and Email/Password.
+3. Enable **Authentication** → Google.
 4. Create a **Cloud Firestore** database, then deploy the rules and indexes:
    ```bash
    npm i -g firebase-tools && firebase login && firebase use <project-id>

@@ -12,7 +12,6 @@ import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.UserProfileChangeRequest
 import com.rave.app.R
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -25,7 +24,7 @@ import javax.inject.Singleton
 
 data class CloudUser(val uid: String, val name: String, val email: String?, val photoUrl: String?)
 
-/** Optional sign-in (Google via Credential Manager, or email + password). */
+/** Optional sign-in (Google via Credential Manager). */
 @Singleton
 class AuthRepository @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -57,23 +56,6 @@ class AuthRepository @Inject constructor(
         val idToken = GoogleIdTokenCredential.createFrom(credential.data).idToken
         auth.signInWithCredential(GoogleAuthProvider.getCredential(idToken, null)).await()
         afterSignIn(null)
-    }
-
-    suspend fun signInWithEmail(email: String, password: String): Result<Unit> = runCatching {
-        val auth = firebase.auth ?: throw CloudUnavailableException()
-        auth.signInWithEmailAndPassword(email.trim(), password).await()
-        afterSignIn(null)
-    }
-
-    suspend fun signUpWithEmail(name: String, email: String, password: String): Result<Unit> = runCatching {
-        val auth = firebase.auth ?: throw CloudUnavailableException()
-        val result = auth.createUserWithEmailAndPassword(email.trim(), password).await()
-        result.user?.updateProfile(UserProfileChangeRequest.Builder().setDisplayName(name.trim()).build())?.await()
-        afterSignIn(name.trim())
-    }
-
-    suspend fun sendPasswordReset(email: String): Result<Unit> = runCatching {
-        (firebase.auth ?: throw CloudUnavailableException()).sendPasswordResetEmail(email.trim()).await()
     }
 
     suspend fun signOut() {

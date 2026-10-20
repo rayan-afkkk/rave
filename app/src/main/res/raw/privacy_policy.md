@@ -23,7 +23,7 @@ Android may include this data in your own Google account backup (Android Auto Ba
 
 ## 2. Data stored in the cloud when you sign in
 
-Signing in is optional. When you sign in with Google or with an email and password, we use Google Firebase (Authentication and Cloud Firestore) to store:
+Signing in is optional. When you sign in with Google, we use Google Firebase (Authentication and Cloud Firestore) to store:
 
 - **Account:** your user ID, email address, display name, username, profile photo link and invite code.
 - **Profile summary:** total and weekly distance, current and best streak, weekly points. Signed-in Rave users can look up profiles to find friends. When your visibility is set to Private you are hidden from search and your activities are not shared.

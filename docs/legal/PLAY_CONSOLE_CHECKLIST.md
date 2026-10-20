@@ -16,7 +16,7 @@ plus the exact answers to give. Wrong or missing declarations are the #1 reason 
 | Section | Answer |
 |---|---|
 | Privacy policy | Your hosted privacy-policy URL |
-| App access | **"All or some functionality is restricted"** → give a test login: create a test email/password account in the app and paste it with: "Friends, competitions and feed need sign-in. Everything else works as a guest." |
+| App access | **"All or some functionality is restricted"** → give a test login: make a spare Gmail account just for reviewers (no 2-step verification) and paste its email + password with: "Friends, competitions and feed need sign-in. Everything else works as a guest. Tap Sign in → Continue with Google and use this account." |
 | Ads | No |
 | Content rating | Fill the IARC questionnaire honestly: no violence, users can interact (friends/feed), shares location with friends (route maps), no gambling, no purchases of physical goods. Expect **Everyone / PEGI 3** (or Teen if you answer "users can interact" strictly) |
 | Target audience | **13+** only (do NOT tick under-13 groups) |
