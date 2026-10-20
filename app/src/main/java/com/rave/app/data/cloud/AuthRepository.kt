@@ -116,7 +116,7 @@ class AuthRepository @Inject constructor(
             val v = runCatching { context.getString(resIdApp) }.getOrNull()
             if (!v.isNullOrBlank()) return v
         }
-        return null
+        return "898789468985-tm035vo6h92v33a8gulvqvu7jjfe4a5d.apps.googleusercontent.com"
     }
 
     private fun Context.findActivity(): Activity? {

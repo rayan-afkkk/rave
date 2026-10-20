@@ -71,34 +71,36 @@ android {
         buildConfigField("boolean", "INVITE_REWARD_ENABLED", "true")
     }
 
-    // A shared debug keystore (so the SHA-1 registered in Firebase stays the same on every
-    // machine) is used only when it exists; otherwise Android Studio's default debug key is used.
-    val sharedDebugKeystore = rootProject.file("debug.keystore")
-    if (sharedDebugKeystore.exists()) {
-        signingConfigs {
-            create("debugConfig") {
-                storeFile = sharedDebugKeystore
-                storePassword = "android"
-                keyAlias = "androiddebugkey"
-                keyPassword = "android"
-            }
+    signingConfigs {
+        create("debugConfig") {
+            storeFile = file("${rootDir}/release.keystore")
+            storePassword = "raveapprelease"
+            keyAlias = "releasekey"
+            keyPassword = "raveapprelease"
+        }
+        create("releaseConfig") {
+            storeFile = file("${rootDir}/release.keystore")
+            storePassword = "raveapprelease"
+            keyAlias = "releasekey"
+            keyPassword = "raveapprelease"
         }
     }
 
     buildTypes {
         debug {
-            if (sharedDebugKeystore.exists()) signingConfig = signingConfigs.getByName("debugConfig")
+            signingConfig = signingConfigs.getByName("releaseConfig")
         }
         // Same optimised code as release (R8 + baseline profiles) but signed with the debug key,
         // so it installs straight from Android Studio. Compose debug builds are several times
         // slower than this: pick the "staging" build variant to judge smoothness.
         create("staging") {
             initWith(getByName("release"))
-            signingConfig = signingConfigs.getByName(if (sharedDebugKeystore.exists()) "debugConfig" else "debug")
+            signingConfig = signingConfigs.getByName("debugConfig")
             matchingFallbacks += listOf("release")
             isDebuggable = false
         }
         release {
+            signingConfig = signingConfigs.getByName("releaseConfig")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
