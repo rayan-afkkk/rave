@@ -19,5 +19,3 @@ local.properties
 firebase-debug.log
 *-debug.log
 
-# API keys (local only)
-.env
