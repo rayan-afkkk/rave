@@ -12,10 +12,16 @@ plugins {
     alias(libs.plugins.secrets)
 }
 
+val appId = "com.rave.fitness"
+
 // Firebase is optional: the app runs fully offline (guest mode) without it.
-// Drop app/google-services.json in to enable sign-in, friends and competitions.
-if (file("google-services.json").exists()) {
+// Drop app/google-services.json in to enable sign-in, friends and competitions. It must be
+// registered for [appId]; a file for another package is ignored rather than breaking the build.
+val googleServices = file("google-services.json")
+if (googleServices.exists() && googleServices.readText().contains("\"$appId\"")) {
     apply(plugin = libs.plugins.google.services.get().pluginId)
+} else if (googleServices.exists()) {
+    logger.warn("google-services.json has no client for $appId: Firebase is off in this build.")
 }
 
 // Populate/sync .env from environment variables provided in AI Studio Secrets panel
@@ -58,7 +64,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "app.rave.applet"
+        applicationId = appId
         minSdk = 26
         targetSdk = 36
         versionCode = 1

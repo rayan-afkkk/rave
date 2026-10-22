@@ -156,7 +156,7 @@ Invite links look like `https://<INVITE_DOMAIN>/invite/{code}`, and competitions
    ```json
    [{
      "relation": ["delegate_permission/common.handle_all_urls"],
-     "target": { "namespace": "android_app", "package_name": "app.rave.applet",
+     "target": { "namespace": "android_app", "package_name": "com.rave.fitness",
                  "sha256_cert_fingerprints": ["AA:BB:…"] }
    }]
    ```
