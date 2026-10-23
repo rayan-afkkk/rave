@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "436802402938-i567uhkcf8s8p1l33q16olr9eb403uhs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.rave.fitness",
+            "certificate_hash": "b474fd1f9cd1c506a0e61c677d707ace99e3d79e"
+          }
+        },
+        {
           "client_id": "436802402938-8se71d09qjlf39ujk0ahck9qft84la67.apps.googleusercontent.com",
           "client_type": 3
         }
