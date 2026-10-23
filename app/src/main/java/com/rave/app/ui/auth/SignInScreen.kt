@@ -73,22 +73,26 @@ class SignInViewModel @Inject constructor(private val auth: AuthRepository) : Vi
                 }
                 .onFailure { e ->
                     android.util.Log.e("Auth", "Sign-in failed with ${e.javaClass.name}: ${e.message}", e)
+                    val raw = e.message.orEmpty()
+                    val keyHint = "This build's signing key isn't registered in Firebase. Add its SHA-1 under " +
+                        "Project settings → your Android app, or install a build signed with release.keystore."
                     val msg = when {
-                        e.message?.contains("16") == true || e.message?.contains("Cannot find a matching credential") == true ->
-                            "No Google credential found. Ensure SHA-1 is added and Google Sign-In is enabled in Firebase."
-                        e.message?.contains("10") == true || e.message?.contains("Developer error", ignoreCase = true) == true ->
-                            "Google Developer Error (10): Ensure SHA-1 is added in Firebase Console."
-                        e.message?.contains("operation is not allowed", ignoreCase = true) == true ->
-                            "Please enable Google provider in Firebase Console under Authentication > Sign-in method."
-                        e.message?.contains("PERMISSION_DENIED", ignoreCase = true) == true || e.message?.contains("insufficient permissions", ignoreCase = true) == true ->
-                            "Firestore Permission Error: Check Firestore Security Rules in Firebase Console."
-                        e is androidx.credentials.exceptions.GetCredentialCancellationException -> {
-                            android.util.Log.w("Auth", "Sign-in cancelled or closed: ${e.message}")
-                            null
-                        }
-                        else -> e.localizedMessage ?: e.message ?: e.javaClass.simpleName
+                        raw.contains("reauth", ignoreCase = true) || raw.contains("[16]") ||
+                            raw.contains("DEVELOPER_ERROR", ignoreCase = true) || raw.contains("[10]") -> keyHint
+                        raw.contains("matching credential", ignoreCase = true) ->
+                            "No Google account on this phone. Add one in Settings → Accounts, then try again."
+                        raw.contains("operation is not allowed", ignoreCase = true) ->
+                            "Google sign-in is off. Enable it in Firebase → Authentication → Sign-in method."
+                        raw.contains("network", ignoreCase = true) -> "No connection. Check your internet and try again."
+                        // With a wrong SHA-1 the picker often closes with a plain "cancelled" error right after an
+                        // account is chosen, so don't fail silently.
+                        e is androidx.credentials.exceptions.GetCredentialCancellationException ->
+                            "Sign-in didn't finish. If the window closed after you picked an account: $keyHint"
+                        else -> raw.ifBlank { e.javaClass.simpleName }
                     }
-                    _state.update { it.copy(busy = false, error = msg) }
+                    // Debug builds also show the raw error so it can be screenshotted.
+                    val detail = if (com.rave.app.BuildConfig.DEBUG) "\n(${e.javaClass.simpleName}: $raw)" else ""
+                    _state.update { it.copy(busy = false, error = msg + detail) }
                 }
         }
     }
