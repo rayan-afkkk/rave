@@ -12,7 +12,7 @@ plugins {
     alias(libs.plugins.secrets)
 }
 
-val appId = "com.rave.fitness"
+val appId = "app.rave.fitness"
 
 // Firebase is optional: the app runs fully offline (guest mode) without it.
 // Drop app/google-services.json in to enable sign-in, friends and competitions. It must be
