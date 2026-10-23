@@ -15,19 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "436802402938-8bqhu51ol9n0dca135e45nugklieihps.apps.googleusercontent.com",
+          "client_id": "436802402938-9nesh8serlitakjr7lmn0b4ruetpujjh.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "app.rave.fitness",
-            "certificate_hash": "26054d3e4e1212995aa0ab138b5c017908b9e2a3"
-          }
-        },
-        {
-          "client_id": "436802402938-i567uhkcf8s8p1l33q16olr9eb403uhs.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "app.rave.fitness",
-            "certificate_hash": "b474fd1f9cd1c506a0e61c677d707ace99e3d79e"
+            "certificate_hash": "c3f6e09cbdf0a4cd3218e1e9b10cbd8c4c77ce2c"
           }
         },
         {
