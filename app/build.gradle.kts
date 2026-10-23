@@ -85,7 +85,9 @@ android {
     val localProps = Properties().apply {
         rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
     }
-    fun signingValue(key: String): String? = System.getenv(key) ?: localProps.getProperty(key)
+    // Blank counts as unset: CI passes a missing secret as an empty variable.
+    fun signingValue(key: String): String? =
+        (System.getenv(key) ?: localProps.getProperty(key))?.takeIf { it.isNotBlank() }
     val releaseKeystore = rootProject.file("release.keystore")
     val storePass = signingValue("RELEASE_STORE_PASSWORD")
     val hasReleaseKey = releaseKeystore.exists() && storePass != null
