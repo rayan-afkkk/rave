@@ -171,7 +171,6 @@ fun OnboardingScreen(
                     error = signInState.error,
                     available = signIn.available,
                     onGoogle = { signIn.google(it) },
-                    onEmail = { viewModel.finish(name) { onFinished(true) } },
                     onGuest = { viewModel.finish(name) { onFinished(false) } },
                 )
                 else -> {
@@ -317,14 +316,13 @@ private fun SetupPage(name: String, onName: (String) -> Unit) {
     }
 }
 
-/** Last step: Google sign-in, with email and guest as secondary options. */
+/** Last step: Google sign-in, with guest as the alternative. */
 @Composable
 private fun SignInPage(
     busy: Boolean,
     error: String?,
     available: Boolean,
     onGoogle: (android.content.Context) -> Unit,
-    onEmail: () -> Unit,
     onGuest: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -365,8 +363,6 @@ private fun SignInPage(
                 Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth())
             }
-            BentoButton(stringResource(R.string.onb_signin_email), c.tileSand.container, c.tileSand.content, onClick = { consent.require(onEmail) },
-                enabled = !busy, modifier = Modifier.fillMaxWidth())
         } else {
             Text(stringResource(R.string.cloud_unavailable), style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())

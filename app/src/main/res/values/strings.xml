@@ -966,7 +966,6 @@ Permission was denied. You can turn it on in Settings.</string>
     <string name="onb_signin_perk_friends">Shared streaks and nudges with friends</string>
     <string name="onb_signin_perk_compete">Competitions and weekly leaderboards</string>
     <string name="onb_signin_perk_backup">Cloud backup of your habits and history</string>
-    <string name="onb_signin_email">Use email instead</string>
     <plurals name="freezes_count">
         <item quantity="one">%d streak freeze</item>
         <item quantity="other">%d streak freezes</item>
