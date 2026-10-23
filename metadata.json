@@ -1,8 +1,0 @@
-{
-  "name": "Rave",
-  "description": "Habit tracker, GPS walk/run tracker, and workout logger with social streaks and competitions.",
-  "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
-}
