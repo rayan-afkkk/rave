@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "436802402938",
+    "firebase_url": "https://rave-2024d-default-rtdb.firebaseio.com",
+    "project_id": "rave-2024d",
+    "storage_bucket": "rave-2024d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:436802402938:android:a5aadeac74a322b25599c3",
+        "android_client_info": {
+          "package_name": "app.rave.fitness"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "436802402938-8bqhu51ol9n0dca135e45nugklieihps.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.rave.fitness",
+            "certificate_hash": "26054d3e4e1212995aa0ab138b5c017908b9e2a3"
+          }
+        },
+        {
+          "client_id": "436802402938-8se71d09qjlf39ujk0ahck9qft84la67.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcSj9qH1LwcUy__CQ5YyzhXk8h36EW-DQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "436802402938-8se71d09qjlf39ujk0ahck9qft84la67.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
