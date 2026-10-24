@@ -89,7 +89,7 @@ class RouteWidget : GlanceAppWidget() {
         val ep = entryPoint(context)
         val activity = ep.activities().latestCompleted() ?: return null
         val unit = ep.settings().current().unit
-        val segments = RouteCleaner.clean(ep.activities().points(activity.id))
+        val segments = RouteCleaner.asTracked(ep.activities().points(activity.id))
         val color = (if (dark) DarkColors else LightColors).primary.toArgb()
         return RouteData(
             activityId = activity.id,

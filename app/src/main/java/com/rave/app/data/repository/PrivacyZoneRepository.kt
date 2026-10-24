@@ -31,12 +31,12 @@ class PrivacyZoneRepository @Inject constructor(
     }
 
     /**
-     * The route for a share card: cleaned of GPS noise (see [RouteCleaner]) so it matches the
-     * shape you walked. Cards show only the line on a plain background, with no map or
-     * coordinates, so the start and end aren't trimmed; privacy zones are still removed.
+     * The route for a share card: the same line as the Routes list (see [RouteCleaner.asTracked]).
+     * Cards show only the line on a plain background, with no map or coordinates, so the start
+     * and end aren't trimmed; privacy zones are still removed.
      */
     suspend fun shareCardSegments(points: List<TrackPoint>): List<List<LatLngPoint>> {
         val zones = dao.getAll().map { PrivacyArea(it.lat, it.lng, it.radiusM) }
-        return RouteCleaner.clean(points).flatMap { PrivacyFilter.apply(it, zones, trimEnds = false) }
+        return RouteCleaner.asTracked(points).flatMap { PrivacyFilter.apply(it, zones, trimEnds = false) }
     }
 }

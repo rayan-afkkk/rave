@@ -19,6 +19,16 @@ object RouteCleaner {
     const val MAX_ACCURACY_M = 25f
     private const val SMOOTH_RADIUS = 2 // 5-point window
 
+    /**
+     * The route exactly as recorded, one line per tracking segment, only thinned out
+     * ([toleranceM]) so it draws fast. This is what the Routes list shows, and share cards
+     * and the widget use the same so the shape always matches.
+     */
+    fun asTracked(points: List<TrackPoint>, toleranceM: Double = 3.0): List<List<LatLngPoint>> =
+        points.groupBy { it.segment }.toSortedMap().values
+            .map { seg -> Polyline.simplify(seg.map { LatLngPoint(it.lat, it.lng) }, toleranceM) }
+            .filter { it.size >= 2 }
+
     fun clean(points: List<TrackPoint>): List<List<LatLngPoint>> {
         if (points.size < 2) return emptyList()
         val segments = points.groupBy { it.segment }.values.map { seg ->
