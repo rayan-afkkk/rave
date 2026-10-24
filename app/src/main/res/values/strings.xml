@@ -653,10 +653,10 @@ Permission was denied. You can turn it on in Settings.</string>
     <string name="onboarding_allow_all">Allow all</string>
     <string name="onboarding_perm_steps">Physical activity</string>
     <string name="onboarding_perm_steps_body">Counts your steps all day, even when Rave is closed.</string>
-    <string name="onboarding_perm_watch">Smartwatch</string>
-    <string name="onboarding_perm_watch_body">Bring in steps and walks from Samsung Health, Fitbit, Garmin and more via Health Connect.</string>
-    <string name="settings_watch">Smartwatch</string>
-    <string name="settings_watch_help">Steps and walks from your watch app, via Health Connect</string>
+    <string name="onboarding_perm_watch">Samsung Health &amp; watches</string>
+    <string name="onboarding_perm_watch_body">Match your Samsung Health count and bring in steps and walks from your watch (Fitbit, Garmin and more) via Health Connect.</string>
+    <string name="settings_watch">Samsung Health &amp; watches</string>
+    <string name="settings_watch_help">Steps and walks from Samsung Health or your watch app, via Health Connect</string>
     <string name="settings_watch_connected">Connected</string>
     <string name="tag_from_app">From %1$s</string>
     <string name="onboarding_perm_camera">Camera</string>

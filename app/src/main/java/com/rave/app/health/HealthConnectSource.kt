@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.HealthConnectFeatures
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ExerciseRoute
@@ -59,6 +60,19 @@ class HealthConnectSource @Inject constructor(@ApplicationContext private val co
     private val client: HealthConnectClient? by lazy {
         if (availability() == Availability.AVAILABLE) runCatching { HealthConnectClient.getOrCreate(context) }.getOrNull() else null
     }
+
+    /** Android lets apps read Health Connect while closed only with this extra permission. */
+    suspend fun backgroundReadSupported(): Boolean {
+        val c = client ?: return false
+        return runCatching {
+            c.features.getFeatureStatus(HealthConnectFeatures.FEATURE_READ_HEALTH_DATA_IN_BACKGROUND) ==
+                HealthConnectFeatures.FEATURE_STATUS_AVAILABLE
+        }.getOrDefault(false)
+    }
+
+    /** What to ask for: the read permissions, plus background reading where supported. */
+    suspend fun permissionsToRequest(): Set<String> =
+        if (backgroundReadSupported()) PERMISSIONS + HealthPermission.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND else PERMISSIONS
 
     suspend fun hasPermissions(): Boolean {
         val c = client ?: return false

@@ -40,8 +40,8 @@ class StepRepository @Inject constructor(
      * - [counter]: the hardware step counter, whose difference since the last reading is
      *   added to today. This catches steps taken while the app was closed even when the
      *   Recording API hasn't delivered them.
-     * Taking the larger of the two (rather than adding them) means steps are never counted
-     * twice when both sources saw the same walk.
+     * Each source keeps its own total for today and the day shows the largest (never their
+     * sum), so steps are never counted twice when both saw the same walk.
      */
     suspend fun merge(recorded: Map<LocalDate, Int>?, counter: Long?) = mutex.withLock {
         val today = time.today()
@@ -65,13 +65,15 @@ class StepRepository @Inject constructor(
         }
         val key = today.toString()
         val current = dao.get(key)?.steps ?: 0
-        // The phone's own count is kept apart from the watch's, so a watch total that raised
-        // today's number never gets phone steps added on top of it.
         val watch = dayValue(KEY_WATCH_TODAY, today)
-        val phoneBefore = dayValue(KEY_PHONE_TODAY, today) ?: if (watch != null) 0 else current
-        val phone = FitnessMath.mergeSteps(phoneBefore, recorded?.get(today), delta)
-        settings.putString(KEY_PHONE_TODAY, "$today:$phone")
-        val value = maxOf(current, phone, watch ?: 0)
+        // Steps the hardware counter saw today, kept on their own. Adding counter deltas onto a
+        // total that the Recording API (or a watch) had already raised counted the same steps
+        // twice, so each source keeps its own number and the day shows the largest.
+        val counterBefore = dayValue(KEY_COUNTER_TODAY, today)
+            ?: if (recorded == null && watch == null) current else 0
+        val counterToday = (counterBefore + delta.coerceAtLeast(0)).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+        settings.putString(KEY_COUNTER_TODAY, "$today:$counterToday")
+        val value = FitnessMath.todaySteps(current, counterToday, recorded?.get(today), watch)
         if (value != current) { dao.upsert(DailyStepsEntity(key, value, time.nowMs())); changed = true }
         if (changed) widget.refreshSteps()
     }
@@ -124,7 +126,7 @@ class StepRepository @Inject constructor(
     private companion object {
         const val KEY_LAST_COUNTER = "steps_last_counter"
         const val KEY_LAST_COUNTER_DAY = "steps_last_counter_day"
-        const val KEY_PHONE_TODAY = "steps_phone_today"
+        const val KEY_COUNTER_TODAY = "steps_counter_today"
         const val KEY_WATCH_TODAY = "steps_watch_today"
     }
 }

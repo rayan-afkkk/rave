@@ -45,8 +45,10 @@ fun rememberWatchConnect(): WatchConnectState {
             when {
                 availability == HealthConnectSource.Availability.NEEDS_UPDATE -> context.tryStart(source.installIntent())
                 connected -> context.openHealthConnectSettings()
-                else -> runCatching { launcher.launch(HealthConnectSource.PERMISSIONS) }
-                    .onFailure { context.openHealthConnectSettings() }
+                else -> scope.launch {
+                    runCatching { launcher.launch(source.permissionsToRequest()) }
+                        .onFailure { context.openHealthConnectSettings() }
+                }
             }
         },
     )

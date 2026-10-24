@@ -60,7 +60,7 @@ plus the exact answers to give. Wrong or missing declarations are the #1 reason 
 - Reply to any policy email calmly and fix exactly what they mention; resubmissions are normal.
 
 ## Health Connect (smartwatch sync)
-- [ ] Play Console → **App content → Health apps / Health Connect**: declare read access to **Steps, Exercise and Distance**.
+- [ ] Play Console → **App content → Health apps / Health Connect**: declare read access to **Steps, Exercise and Distance**, plus **reading health data in the background** (keeps the step count up to date while the app is closed).
       Reason: "Show the user's smartwatch steps and walks/runs inside Rave. Read only, never shared or used for ads."
 - [ ] Data safety: add **Health and fitness → Fitness info** as collected (from Health Connect), not shared.
 - [ ] The privacy policy already has a Health Connect section; make sure the hosted copy is updated.

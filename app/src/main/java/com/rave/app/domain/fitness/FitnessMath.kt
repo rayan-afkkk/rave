@@ -33,10 +33,9 @@ object FitnessMath {
     }
 
     /**
-     * Today's steps after a sync: the current total plus what the hardware counter saw since
-     * the last reading, or the Recording API's total if that's higher. Never goes down.
+     * Today's steps: the largest of what each source counted on its own (hardware counter,
+     * Recording API, smartwatch), never their sum, and never lower than before.
      */
-    fun mergeSteps(current: Int, recorded: Int?, counterDelta: Long): Int =
-        maxOf(current.toLong() + counterDelta.coerceAtLeast(0), (recorded ?: 0).toLong(), current.toLong())
-            .coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+    fun todaySteps(current: Int, counterToday: Int, recorded: Int?, watch: Int?): Int =
+        maxOf(current, counterToday, recorded ?: 0, watch ?: 0)
 }

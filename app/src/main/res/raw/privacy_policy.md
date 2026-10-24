@@ -46,7 +46,7 @@ Signing in is optional. When you sign in with Google, we use Google Firebase (Au
 
 - **Location (while using the app):** to record walks, runs and rides that you start. Location is only used while a walk is being recorded, shown by a notification.
 - **Physical activity:** to count steps and, if you turn on "Auto-detect walks", to notice when you start and stop walking. Detected walks are measured with the step counter; Rave never uses your location in the background.
-- **Health Connect (optional, read only):** if you connect a smartwatch, Rave reads your steps, walks/runs and their distance that other apps (for example Samsung Health, Fitbit or Garmin Connect) saved in Health Connect. This data is used only to show your steps and activities in Rave, stays on your device (and in your own cloud backup if you sign in), is never sold, never used for ads and never shared with anyone else. You can disconnect any time in Health Connect settings.
+- **Health Connect (optional, read only):** if you connect a smartwatch, Rave reads your steps, walks/runs and their distance that other apps (for example Samsung Health, Fitbit or Garmin Connect) saved in Health Connect. Where Android allows it, Rave also reads this in the background so your step count stays up to date while the app is closed. This data is used only to show your steps and activities in Rave, stays on your device (and in your own cloud backup if you sign in), is never sold, never used for ads and never shared with anyone else. You can disconnect any time in Health Connect settings.
 - **Camera:** to scan barcodes, nutrition labels and friend invite QR codes.
 - **Notifications and alarms:** for habit reminders and friend activity.
 
