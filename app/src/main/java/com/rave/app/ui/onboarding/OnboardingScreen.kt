@@ -1,6 +1,17 @@
 package com.rave.app.ui.onboarding
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import androidx.compose.material.icons.automirrored.rounded.DirectionsWalk
+import androidx.compose.material.icons.rounded.Alarm
+import androidx.compose.material.icons.rounded.BatteryChargingFull
+import androidx.compose.material.icons.rounded.PhotoCamera
+import com.rave.app.ui.permissions.exactAlarmsAllowed
+import com.rave.app.ui.permissions.openAppSettings
+import com.rave.app.ui.settings.isIgnoringBatteryOptimizations
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -268,19 +279,33 @@ private fun StoryLayout(offset: Float, index: Int, active: Boolean, tile: TileCo
 private fun SetupPage(name: String, onName: (String) -> Unit) {
     val context = LocalContext.current
     val c = RaveTheme.colors
-    var notifGranted by remember { mutableStateOf(notificationPermissions.all { context.hasPermission(it) }) }
-    var locationGranted by remember { mutableStateOf(context.hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) }
-    val notifLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-        notifGranted = notificationPermissions.all { context.hasPermission(it) }
+    val activityPerm = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) Manifest.permission.ACTIVITY_RECOGNITION else null
+    fun notif() = notificationPermissions.all { context.hasPermission(it) }
+    fun steps() = activityPerm == null || context.hasPermission(activityPerm)
+    fun location() = context.hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+    fun camera() = context.hasPermission(Manifest.permission.CAMERA)
+    var notifGranted by remember { mutableStateOf(notif()) }
+    var stepsGranted by remember { mutableStateOf(steps()) }
+    var locationGranted by remember { mutableStateOf(location()) }
+    var cameraGranted by remember { mutableStateOf(camera()) }
+    var exactGranted by remember { mutableStateOf(context.exactAlarmsAllowed()) }
+    var batteryGranted by remember { mutableStateOf(isIgnoringBatteryOptimizations(context)) }
+    fun refresh() {
+        notifGranted = notif(); stepsGranted = steps(); locationGranted = location(); cameraGranted = camera()
+        exactGranted = context.exactAlarmsAllowed(); batteryGranted = isIgnoringBatteryOptimizations(context)
     }
-    val locationLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-        locationGranted = context.hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-    }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { refresh() }
     LifecycleResumeEffect(Unit) {
-        notifGranted = notificationPermissions.all { context.hasPermission(it) }
-        locationGranted = context.hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+        refresh()
         onPauseOrDispose { }
     }
+    val runtime = buildList {
+        addAll(notificationPermissions)
+        activityPerm?.let { add(it) }
+        add(Manifest.permission.ACCESS_FINE_LOCATION); add(Manifest.permission.ACCESS_COARSE_LOCATION)
+        add(Manifest.permission.CAMERA)
+    }
+    val allRuntime = notifGranted && stepsGranted && locationGranted && cameraGranted
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
         verticalArrangement = Arrangement.spacedBy(BentoGap),
@@ -301,15 +326,46 @@ private fun SetupPage(name: String, onName: (String) -> Unit) {
                 },
             )
         }
-        Text(stringResource(R.string.onboarding_permissions_intro), style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 6.dp))
+        Row(Modifier.fillMaxWidth().padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.onboarding_permissions_intro), style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
+            if (!allRuntime) {
+                Spacer(Modifier.width(8.dp))
+                BentoChip(stringResource(R.string.onboarding_allow_all), c.highlight, c.onHighlight,
+                    onClick = { launcher.launch(runtime.toTypedArray()) })
+            }
+        }
         if (notificationPermissions.isNotEmpty()) {
             PermissionTile(Icons.Rounded.Notifications, c.tileBlue, R.string.onboarding_perm_notifications,
-                R.string.onboarding_perm_notifications_body, notifGranted) { notifLauncher.launch(notificationPermissions.toTypedArray()) }
+                R.string.onboarding_perm_notifications_body, notifGranted) { launcher.launch(notificationPermissions.toTypedArray()) }
+        }
+        if (activityPerm != null) {
+            PermissionTile(Icons.AutoMirrored.Rounded.DirectionsWalk, c.tileOrange, R.string.onboarding_perm_steps,
+                R.string.onboarding_perm_steps_body, stepsGranted) { launcher.launch(arrayOf(activityPerm)) }
         }
         PermissionTile(Icons.Rounded.LocationOn, c.tileGreen, R.string.onboarding_perm_location,
             R.string.onboarding_perm_location_body, locationGranted) {
-            locationLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+            launcher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+        }
+        PermissionTile(Icons.Rounded.PhotoCamera, c.tilePink, R.string.onboarding_perm_camera,
+            R.string.onboarding_perm_camera_body, cameraGranted) { launcher.launch(arrayOf(Manifest.permission.CAMERA)) }
+        // Special access: these open a system settings page instead of a dialog.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PermissionTile(Icons.Rounded.Alarm, c.tileYellow, R.string.onboarding_perm_alarms,
+                R.string.onboarding_perm_alarms_body, exactGranted) {
+                runCatching {
+                    context.startActivity(
+                        Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:${context.packageName}"))
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                    )
+                }.onFailure { context.openAppSettings() }
+            }
+        }
+        PermissionTile(Icons.Rounded.BatteryChargingFull, c.tileSand, R.string.onboarding_perm_battery,
+            R.string.onboarding_perm_battery_body, batteryGranted) {
+            runCatching {
+                context.startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            }.onFailure { context.openAppSettings() }
         }
         Text(stringResource(R.string.onboarding_perm_activity_note), style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 12.dp))

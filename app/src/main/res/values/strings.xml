@@ -649,7 +649,16 @@ Permission was denied. You can turn it on in Settings.</string>
     <string name="onboarding_perm_notifications_body">Reminders, live tracking and friend nudges.</string>
     <string name="onboarding_perm_location">Location while tracking</string>
     <string name="onboarding_perm_location_body">Precise location, only during a walk or run.</string>
-    <string name="onboarding_perm_activity_note">Physical activity and background location are only requested if you turn on auto-detect walks in Settings.</string>
+    <string name="onboarding_allow_all">Allow all</string>
+    <string name="onboarding_perm_steps">Physical activity</string>
+    <string name="onboarding_perm_steps_body">Counts your steps all day, even when Rave is closed.</string>
+    <string name="onboarding_perm_camera">Camera</string>
+    <string name="onboarding_perm_camera_body">Scan food barcodes, labels and friend QR codes.</string>
+    <string name="onboarding_perm_alarms">Alarms &amp; reminders</string>
+    <string name="onboarding_perm_alarms_body">Lets habit reminders arrive right on time.</string>
+    <string name="onboarding_perm_battery">Unrestricted battery</string>
+    <string name="onboarding_perm_battery_body">Stops your phone from pausing step counting. Choose Rave, then Allow / Don\'t optimize.</string>
+    <string name="onboarding_perm_activity_note">All optional. Rave never uses your location in the background.</string>
     <string name="cd_granted">Granted</string>
     <string name="signin_title">Sign in</string>
     <string name="signin_headline">Unlock friends &amp; backup</string>
