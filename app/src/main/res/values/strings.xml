@@ -11,6 +11,7 @@
     <string name="action_accept">Accept</string>
     <string name="action_add">Add</string>
     <string name="action_allow">Allow</string>
+    <string name="action_connect">Connect</string>
     <string name="action_back">Back</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_close">Close</string>
@@ -652,6 +653,12 @@ Permission was denied. You can turn it on in Settings.</string>
     <string name="onboarding_allow_all">Allow all</string>
     <string name="onboarding_perm_steps">Physical activity</string>
     <string name="onboarding_perm_steps_body">Counts your steps all day, even when Rave is closed.</string>
+    <string name="onboarding_perm_watch">Smartwatch</string>
+    <string name="onboarding_perm_watch_body">Bring in steps and walks from Samsung Health, Fitbit, Garmin and more via Health Connect.</string>
+    <string name="settings_watch">Smartwatch</string>
+    <string name="settings_watch_help">Steps and walks from your watch app, via Health Connect</string>
+    <string name="settings_watch_connected">Connected</string>
+    <string name="tag_from_app">From %1$s</string>
     <string name="onboarding_perm_camera">Camera</string>
     <string name="onboarding_perm_camera_body">Scan food barcodes, labels and friend QR codes.</string>
     <string name="onboarding_perm_alarms">Alarms &amp; reminders</string>

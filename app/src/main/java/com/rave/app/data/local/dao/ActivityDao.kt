@@ -24,6 +24,13 @@ interface ActivityDao {
     @Query("SELECT * FROM activities WHERE status = 'COMPLETED'")
     suspend fun getAllCompleted(): List<ActivityEntity>
 
+    @Query("SELECT COUNT(*) FROM activities WHERE externalId = :externalId")
+    suspend fun countByExternalId(externalId: String): Int
+
+    /** Completed activities that overlap [from, to] in time. */
+    @Query("SELECT * FROM activities WHERE status = 'COMPLETED' AND startTime < :to AND COALESCE(endTime, startTime) > :from")
+    suspend fun getCompletedOverlapping(from: Long, to: Long): List<ActivityEntity>
+
     @Query("SELECT * FROM activities WHERE id = :id")
     fun observeById(id: Long): Flow<ActivityEntity?>
 
@@ -81,6 +88,9 @@ interface LocationPointDao {
 
     @Insert
     suspend fun insert(point: LocationPointEntity): Long
+
+    @Insert
+    suspend fun insertAll(points: List<LocationPointEntity>)
 
     @Query("SELECT * FROM location_points WHERE activityId = :activityId ORDER BY timestamp ASC")
     suspend fun forActivity(activityId: Long): List<LocationPointEntity>

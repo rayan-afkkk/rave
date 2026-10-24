@@ -50,7 +50,8 @@ class ActivityProcessor @Inject constructor(
     private val widget: WidgetRefresher,
     private val time: TimeProvider,
 ) {
-    suspend fun finalize(activityId: Long, autoDetected: Boolean = false): FinishResult? {
+    /** [endTimeMs]: when it ended, for workouts imported after the fact (defaults to now). */
+    suspend fun finalize(activityId: Long, autoDetected: Boolean = false, endTimeMs: Long? = null): FinishResult? {
         val activity = activityDao.getById(activityId) ?: return null
         val points = pointDao.forActivity(activityId).map { it.toTrackPoint() }
         val prefs = settings.current()
@@ -77,7 +78,7 @@ class ActivityProcessor @Inject constructor(
         val startDate = time.dateOf(activity.startTime)
         val finished = activity.copy(
             status = ActivityStatus.COMPLETED,
-            endTime = now,
+            endTime = endTimeMs ?: now,
             distanceM = distance,
             durationS = effectiveDuration,
             movingTimeS = moving,

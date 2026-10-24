@@ -65,9 +65,39 @@ class StepRepository @Inject constructor(
         }
         val key = today.toString()
         val current = dao.get(key)?.steps ?: 0
-        val value = FitnessMath.mergeSteps(current, recorded?.get(today), delta)
+        // The phone's own count is kept apart from the watch's, so a watch total that raised
+        // today's number never gets phone steps added on top of it.
+        val watch = dayValue(KEY_WATCH_TODAY, today)
+        val phoneBefore = dayValue(KEY_PHONE_TODAY, today) ?: if (watch != null) 0 else current
+        val phone = FitnessMath.mergeSteps(phoneBefore, recorded?.get(today), delta)
+        settings.putString(KEY_PHONE_TODAY, "$today:$phone")
+        val value = maxOf(current, phone, watch ?: 0)
         if (value != current) { dao.upsert(DailyStepsEntity(key, value, time.nowMs())); changed = true }
         if (changed) widget.refreshSteps()
+    }
+
+    /**
+     * Per-day totals from a smartwatch (via Health Connect). Each day shows the larger of the
+     * phone and watch counts, never their sum, and never goes down.
+     */
+    suspend fun mergeWatch(days: Map<LocalDate, Int>) = mutex.withLock {
+        val today = time.today()
+        var changed = false
+        days.forEach { (date, steps) ->
+            if (date.isAfter(today)) return@forEach
+            if (date == today) settings.putString(KEY_WATCH_TODAY, "$today:$steps")
+            val key = date.toString()
+            val current = dao.get(key)?.steps ?: 0
+            if (steps > current) { dao.upsert(DailyStepsEntity(key, steps, time.nowMs())); changed = true }
+        }
+        if (changed) widget.refreshSteps()
+    }
+
+    /** Reads a "yyyy-MM-dd:steps" value, or null if it's for another day. */
+    private suspend fun dayValue(key: String, day: LocalDate): Int? {
+        val raw = settings.getString(key) ?: return null
+        val (date, steps) = raw.split(':').takeIf { it.size == 2 } ?: return null
+        return if (date == day.toString()) steps.toIntOrNull() else null
     }
 
     suspend fun todaySteps(): Int = dao.get(time.today().toString())?.steps ?: 0
@@ -94,5 +124,7 @@ class StepRepository @Inject constructor(
     private companion object {
         const val KEY_LAST_COUNTER = "steps_last_counter"
         const val KEY_LAST_COUNTER_DAY = "steps_last_counter_day"
+        const val KEY_PHONE_TODAY = "steps_phone_today"
+        const val KEY_WATCH_TODAY = "steps_watch_today"
     }
 }

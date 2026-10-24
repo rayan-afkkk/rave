@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.Watch
 import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.FitnessCenter
 import androidx.compose.material.icons.rounded.Map
@@ -171,6 +172,11 @@ private fun ActivityRow(a: ActivityEntity, unit: DistanceUnit, viewModel: Routes
                 if (a.autoDetected) {
                     Spacer(Modifier.width(4.dp))
                     Icon(Icons.Rounded.AutoAwesome, stringResource(R.string.tag_auto_detected), tint = RaveTheme.colors.tileBlue.content,
+                        modifier = Modifier.size(16.dp))
+                }
+                if (a.sourceApp != null) {
+                    Spacer(Modifier.width(4.dp))
+                    Icon(Icons.Rounded.Watch, stringResource(R.string.settings_watch), tint = RaveTheme.colors.tileBlue.content,
                         modifier = Modifier.size(16.dp))
                 }
             }

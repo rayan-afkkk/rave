@@ -22,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.Watch
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Delete
@@ -193,7 +194,7 @@ fun ActivitySummaryScreen(
                         }
 
                         // ---- More below the fold: badges, extra stats, name & note, delete ----
-                        val hasTags = state.pbTags.isNotEmpty() || a.goalReached || a.autoDetected
+                        val hasTags = state.pbTags.isNotEmpty() || a.goalReached || a.autoDetected || a.sourceApp != null
                         if (hasTags) {
                             FlowRow(
                                 Modifier.padding(top = 18.dp),
@@ -207,6 +208,11 @@ fun ActivitySummaryScreen(
                                 }
                                 if (a.autoDetected) {
                                     BentoChip(stringResource(R.string.tag_auto_detected), c.tileBlue.container, c.tileBlue.content, icon = Icons.Rounded.AutoAwesome)
+                                }
+                                a.sourceApp?.let { app ->
+                                    val ctx = androidx.compose.ui.platform.LocalContext.current
+                                    BentoChip(stringResource(R.string.tag_from_app, com.rave.app.health.HealthConnectSource.appName(ctx, app)),
+                                        c.tileBlue.container, c.tileBlue.content, icon = Icons.Rounded.Watch)
                                 }
                             }
                         }

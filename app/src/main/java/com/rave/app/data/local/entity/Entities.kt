@@ -97,6 +97,10 @@ data class ActivityEntity(
     val guideActivityId: Long? = null,
     val synced: Boolean = false,
     val remoteId: String? = null,
+    /** Package of the app it was imported from via Health Connect (e.g. Samsung Health); null if tracked in Rave. */
+    val sourceApp: String? = null,
+    /** Health Connect record id, so a watch workout is only imported once. */
+    val externalId: String? = null,
 )
 
 @Entity(

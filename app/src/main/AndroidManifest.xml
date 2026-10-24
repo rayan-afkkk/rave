@@ -31,8 +31,14 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.location.gps" android:required="false" />
 
+    <!-- Smartwatch data via Health Connect (read only) -->
+    <uses-permission android:name="android.permission.health.READ_STEPS" />
+    <uses-permission android:name="android.permission.health.READ_EXERCISE" />
+    <uses-permission android:name="android.permission.health.READ_DISTANCE" />
+
     <!-- Package visibility for explicit share targets (Android 11+) -->
     <queries>
+        <package android:name="com.google.android.apps.healthdata" />
         <package android:name="com.instagram.android" />
         <package android:name="com.whatsapp" />
         <intent>
@@ -182,5 +188,25 @@
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>
+
+        <!-- Health Connect asks the app to explain its data use (privacy policy). -->
+        <activity
+            android:name=".health.HealthPermissionsActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Rave">
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
+        </activity>
+        <activity-alias
+            android:name="ViewPermissionUsageActivity"
+            android:exported="true"
+            android:targetActivity=".health.HealthPermissionsActivity"
+            android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
+            </intent-filter>
+        </activity-alias>
     </application>
 </manifest>

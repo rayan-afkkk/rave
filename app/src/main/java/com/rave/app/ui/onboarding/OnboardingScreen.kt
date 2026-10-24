@@ -9,6 +9,7 @@ import androidx.compose.material.icons.automirrored.rounded.DirectionsWalk
 import androidx.compose.material.icons.rounded.Alarm
 import androidx.compose.material.icons.rounded.BatteryChargingFull
 import androidx.compose.material.icons.rounded.PhotoCamera
+import androidx.compose.material.icons.rounded.Watch
 import com.rave.app.ui.permissions.exactAlarmsAllowed
 import com.rave.app.ui.permissions.openAppSettings
 import com.rave.app.ui.settings.isIgnoringBatteryOptimizations
@@ -343,6 +344,11 @@ private fun SetupPage(name: String, onName: (String) -> Unit) {
             PermissionTile(Icons.AutoMirrored.Rounded.DirectionsWalk, c.tileOrange, R.string.onboarding_perm_steps,
                 R.string.onboarding_perm_steps_body, stepsGranted) { launcher.launch(arrayOf(activityPerm)) }
         }
+        val watch = com.rave.app.health.rememberWatchConnect()
+        if (watch.supported) {
+            PermissionTile(Icons.Rounded.Watch, c.tileBlue, R.string.onboarding_perm_watch,
+                R.string.onboarding_perm_watch_body, watch.connected, actionRes = R.string.action_connect, onAllow = watch.connect)
+        }
         PermissionTile(Icons.Rounded.LocationOn, c.tileGreen, R.string.onboarding_perm_location,
             R.string.onboarding_perm_location_body, locationGranted) {
             launcher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
@@ -431,7 +437,10 @@ private fun SignInPage(
 }
 
 @Composable
-private fun PermissionTile(icon: ImageVector, tile: TileColor, title: Int, body: Int, granted: Boolean, onAllow: () -> Unit) {
+private fun PermissionTile(
+    icon: ImageVector, tile: TileColor, title: Int, body: Int, granted: Boolean,
+    actionRes: Int = R.string.action_allow, onAllow: () -> Unit,
+) {
     val c = RaveTheme.colors
     BentoTile(tile.container, Modifier.fillMaxWidth(), padding = 14.dp) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -447,7 +456,7 @@ private fun PermissionTile(icon: ImageVector, tile: TileColor, title: Int, body:
             if (granted) {
                 Icon(Icons.Rounded.CheckCircle, contentDescription = stringResource(R.string.cd_granted), tint = tile.content, modifier = Modifier.size(28.dp))
             } else {
-                BentoChip(stringResource(R.string.action_allow), c.tileInk.container, c.tileInk.content, onClick = onAllow)
+                BentoChip(stringResource(actionRes), c.tileInk.container, c.tileInk.content, onClick = onAllow)
             }
         }
     }

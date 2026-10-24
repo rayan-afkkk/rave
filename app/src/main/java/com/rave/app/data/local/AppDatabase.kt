@@ -51,7 +51,7 @@ import com.rave.app.data.local.entity.UserStatsEntity
         FoodLogEntity::class,
         FoodScanEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
@@ -68,6 +68,14 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         const val NAME = "rave.db"
+
+        /** v4: activities imported from a smartwatch via Health Connect. */
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `activities` ADD COLUMN `sourceApp` TEXT")
+                db.execSQL("ALTER TABLE `activities` ADD COLUMN `externalId` TEXT")
+            }
+        }
 
         /** v3: food log and scan history. */
         val MIGRATION_2_3 = object : Migration(2, 3) {

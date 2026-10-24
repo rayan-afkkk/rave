@@ -231,6 +231,7 @@ dependencies {
     implementation(libs.mlkit.text.recognition)
     implementation(libs.okhttp)
     implementation(libs.billing.ktx)
+    implementation(libs.health.connect)
     implementation(libs.zxing.core)
 
     testImplementation(libs.junit)

@@ -180,6 +180,7 @@ fun SettingsScreen(
 
             // Tracking
             SettingsSection(stringResource(R.string.settings_tracking)) {
+                WatchRow()
                 NavRow(stringResource(R.string.battery_settings_row), onClick = onBatteryGuide)
                 NavRow(stringResource(R.string.offline_row), onClick = onOfflineMaps)
                 SwitchRow(stringResource(R.string.settings_auto_pause), stringResource(R.string.settings_auto_pause_help), s.autoPause) { on ->
@@ -317,6 +318,28 @@ private fun NavRow(title: String, destructive: Boolean = false, onClick: () -> U
         Text(title, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f),
             color = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface)
         Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+/** Smartwatch steps and workouts through Health Connect. */
+@Composable
+private fun WatchRow() {
+    val watch = com.rave.app.health.rememberWatchConnect()
+    if (!watch.supported) return
+    Row(
+        Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable(onClick = watch.connect),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(stringResource(R.string.settings_watch), style = MaterialTheme.typography.bodyLarge)
+            Text(stringResource(R.string.settings_watch_help), style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Text(
+            stringResource(if (watch.connected) R.string.settings_watch_connected else R.string.action_connect),
+            style = MaterialTheme.typography.labelLarge,
+            color = if (watch.connected) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.primary,
+        )
     }
 }
 
