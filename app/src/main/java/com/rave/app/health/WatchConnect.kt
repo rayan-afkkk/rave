@@ -2,6 +2,7 @@ package com.rave.app.health
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -10,7 +11,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import kotlinx.coroutines.launch
@@ -44,14 +44,23 @@ fun rememberWatchConnect(): WatchConnectState {
         connect = {
             when {
                 availability == HealthConnectSource.Availability.NEEDS_UPDATE -> context.tryStart(source.installIntent())
-                connected -> context.tryStart(Intent(HealthConnectClient.getHealthConnectSettingsAction()))
+                connected -> context.openHealthConnectSettings()
                 else -> runCatching { launcher.launch(HealthConnectSource.PERMISSIONS) }
-                    .onFailure { context.tryStart(Intent(HealthConnectClient.getHealthConnectSettingsAction())) }
+                    .onFailure { context.openHealthConnectSettings() }
             }
         },
     )
 }
 
-private fun Context.tryStart(intent: Intent) {
-    runCatching { startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+private fun Context.tryStart(intent: Intent): Boolean =
+    runCatching { startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }.isSuccess
+
+/** Health Connect's settings: built into Android 14+, a separate app before that. */
+private fun Context.openHealthConnectSettings() {
+    val action = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        "android.health.connect.action.HEALTH_HOME_SETTINGS"
+    } else {
+        "androidx.health.ACTION_HEALTH_CONNECT_SETTINGS"
+    }
+    tryStart(Intent(action))
 }
