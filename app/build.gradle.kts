@@ -123,6 +123,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            // Ship native debug symbols in the bundle so Play can read native crash reports.
+            ndk { debugSymbolLevel = "SYMBOL_TABLE" }
         }
     }
 
