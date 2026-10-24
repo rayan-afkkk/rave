@@ -146,26 +146,10 @@ keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -sto
 Add both **SHA-1** and **SHA-256** for debug and release, then download `google-services.json`
 again. The app uses the Web client ID (`default_web_client_id`) that the plugin generates.
 
-### 4. App Links for invites
+### 4. Invites
 
-Invite links look like `https://<INVITE_DOMAIN>/invite/{code}`, and competitions like
-`https://<INVITE_DOMAIN>/competition/{id}`.
-
-1. Set `INVITE_DOMAIN=your.domain` in `local.properties`.
-2. Host `https://your.domain/.well-known/assetlinks.json`:
-   ```json
-   [{
-     "relation": ["delegate_permission/common.handle_all_urls"],
-     "target": { "namespace": "android_app", "package_name": "app.rave.fitness",
-                 "sha256_cert_fingerprints": ["AA:BB:…"] }
-   }]
-   ```
-3. On the web page for `/invite/{code}`, send people who don't have the app to the Play Store with
-   `&referrer=invite_code%3D{code}`. On first launch the app reads the install referrer and opens
-   that invite right after sign-up.
-
-**No domain?** Invites still work through the short code (`RAYAN-7K2Q`), the QR code, the pre-filled
-share text, and the `rave://invite/{code}` fallback scheme.
+Invites use a short code (`RAYAN-7K2Q`), a QR code and pre-filled share text. There are no web
+invite links, so no domain or `assetlinks.json` is needed.
 
 ### 5. Instagram Story sharing (optional)
 

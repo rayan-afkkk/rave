@@ -140,13 +140,11 @@ fun InviteScreen(onBack: () -> Unit, viewModel: InviteViewModel = hiltViewModel(
             }
             return@RaveScreen
         }
-        val link = viewModel.invites.appLink(p.inviteCode)
         val message = viewModel.invites.shareMessage(p.inviteCode)
         val qrColor = MaterialTheme.colorScheme.onSurface.toArgb()
-        // The scanner accepts a bare code too, so the QR still works without a link domain.
-        val qrText = link ?: p.inviteCode
-        val qr = remember(qrText, qrColor) { qrBitmap(qrText, dark = qrColor).asImageBitmap() }
-        val copied = stringResource(if (link != null) R.string.invite_copied else R.string.invite_code_copied)
+        // The QR holds the bare code; the in-app scanner reads it.
+        val qr = remember(p.inviteCode, qrColor) { qrBitmap(p.inviteCode, dark = qrColor).asImageBitmap() }
+        val copied = stringResource(R.string.invite_code_copied)
 
         Column(
             Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = Dimens.ScreenPadding, vertical = 8.dp),

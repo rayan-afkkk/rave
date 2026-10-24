@@ -189,7 +189,7 @@ class CompetitionDetailViewModel @Inject constructor(
     suspend fun shareText(competitionName: String, appName: String, template: (String, String, String, String?) -> String): String {
         val cached = settings.getString("comp_code_$id")
         val code = cached ?: invites.createTargetInvite(InviteType.COMPETITION, id).also { settings.putString("comp_code_$id", it) }
-        return template(appName, competitionName, code, invites.competitionLink(id))
+        return template(appName, competitionName, code, null)
     }
 }
 

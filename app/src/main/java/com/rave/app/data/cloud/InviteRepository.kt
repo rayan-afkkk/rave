@@ -2,7 +2,6 @@ package com.rave.app.data.cloud
 
 import android.content.Context
 import com.google.firebase.firestore.FieldValue
-import com.rave.app.BuildConfig
 import com.rave.app.R
 import com.rave.app.data.preferences.SettingsRepository
 import com.rave.app.domain.social.InviteCodes
@@ -40,19 +39,9 @@ class InviteRepository @Inject constructor(
     private val sharedStreaks: Lazy<SharedStreakRepository>,
     private val settings: SettingsRepository,
 ) {
-    /** Links need a real App Links domain; until one is configured, invites use the short code only. */
-    private val linkDomain: String? = BuildConfig.INVITE_DOMAIN.trim()
-        .takeIf { it.isNotEmpty() && !it.endsWith("example.com") && !it.startsWith("YOUR_") }
-
-    fun appLink(code: String): String? = linkDomain?.let { "https://$it/invite/$code" }
-    fun competitionLink(competitionId: String): String? = linkDomain?.let { "https://$it/competition/$competitionId" }
-
-    fun shareMessage(code: String): String {
-        val appName = context.getString(R.string.app_name)
-        val link = appLink(code)
-        return if (link != null) context.getString(R.string.invite_share_message, appName, code, link)
-        else context.getString(R.string.invite_share_message_code_only, appName, code)
-    }
+    /** Invites are shared as a short code (and QR); there are no web invite links. */
+    fun shareMessage(code: String): String =
+        context.getString(R.string.invite_share_message_code_only, context.getString(R.string.app_name), code)
 
     suspend fun resolve(rawCode: String): InviteInfo? {
         val code = InviteCodes.normalize(rawCode)

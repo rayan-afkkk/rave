@@ -559,7 +559,7 @@
     <string name="settings_delete_account_body">This deletes your account, cloud data and everything on this phone. It can\'t be undone.</string>
     <string name="settings_delete_data_body">This deletes all habits, activities and settings on this phone. It can\'t be undone.</string>
     <!-- About & legal. Fill in the contact email and developer name before release. -->
-    <string name="legal_contact_email" translatable="false">support@example.com</string>
+    <string name="legal_contact_email" translatable="false">rayanshahid98@gmail.com</string>
     <string name="legal_developer_name" translatable="false">The Rave team</string>
     <string name="legal_last_updated">18 October 2026</string>
     <string name="legal_privacy">Privacy Policy</string>
@@ -704,7 +704,6 @@ Permission was denied. You can turn it on in Settings.</string>
     <string name="invite_headline">Bring a friend along</string>
     <string name="invite_body">Share your link, code or QR. You\'ll be friends as soon as they join.</string>
     <string name="invite_your_code">Your invite code</string>
-    <string name="invite_copied">Link copied</string>
     <string name="invite_code_copied">Code copied</string>
     <string name="invite_preparing">Setting up your invite code</string>
     <string name="invite_preparing_body">This only takes a moment after your first sign-in.</string>
@@ -714,7 +713,6 @@ Permission was denied. You can turn it on in Settings.</string>
     <string name="invite_error_rules">Firestore blocked it. In Firebase Console open Firestore Database → Rules, paste the rules from firestore.rules, tap Publish, then try again.</string>
     <string name="invite_error_generic">Check your internet connection and try again.</string>
     <string name="invite_reward_note">When a friend joins and finishes their first activity, you both get a streak freeze ❄️</string>
-    <string name="invite_share_message">Join me on %1$s — let\'s keep our streaks together! Use my code %2$s: %3$s</string>
     <string name="invite_share_message_code_only">Join me on %1$s — let\'s keep our streaks together! Add me with my invite code %2$s</string>
     <string name="invite_landing_title">Invitation</string>
     <string name="invite_landing_app">%1$s invited you to be friends</string>

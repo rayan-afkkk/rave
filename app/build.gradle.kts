@@ -41,7 +41,6 @@ if (envExampleFile.exists()) {
         "TOMTOM_API_KEY",
         "GEOAPIFY_API_KEY",
         "MAPBOX_ACCESS_TOKEN",
-        "INVITE_DOMAIN",
         "FACEBOOK_APP_ID",
     ).forEach { key ->
         val v = System.getenv(key)

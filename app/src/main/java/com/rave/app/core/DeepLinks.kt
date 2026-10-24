@@ -5,7 +5,6 @@ import android.net.Uri
 import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerStateListener
 import android.content.Context
-import com.rave.app.BuildConfig
 import com.rave.app.data.preferences.SettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,9 +30,8 @@ sealed interface DeepLink {
 }
 
 /**
- * Parses App Links (`https://<domain>/invite/{code}`, `/competition/{id}`) and internal
- * `rave://…` links from notifications. The pending link is consumed by the UI once ready
- * (after onboarding / sign-in when needed).
+ * Parses internal `rave://…` links (invite QR codes, notifications, widget). The pending link is
+ * consumed by the UI once ready (after onboarding / sign-in when needed).
  */
 @Singleton
 class DeepLinkHandler @Inject constructor(
@@ -57,14 +55,6 @@ class DeepLinkHandler @Inject constructor(
     fun parse(uri: Uri): DeepLink? {
         val segments = uri.pathSegments
         return when (uri.scheme) {
-            "https", "http" -> {
-                if (uri.host != BuildConfig.INVITE_DOMAIN) return null
-                when (segments.getOrNull(0)) {
-                    "invite" -> segments.getOrNull(1)?.let { DeepLink.Invite(it) }
-                    "competition" -> segments.getOrNull(1)?.let { DeepLink.CompetitionLink(it) }
-                    else -> null
-                }
-            }
             "rave" -> when (uri.host) {
                 "invite" -> segments.getOrNull(0)?.let { DeepLink.Invite(it) }
                 "competition" -> segments.getOrNull(0)?.let { DeepLink.CompetitionLink(it) }

@@ -75,18 +75,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Verified App Links: https://<INVITE_DOMAIN>/invite/{code} and /competition/{id} -->
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" />
-                <data android:host="${INVITE_DOMAIN}" />
-                <data android:pathPrefix="/invite/" />
-                <data android:pathPrefix="/competition/" />
-            </intent-filter>
 
-            <!-- Internal links (notifications, widget) and a no-domain fallback: rave://invite/{code} -->
+            <!-- Internal links (notifications, widget, invite QR): rave://invite/{code} -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

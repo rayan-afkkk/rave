@@ -4,12 +4,12 @@ The app itself is set up to pass review. These are the things only you can do in
 plus the exact answers to give. Wrong or missing declarations are the #1 reason apps get rejected.
 
 ## 1. Before you build the release
-- [ ] Put your real support email and name in `app/src/main/res/values/strings.xml`
-      (`legal_contact_email`, `legal_developer_name`) and in `docs/legal/*.html`.
+- [x] Support email set to rayanshahid98@gmail.com (app and `docs/legal/*.html`).
+- [ ] Developer name: still "The Rave team" (`legal_developer_name` and `docs/legal/*.html`).
 - [ ] Host `docs/legal/privacy-policy.html`, `terms.html` and `delete-account.html` on a public URL
       (repo is private: use a free public GitHub Pages repo, Google Sites or your website).
 - [ ] Deploy Firestore rules: `firebase deploy --only firestore:rules` (blocking, reports and account deletion need them).
-- [ ] Build an **App Bundle (.aab)** of the `release` variant, signed with your upload key. Bump `versionCode` for every upload.
+- [ ] Build the signed **App Bundle (.aab)**: GitHub → Actions → Release AAB → Run workflow (the version code goes up automatically).
 - [ ] Test the release build once on a real phone: sign in, track a walk, scan a barcode, buy Pro with a test card, delete a test account.
 
 ## 2. App content (Policy → App content)
