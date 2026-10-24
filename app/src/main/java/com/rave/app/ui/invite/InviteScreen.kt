@@ -162,9 +162,6 @@ fun InviteScreen(onBack: () -> Unit, viewModel: InviteViewModel = hiltViewModel(
                     Spacer(Modifier.height(12.dp))
                     Text(stringResource(R.string.invite_your_code), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(p.inviteCode, style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
-                    if (link != null) {
-                        Text(link, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
-                    }
                 }
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
@@ -176,7 +173,7 @@ fun InviteScreen(onBack: () -> Unit, viewModel: InviteViewModel = hiltViewModel(
                 }
                 Target(Icons.Rounded.Sms, stringResource(R.string.share_sms)) { ShareHelper.shareSms(context, message) }
                 Target(Icons.Rounded.ContentCopy, stringResource(R.string.share_copy)) {
-                    copyToClipboard(context, link ?: p.inviteCode)
+                    copyToClipboard(context, p.inviteCode)
                     Toast.makeText(context, copied, Toast.LENGTH_SHORT).show()
                 }
                 Target(Icons.Rounded.IosShare, stringResource(R.string.share_more)) { ShareHelper.shareText(context, message) }
